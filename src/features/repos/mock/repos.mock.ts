@@ -1,0 +1,62 @@
+import { Repo, ScanStatus } from "@/shared/types/repo.types";
+import { DebtType } from "@/shared/types/debt.types";
+
+export const MOCK_REPOS: Repo[] = [
+  {
+    id: "1",
+    name: "core-api",
+    fullName: "acme/core-api",
+    owner: "acme",
+    language: "Go",
+    description: "Core API for Acme Corp",
+    isPrivate: true,
+    lastScanAt: "3h ago",
+    scanStatus: ScanStatus.COMPLETED,
+    debtCount: 142,
+    resolvedCount: 0,
+    connectedAt: "2023-01-01T00:00:00Z",
+    debtBreakdown: {
+      [DebtType.TODO]: 82,
+      [DebtType.FIXME]: 34,
+      [DebtType.HACK]: 18,
+      [DebtType.XXX]: 8,
+    },
+  },
+  {
+    id: "2",
+    name: "web-client",
+    fullName: "acme/web-client",
+    owner: "acme",
+    language: "TypeScript",
+    description: "Frontend web client",
+    isPrivate: true,
+    lastScanAt: "5h ago",
+    scanStatus: ScanStatus.COMPLETED,
+    debtCount: 62,
+    resolvedCount: 0,
+    connectedAt: "2023-01-01T00:00:00Z",
+    debtBreakdown: {
+      [DebtType.TODO]: 45,
+      [DebtType.FIXME]: 12,
+      [DebtType.HACK]: 5,
+    },
+  },
+  {
+    id: "3",
+    name: "docs",
+    fullName: "hashmark/docs",
+    owner: "hashmark",
+    language: "Markdown",
+    description: "Documentation",
+    isPrivate: false,
+    lastScanAt: "1d ago",
+    scanStatus: ScanStatus.COMPLETED,
+    debtCount: 16,
+    resolvedCount: 0,
+    connectedAt: "2023-01-01T00:00:00Z",
+    debtBreakdown: {
+      [DebtType.TODO]: 14,
+      [DebtType.XXX]: 2,
+    },
+  },
+];

@@ -18,6 +18,7 @@ export interface Repo {
   debtCount: number;
   resolvedCount: number;
   connectedAt: string;
+  debtBreakdown?: Record<string, number>;
 }
 
 /**

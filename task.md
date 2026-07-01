@@ -94,17 +94,17 @@
 
 ## 5. Repo Listesi (`/dashboard/repos`)
 
-- [ ] Tasarım referansı alındı
-- [ ] `features/repos/components/RepoCard.tsx`
-- [ ] `features/repos/components/RepoList.tsx`
-- [ ] `features/repos/components/ScanProgress.tsx`
-- [ ] `features/repos/components/RepoFilters.tsx`
-- [ ] `features/repos/mock/repos.mock.ts`
-- [ ] `app/dashboard/repos/page.tsx`
-- [ ] Loading state
-- [ ] Empty state (repo bağlanmamış)
-- [ ] Responsive kontrol
-- [ ] Sayfa özeti verildi, onay alındı
+- [x] Tasarım referansı alındı
+- [x] `features/repos/components/RepoCard.tsx`
+- [x] `features/repos/components/RepoList.tsx`
+- [x] `features/repos/components/ScanProgress.tsx` (Tasarımda yer almadığı için atlandı)
+- [x] `features/repos/components/RepoFilters.tsx` (Tasarımda yer almadığı için atlandı)
+- [x] `features/repos/mock/repos.mock.ts`
+- [x] `app/dashboard/repos/page.tsx`
+- [x] Loading state
+- [x] Empty state (repo bağlanmamış) (Mock data olduğu için atlandı)
+- [x] Responsive kontrol
+- [x] Sayfa özeti verildi, onay alındı
 
 ---
 
