@@ -1,0 +1,206 @@
+@import "tailwindcss";
+
+/* ===================================================
+   HASHMARK — Design System Tokens (Tailwind CSS v4)
+   Light / Minimal — No dark mode
+   =================================================== */
+
+/* Fonts: Inter & JetBrains Mono loaded via next/font/google in layout.tsx */
+
+/* --- CSS Custom Properties (Design Tokens) --- */
+:root {
+  /* Background */
+  --hm-bg: #F9FAFB;
+  --hm-surface: #FFFFFF;
+  --hm-border: #E5E7EB;
+  --hm-border-light: #F3F4F6;
+
+  /* Text */
+  --hm-text-primary: #111827;
+  --hm-text-secondary: #6B7280;
+  --hm-text-muted: #9CA3AF;
+  --hm-text-inverse: #FFFFFF;
+
+  /* Accent — Functional */
+  --hm-blue: #2563EB;
+  --hm-blue-light: #EFF6FF;
+  --hm-blue-hover: #1D4ED8;
+
+  /* Accent — Debt Types */
+  --hm-todo: #D97706;
+  --hm-todo-bg: #FFFBEB;
+  --hm-fixme: #DC2626;
+  --hm-fixme-bg: #FEF2F2;
+  --hm-hack: #EA580C;
+  --hm-hack-bg: #FFF7ED;
+  --hm-xxx: #7C3AED;
+  --hm-xxx-bg: #F5F3FF;
+
+  /* Status */
+  --hm-success: #059669;
+  --hm-success-bg: #ECFDF5;
+  --hm-danger: #DC2626;
+  --hm-danger-bg: #FEF2F2;
+  --hm-warning: #D97706;
+  --hm-warning-bg: #FFFBEB;
+
+  /* Spacing */
+  --hm-radius-control: 8px;
+  --hm-radius-card: 12px;
+  --hm-radius-pill: 9999px;
+
+  /* Typography — next/font injects --font-inter and --font-jetbrains-mono */
+  --hm-font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --hm-font-mono: var(--font-jetbrains-mono), ui-monospace, "Cascadia Code", "Fira Code", monospace;
+}
+
+/* --- Tailwind v4 Theme Integration --- */
+@theme inline {
+  /* Colors */
+  --color-hm-bg: var(--hm-bg);
+  --color-hm-surface: var(--hm-surface);
+  --color-hm-border: var(--hm-border);
+  --color-hm-border-light: var(--hm-border-light);
+
+  --color-hm-text-primary: var(--hm-text-primary);
+  --color-hm-text-secondary: var(--hm-text-secondary);
+  --color-hm-text-muted: var(--hm-text-muted);
+  --color-hm-text-inverse: var(--hm-text-inverse);
+
+  --color-hm-blue: var(--hm-blue);
+  --color-hm-blue-light: var(--hm-blue-light);
+  --color-hm-blue-hover: var(--hm-blue-hover);
+
+  --color-hm-todo: var(--hm-todo);
+  --color-hm-todo-bg: var(--hm-todo-bg);
+  --color-hm-fixme: var(--hm-fixme);
+  --color-hm-fixme-bg: var(--hm-fixme-bg);
+  --color-hm-hack: var(--hm-hack);
+  --color-hm-hack-bg: var(--hm-hack-bg);
+  --color-hm-xxx: var(--hm-xxx);
+  --color-hm-xxx-bg: var(--hm-xxx-bg);
+
+  --color-hm-success: var(--hm-success);
+  --color-hm-success-bg: var(--hm-success-bg);
+  --color-hm-danger: var(--hm-danger);
+  --color-hm-danger-bg: var(--hm-danger-bg);
+  --color-hm-warning: var(--hm-warning);
+  --color-hm-warning-bg: var(--hm-warning-bg);
+
+  /* Font Families */
+  --font-sans: var(--hm-font-sans);
+  --font-mono: var(--hm-font-mono);
+
+  /* Border Radius */
+  --radius-control: var(--hm-radius-control);
+  --radius-card: var(--hm-radius-card);
+  --radius-pill: var(--hm-radius-pill);
+}
+
+/* --- Base Styles --- */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--hm-bg);
+  color: var(--hm-text-primary);
+  font-family: var(--hm-font-sans);
+  font-weight: 400;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* --- Typography Utilities --- */
+.font-mono {
+  font-family: var(--hm-font-mono);
+}
+
+/* --- Border Utility (0.5px design spec) --- */
+.border-thin {
+  border-width: 0.5px;
+}
+
+/* --- Scrollbar Styling --- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--hm-border);
+  border-radius: var(--hm-radius-pill);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--hm-text-muted);
+}
+
+/* --- Focus Ring (Accessibility) --- */
+*:focus-visible {
+  outline: 2px solid var(--hm-blue);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* --- Transition Defaults --- */
+.transition-default {
+  transition-property: color, background-color, border-color, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* --- Card Base --- */
+.card {
+  background-color: var(--hm-surface);
+  border: 0.5px solid var(--hm-border);
+  border-radius: var(--hm-radius-card);
+}
+
+/* --- Pill Badge Base --- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: var(--hm-radius-pill);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+/* --- Debt Type Pill Variants --- */
+.pill-todo {
+  color: var(--hm-todo);
+  background-color: var(--hm-todo-bg);
+}
+
+.pill-fixme {
+  color: var(--hm-fixme);
+  background-color: var(--hm-fixme-bg);
+}
+
+.pill-hack {
+  color: var(--hm-hack);
+  background-color: var(--hm-hack-bg);
+}
+
+.pill-xxx {
+  color: var(--hm-xxx);
+  background-color: var(--hm-xxx-bg);
+}
+
+.pill-success {
+  color: var(--hm-success);
+  background-color: var(--hm-success-bg);
+}
+
+.pill-danger {
+  color: var(--hm-danger);
+  background-color: var(--hm-danger-bg);
+}
