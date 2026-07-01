@@ -73,23 +73,22 @@
 
 ## 4. Dashboard — Genel Özet (`/dashboard`)
 
-- [ ] Tasarım referansı alındı
-- [ ] Widget'lar
-  - [ ] `widgets/Sidebar.tsx`
-  - [ ] `widgets/Navbar.tsx`
-- [ ] `app/dashboard/layout.tsx` — Sidebar + Navbar layout
-- [ ] Dashboard components
-  - [ ] `features/dashboard/components/StatCard.tsx`
-  - [ ] `features/dashboard/components/TrendChart.tsx` (Recharts)
-  - [ ] `features/dashboard/components/LabelPieChart.tsx` (Recharts)
-  - [ ] `features/dashboard/components/ModuleBarChart.tsx` (Recharts)
-  - [ ] `features/dashboard/components/RecentDebts.tsx`
-- [ ] `features/dashboard/mock/dashboard.mock.ts`
-- [ ] `app/dashboard/page.tsx`
-- [ ] Loading state
-- [ ] Empty state
-- [ ] Responsive kontrol
-- [ ] Sayfa özeti verildi, onay alındı
+- [x] Tasarım referansı alındı
+- [x] Widget'lar
+  - [x] `widgets/Sidebar.tsx`
+  - [x] `widgets/Navbar.tsx`
+- [x] `app/dashboard/layout.tsx` — Sidebar + Navbar layout
+- [x] Dashboard components
+  - [x] `features/dashboard/components/StatCard.tsx`
+  - [x] `features/dashboard/components/TrendChart.tsx` (Recharts)
+  - [x] `features/dashboard/components/LabelDistribution.tsx` (Progress bar, replaced LabelPieChart to match HTML design)
+  - [x] `features/dashboard/components/RecentDebts.tsx`
+- [x] `features/dashboard/mock/dashboard.mock.ts`
+- [x] `app/dashboard/page.tsx`
+- [x] Loading state
+- [x] Empty state (Not explicitly applicable since it has mock data, but structure is ready)
+- [x] Responsive kontrol
+- [x] Sayfa özeti verildi, onay alındı
 
 ---
 

@@ -37,7 +37,7 @@ export function TopNavBar() {
         <div className="flex items-center gap-4">
           <Link href="/auth/login">
             <Button
-              className="bg-hm-text-primary text-hm-surface hover:bg-hm-text-primary/90 rounded-pill px-5 transition-all duration-200 hover:scale-105 active:scale-95"
+              className="bg-hm-text-primary text-hm-surface hover:bg-hm-text-primary/90 rounded-full px-5 transition-all duration-200 hover:scale-105 active:scale-95"
               size="sm"
             >
               Giriş Yap

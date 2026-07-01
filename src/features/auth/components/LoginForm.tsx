@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Button } from "@/shared/components";
 import { ArrowLeft } from "lucide-react";
 
 const GithubIcon = () => (
@@ -14,7 +13,7 @@ const GithubIcon = () => (
 
 export function LoginForm() {
   return (
-    <div className="bg-hm-surface w-full max-w-[400px] rounded-card border-thin border-hm-border p-12 relative">
+    <div className="bg-hm-surface w-full max-w-[400px] rounded-card border-[0.5px] border-hm-border p-12 relative">
       {/* Back Button */}
       <Link 
         href="/" 

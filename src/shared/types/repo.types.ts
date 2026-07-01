@@ -25,22 +25,26 @@ export interface Repo {
  */
 export const SCAN_STATUS_CONFIG: Record<
   ScanStatus,
-  { label: string; pillClass: string }
+  { label: string; colorClass: string; bgClass: string }
 > = {
   [ScanStatus.IDLE]: {
     label: "Idle",
-    pillClass: "pill-todo",
+    colorClass: "text-hm-todo",
+    bgClass: "bg-hm-todo-bg",
   },
   [ScanStatus.SCANNING]: {
     label: "Scanning...",
-    pillClass: "pill-todo",
+    colorClass: "text-hm-todo",
+    bgClass: "bg-hm-todo-bg",
   },
   [ScanStatus.COMPLETED]: {
     label: "Completed",
-    pillClass: "pill-success",
+    colorClass: "text-hm-success",
+    bgClass: "bg-hm-success-bg",
   },
   [ScanStatus.FAILED]: {
     label: "Failed",
-    pillClass: "pill-danger",
+    colorClass: "text-hm-danger",
+    bgClass: "bg-hm-danger-bg",
   },
 };

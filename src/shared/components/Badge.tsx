@@ -11,13 +11,13 @@ interface BadgeProps {
 /**
  * Debt tipi için renkli pill badge.
  * Renk konfigürasyonu DEBT_TYPE_CONFIG'den alınır,
- * CSS class'ları globals.css'deki .pill-* tanımlarını kullanır.
+ * CSS class'ları Tailwind utility class'larına dönüştürülmüştür.
  */
 export function Badge({ type, className = "" }: BadgeProps) {
   const config = DEBT_TYPE_CONFIG[type];
 
   return (
-    <span className={`pill ${config.pillClass} ${className}`}>
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium leading-5 whitespace-nowrap ${config.bgClass} ${config.colorClass} ${className}`}>
       {config.label}
     </span>
   );
@@ -32,9 +32,9 @@ interface StatusBadgeProps {
 }
 
 const statusVariantClass: Record<StatusBadgeProps["variant"], string> = {
-  success: "pill-success",
-  danger: "pill-danger",
-  warning: "pill-todo",
+  success: "text-hm-success bg-hm-success-bg",
+  danger: "text-hm-danger bg-hm-danger-bg",
+  warning: "text-hm-todo bg-hm-todo-bg",
   info: "bg-hm-blue-light text-hm-blue",
 };
 
@@ -44,7 +44,7 @@ export function StatusBadge({
   className = "",
 }: StatusBadgeProps) {
   return (
-    <span className={`pill ${statusVariantClass[variant]} ${className}`}>
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium leading-5 whitespace-nowrap ${statusVariantClass[variant]} ${className}`}>
       {label}
     </span>
   );

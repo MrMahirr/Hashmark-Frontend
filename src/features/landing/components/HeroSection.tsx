@@ -10,7 +10,7 @@ const GithubIcon = () => (
 export function HeroSection() {
   return (
     <section className="flex flex-col items-start gap-6">
-      <div className="bg-hm-bg border-thin border-hm-border px-3 py-1 rounded-pill w-max flex items-center gap-2">
+      <div className="bg-hm-bg border-[0.5px] border-hm-border px-3 py-1 rounded-full w-max flex items-center gap-2">
         <span className="text-[11px] font-medium text-hm-text-secondary tracking-wide">
           Ücretsiz · Açık Kaynak
         </span>
@@ -30,11 +30,11 @@ export function HeroSection() {
       <div className="flex items-center gap-4 pt-2">
         <Link href="/auth/login">
           <Button
-            className="bg-hm-text-primary text-hm-surface hover:bg-hm-text-primary/90 rounded-pill px-6 h-12"
+            className="bg-hm-text-primary text-hm-surface hover:bg-hm-text-primary/90 rounded-full px-6 h-12"
             size="lg"
             leftIcon={<GithubIcon />}
           >
-            GitHub'ı Bağla
+            {"GitHub'ı Bağla"}
           </Button>
         </Link>
       </div>

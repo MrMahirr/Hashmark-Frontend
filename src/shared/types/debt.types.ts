@@ -34,25 +34,25 @@ export const DEBT_TYPE_CONFIG: Record<
 > = {
   [DebtType.TODO]: {
     label: "TODO",
-    pillClass: "pill-todo",
+    pillClass: "bg-hm-todo-bg text-hm-todo",
     colorClass: "text-hm-todo",
     bgClass: "bg-hm-todo-bg",
   },
   [DebtType.FIXME]: {
     label: "FIXME",
-    pillClass: "pill-fixme",
+    pillClass: "bg-hm-fixme-bg text-hm-fixme",
     colorClass: "text-hm-fixme",
     bgClass: "bg-hm-fixme-bg",
   },
   [DebtType.HACK]: {
     label: "HACK",
-    pillClass: "pill-hack",
+    pillClass: "bg-hm-hack-bg text-hm-hack",
     colorClass: "text-hm-hack",
     bgClass: "bg-hm-hack-bg",
   },
   [DebtType.XXX]: {
     label: "XXX",
-    pillClass: "pill-xxx",
+    pillClass: "bg-hm-xxx-bg text-hm-xxx",
     colorClass: "text-hm-xxx",
     bgClass: "bg-hm-xxx-bg",
   },

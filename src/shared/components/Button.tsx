@@ -55,7 +55,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={isDisabled}
         className={`
           inline-flex items-center justify-center
-          rounded-control border-thin border-solid
+          rounded-control border-[0.5px] border-solid
           font-medium
           transition-all duration-150 ease-in-out
           cursor-pointer

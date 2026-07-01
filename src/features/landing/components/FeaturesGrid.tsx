@@ -4,7 +4,7 @@ export function FeaturesGrid() {
   return (
     <section className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
       {/* Feature 1 */}
-      <div className="card p-5 flex flex-col gap-4">
+      <div className="bg-hm-surface border-[0.5px] border-hm-border rounded-card p-5 flex flex-col gap-4">
         <div className="bg-hm-border-light w-10 h-10 rounded-control flex items-center justify-center">
           <FolderOpen className="w-5 h-5 text-hm-text-primary" />
         </div>
@@ -19,7 +19,7 @@ export function FeaturesGrid() {
       </div>
 
       {/* Feature 2 */}
-      <div className="card p-5 flex flex-col gap-4">
+      <div className="bg-hm-surface border-[0.5px] border-hm-border rounded-card p-5 flex flex-col gap-4">
         <div className="bg-hm-border-light w-10 h-10 rounded-control flex items-center justify-center">
           <TrendingUp className="w-5 h-5 text-hm-text-primary" />
         </div>
@@ -34,7 +34,7 @@ export function FeaturesGrid() {
       </div>
 
       {/* Feature 3 */}
-      <div className="card p-5 flex flex-col gap-4">
+      <div className="bg-hm-surface border-[0.5px] border-hm-border rounded-card p-5 flex flex-col gap-4">
         <div className="bg-hm-border-light w-10 h-10 rounded-control flex items-center justify-center">
           <Mail className="w-5 h-5 text-hm-text-primary" />
         </div>
