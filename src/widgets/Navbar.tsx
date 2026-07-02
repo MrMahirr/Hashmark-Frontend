@@ -1,7 +1,7 @@
 import { Search, Bell } from "lucide-react";
 
 interface NavbarProps {
-  title: string;
+  title: string | React.ReactNode;
   action?: React.ReactNode;
 }
 

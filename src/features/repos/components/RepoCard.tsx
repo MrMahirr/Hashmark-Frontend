@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Repo } from "@/shared/types/repo.types";
 import { DebtType, DEBT_TYPE_CONFIG } from "@/shared/types/debt.types";
@@ -14,12 +16,15 @@ interface RepoCardProps {
 
 export const RepoCard = ({ repo }: RepoCardProps) => {
   return (
-    <div className="bg-hm-surface rounded-card border-[0.5px] border-hm-border p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-hm-bg transition-colors">
-      <div className="flex items-center gap-4">
-        <div className="w-8 h-8 rounded-full bg-hm-border-light flex items-center justify-center text-hm-text-primary shrink-0">
+    <div 
+      className="bg-hm-surface rounded-card border-[0.5px] border-hm-border p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-hm-bg transition-colors relative group"
+    >
+      <Link href={`/dashboard/repos/${repo.id}`} className="absolute inset-0 z-0" aria-label={`View ${repo.name}`} />
+      <div className="flex items-center gap-4 relative z-10 pointer-events-none">
+        <div className="w-8 h-8 rounded-full bg-hm-border-light flex items-center justify-center text-hm-text-primary shrink-0 pointer-events-auto">
           <GithubIcon className="w-4 h-4" />
         </div>
-        <div>
+        <div className="pointer-events-auto">
           <div className="flex items-center gap-2">
             <span className="font-mono text-[13px] font-medium text-hm-text-primary">{repo.fullName}</span>
             <span className="font-sans text-[11px] font-medium bg-hm-bg border-[0.5px] border-hm-border text-hm-text-secondary px-2 py-0.5 rounded-lg">
@@ -43,7 +48,7 @@ export const RepoCard = ({ repo }: RepoCardProps) => {
           </div>
         </div>
       </div>
-      <div className="flex items-center gap-6 justify-between md:justify-end border-t-[0.5px] border-hm-border md:border-t-0 pt-3 md:pt-0">
+      <div className="flex items-center gap-6 justify-between md:justify-end border-t-[0.5px] border-hm-border md:border-t-0 pt-3 md:pt-0 pointer-events-none">
         <div className="flex flex-col text-right">
           <span className="font-sans text-[12px] text-hm-text-secondary">
             Last scan {repo.lastScanAt || "never"}
@@ -52,16 +57,16 @@ export const RepoCard = ({ repo }: RepoCardProps) => {
             {repo.debtCount} debts
           </span>
         </div>
-        <div className="flex items-center gap-2">
-          <button className="border-[0.5px] border-hm-border bg-transparent text-hm-text-primary px-3 py-1.5 rounded font-sans text-[12px] hover:bg-hm-bg transition-colors">
+        <div className="flex items-center gap-2 pointer-events-auto">
+          <button 
+            className="border-[0.5px] border-hm-border bg-transparent text-hm-text-primary px-3 py-1.5 rounded font-sans text-[12px] hover:bg-hm-bg transition-colors relative z-10"
+            onClick={(e) => e.preventDefault()}
+          >
             Scan now
           </button>
-          <Link
-            href={`/dashboard/repos/${repo.id}`}
-            className="font-sans text-[13px] font-medium text-hm-blue hover:underline px-2"
-          >
+          <span className="font-sans text-[13px] font-medium text-hm-blue group-hover:underline px-2 relative z-10">
             View
-          </Link>
+          </span>
         </div>
       </div>
     </div>

@@ -60,3 +60,45 @@ export const MOCK_REPOS: Repo[] = [
     },
   },
 ];
+
+export const MOCK_REPO_MODULES = [
+  { name: "src/auth", count: 42, percentage: 60 },
+  { name: "src/core", count: 28, percentage: 45 },
+  { name: "src/utils", count: 18, percentage: 30 },
+  { name: "src/api", count: 10, percentage: 15 },
+];
+
+export const MOCK_REPO_DEBTS = [
+  {
+    id: "1",
+    type: DebtType.TODO,
+    filePath: "src/auth/session.ts",
+    line: 42,
+    content: "// TODO: Implement redis caching for active sessions",
+    createdAt: "2 days ago",
+  },
+  {
+    id: "2",
+    type: DebtType.FIXME,
+    filePath: "src/core/db/connection.ts",
+    line: 115,
+    content: "// FIXME: Race condition during hot reload dev cycle",
+    createdAt: "5 days ago",
+  },
+  {
+    id: "3",
+    type: DebtType.HACK,
+    filePath: "src/api/v1/users.ts",
+    line: 22,
+    content: "@deprecated Use v2 endpoints for user management",
+    createdAt: "1 week ago",
+  },
+  {
+    id: "4",
+    type: DebtType.TODO,
+    filePath: "src/utils/logger.ts",
+    line: 8,
+    content: "// TODO: integrate Datadog transport in prod",
+    createdAt: "2 weeks ago",
+  },
+];

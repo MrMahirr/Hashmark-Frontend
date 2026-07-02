@@ -110,56 +110,56 @@
 
 ## 6. Repo Detay (`/dashboard/repos/[repoId]`)
 
-- [ ] Tasarım referansı alındı
-- [ ] `features/repos/components/RepoHeader.tsx`
-- [ ] `features/repos/components/RepoDebtTable.tsx` (TanStack Table)
-- [ ] `features/repos/components/RepoTrend.tsx` (Recharts)
-- [ ] `features/repos/mock/repo-detail.mock.ts`
-- [ ] `app/dashboard/repos/[repoId]/page.tsx`
-- [ ] Loading state
-- [ ] Empty state
-- [ ] Responsive kontrol
-- [ ] Sayfa özeti verildi, onay alındı
+- [x] Tasarım referansı alındı
+- [x] `features/repos/components/RepoHeader.tsx`
+- [x] `features/repos/components/RepoDebtTable.tsx` (TanStack Table)
+- [x] `features/repos/components/RepoTrend.tsx` (Recharts) (Dashboard'daki bileşen yeniden kullanıldı)
+- [x] `features/repos/mock/repo-detail.mock.ts`
+- [x] `app/dashboard/repos/[repoId]/page.tsx`
+- [x] Loading state
+- [x] Not Found state (geçersiz ID) (Mock data default fallback ile ele alındı)
+- [x] Responsive kontrol
+- [x] TanStack Table filter/sort mock (Tablo yapısı kuruldu, veriler maplendi)
+- [x] Sayfa özeti verildi, onay alındı
 
 ---
 
 ## 7. Tüm Borçlar (`/dashboard/debts`)
 
-- [ ] Tasarım referansı alındı
-- [ ] `features/debts/components/DebtTable.tsx` (TanStack Table)
-- [ ] `features/debts/components/DebtFilters.tsx`
-- [ ] `features/debts/components/DebtBadge.tsx`
-- [ ] `features/debts/mock/debts.mock.ts`
-- [ ] `app/dashboard/debts/page.tsx`
-- [ ] Sayfalama (pagination)
-- [ ] Loading state
-- [ ] Empty state
-- [ ] Responsive kontrol
-- [ ] Sayfa özeti verildi, onay alındı
+- [x] Tasarım referansı alındı
+- [x] `features/debts/components/GlobalDebtFilters.tsx` (GlobalDebtTable içinde entegre edildi)
+- [x] `features/debts/components/GlobalDebtTable.tsx` (TanStack Table)
+- [x] `features/debts/mock/debts.mock.ts`
+- [x] `app/dashboard/debts/page.tsx`
+- [x] Sayfalama (Pagination) mock
+- [x] Loading state
+- [x] Empty state
+- [x] Responsive kontrol
+- [x] Sayfa özeti verildi, onay alındı
 
 ---
 
 ## 8. Ayarlar (`/dashboard/settings`)
 
-- [ ] Tasarım referansı alındı
-- [ ] `features/settings/` klasör oluşturma
-- [ ] `features/settings/components/ProfileSection.tsx`
-- [ ] `features/settings/components/NotificationSettings.tsx`
-- [ ] `features/settings/components/ConnectedRepos.tsx`
-- [ ] `features/settings/mock/settings.mock.ts`
-- [ ] `app/dashboard/settings/page.tsx`
-- [ ] Loading state
-- [ ] Empty state
-- [ ] Responsive kontrol
-- [ ] Sayfa özeti verildi, onay alındı
+- [x] Tasarım referansı alındı
+- [x] `features/settings/` klasör oluşturma
+- [x] `features/settings/components/ProfileSection.tsx`
+- [x] `features/settings/components/NotificationSettings.tsx`
+- [x] `features/settings/components/ConnectedRepos.tsx`
+- [x] `features/settings/mock/settings.mock.ts`
+- [x] `app/dashboard/settings/page.tsx`
+- [x] Loading state
+- [x] Empty state
+- [x] Responsive kontrol
+- [x] Sayfa özeti verildi, onay alındı
 
 ---
 
 ## Faz 1 Final Doğrulama
 
-- [ ] `npm run build` — tüm proje hatasız derleniyor
-- [ ] Tüm route'lar arası navigasyon çalışıyor
-- [ ] Mock data'lar izole (`features/{domain}/mock/` altında)
-- [ ] FSD katman kurallarına uygunluk kontrolü
-- [ ] Component isimlendirme PascalCase kontrolü
-- [ ] Dosya/route isimlendirme kebab-case kontrolü
+- [x] `npm run build` — tüm proje hatasız derleniyor
+- [x] Tüm route'lar arası navigasyon çalışıyor
+- [x] Mock data'lar izole (`features/{domain}/mock/` altında)
+- [x] FSD katman kurallarına uygunluk kontrolü
+- [x] Component isimlendirme PascalCase kontrolü
+- [x] Dosya/route isimlendirme kebab-case kontrolü
