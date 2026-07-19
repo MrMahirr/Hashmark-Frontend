@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { useGitHubLogin } from "../hooks/useAuth";
 
 const GithubIcon = () => (
   <svg aria-hidden="true" className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -12,6 +13,9 @@ const GithubIcon = () => (
 );
 
 export function LoginForm() {
+  // İş mantığı (API katmanı) ile arayüz katmanı Adapter (hook) yardımıyla haberleşir (SRP)
+  const { mutate: loginWithGitHub, isPending } = useGitHubLogin();
+
   return (
     <div className="bg-hm-surface w-full max-w-[400px] rounded-card border-[0.5px] border-hm-border p-12 relative">
       {/* Back Button */}
@@ -43,10 +47,14 @@ export function LoginForm() {
 
       {/* Action Area */}
       <div className="mt-8 flex flex-col gap-4">
-        {/* GitHub Login Button (Custom dark grey styling from design) */}
-        <button className="w-full h-[44px] bg-[#24292F] hover:bg-[#24292F]/90 text-white font-medium text-[14px] rounded-control flex items-center justify-center gap-3 transition-colors">
+        {/* GitHub Login Button */}
+        <button 
+          onClick={() => loginWithGitHub()}
+          disabled={isPending}
+          className="w-full h-[44px] bg-[#24292F] hover:bg-[#24292F]/90 text-white font-medium text-[14px] rounded-control flex items-center justify-center gap-3 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+        >
           <GithubIcon />
-          GitHub ile Devam Et
+          {isPending ? "Yönlendiriliyor..." : "GitHub ile Devam Et"}
         </button>
       </div>
 
