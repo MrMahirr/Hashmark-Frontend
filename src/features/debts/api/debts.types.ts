@@ -6,6 +6,17 @@
 
 // ── Response Types ──
 
+/**
+ * Spring Data PageResponse DTO
+ */
+export interface PageResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
+
 /** 
  * GET /debts
  * Backend DTO karşılığı: dev.hashmark.debt.dto.DebtDto
@@ -13,16 +24,13 @@
 export interface DebtResponse {
   id: number;
   repoId: number;
+  repoFullName?: string;
   filePath: string;
-  lineNumber: number;
-  // Severity (Önem Derecesi)
-  severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
-  // Borç Tipi
-  type: "TODO" | "FIXME" | "HACK" | "DEPRECATED";
-  message: string;
-  author: string | null;
-  commitHash: string | null;
-  createdAt: string;
+  lineNo: number;
+  label: "TODO" | "FIXME" | "HACK" | "XXX" | string;
+  content: string;
+  detectedAt: string;
+  resolvedAt: string | null;
 }
 
 /** 
@@ -30,11 +38,9 @@ export interface DebtResponse {
  * Backend DTO karşılığı: dev.hashmark.debt.dto.DebtStatsDto
  */
 export interface DebtStatsResponse {
-  totalDebts: number;
-  criticalDebts: number;
-  highDebts: number;
-  mediumDebts: number;
-  lowDebts: number;
+  total: number;
+  addedThisWeek: number;
+  resolvedThisWeek: number;
 }
 
 // ── Request Types ──

@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { Repo } from "@/shared/types/repo.types";
 import { DebtType, DEBT_TYPE_CONFIG } from "@/shared/types/debt.types";
+import { useStartScan } from "@/features/scanner/hooks/useScanner";
+import { Loader2 } from "lucide-react";
 
 const GithubIcon = ({ className }: { className?: string }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
@@ -15,6 +17,16 @@ interface RepoCardProps {
 }
 
 export const RepoCard = ({ repo }: RepoCardProps) => {
+  const scanMutation = useStartScan();
+
+  const handleScan = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!scanMutation.isPending) {
+      scanMutation.mutate(repo.id);
+    }
+  };
+
   return (
     <div 
       className="bg-hm-surface rounded-card border-[0.5px] border-hm-border p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-hm-bg transition-colors relative group"
@@ -59,10 +71,12 @@ export const RepoCard = ({ repo }: RepoCardProps) => {
         </div>
         <div className="flex items-center gap-2 pointer-events-auto">
           <button 
-            className="border-[0.5px] border-hm-border bg-transparent text-hm-text-primary px-3 py-1.5 rounded font-sans text-[12px] hover:bg-hm-bg transition-colors relative z-10"
-            onClick={(e) => e.preventDefault()}
+            className="border-[0.5px] border-hm-border bg-transparent text-hm-text-primary px-3 py-1.5 rounded font-sans text-[12px] hover:bg-hm-bg transition-colors relative z-10 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            onClick={handleScan}
+            disabled={scanMutation.isPending}
           >
-            Scan now
+            {scanMutation.isPending ? <Loader2 size={12} className="animate-spin" /> : null}
+            {scanMutation.isPending ? "Scanning..." : "Scan now"}
           </button>
           <span className="font-sans text-[13px] font-medium text-hm-blue group-hover:underline px-2 relative z-10">
             View

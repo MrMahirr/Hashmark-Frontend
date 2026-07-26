@@ -83,9 +83,39 @@ const columns = [
 
 interface GlobalDebtTableProps {
   data: Debt[];
+  totalElements?: number;
+  totalPages?: number;
+  currentPage?: number;
+  onPageChange?: (newPage: number) => void;
+  selectedLabel?: string;
+  onLabelChange?: (label: string) => void;
+  selectedStatus?: string;
+  onStatusChange?: (status: string) => void;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
+  repos?: { id: string; name: string }[];
+  selectedRepo?: string;
+  onRepoChange?: (repoId: string) => void;
+  isLoading?: boolean;
 }
 
-export const GlobalDebtTable = ({ data }: GlobalDebtTableProps) => {
+export const GlobalDebtTable = ({
+  data,
+  totalElements = data.length,
+  totalPages = 1,
+  currentPage = 0,
+  onPageChange,
+  selectedLabel = "",
+  onLabelChange,
+  selectedStatus = "OPEN",
+  onStatusChange,
+  searchQuery = "",
+  onSearchChange,
+  repos = [],
+  selectedRepo = "",
+  onRepoChange,
+  isLoading = false,
+}: GlobalDebtTableProps) => {
   const table = useReactTable({
     data,
     columns,
@@ -99,27 +129,43 @@ export const GlobalDebtTable = ({ data }: GlobalDebtTableProps) => {
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
           {/* Repo Dropdown */}
           <div className="relative w-full sm:w-auto">
-            <select className="w-full sm:w-[160px] h-8 pl-3 pr-8 py-0 rounded-md border-[0.5px] border-hm-border bg-transparent text-hm-text-primary font-sans text-[12px] appearance-none focus:outline-none focus:border-hm-blue cursor-pointer">
-              <option>All Repositories</option>
-              <option>api-gateway</option>
-              <option>web-client</option>
-              <option>auth-service</option>
+            <select
+              value={selectedRepo}
+              onChange={(e) => onRepoChange?.(e.target.value)}
+              className="w-full sm:w-[160px] h-8 pl-3 pr-8 py-0 rounded-md border-[0.5px] border-hm-border bg-transparent text-hm-text-primary font-sans text-[12px] appearance-none focus:outline-none focus:border-hm-blue cursor-pointer"
+            >
+              <option value="">All Repositories</option>
+              {repos.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.name}
+                </option>
+              ))}
             </select>
           </div>
           {/* Divider */}
           <div className="hidden sm:block w-[1px] h-5 bg-hm-border"></div>
           {/* Tag Toggles */}
           <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => onLabelChange?.("")}
+              className={`h-8 px-3 rounded-md border-[0.5px] font-mono text-[11px] font-medium transition-colors flex items-center gap-1 cursor-pointer ${
+                !selectedLabel
+                  ? "bg-hm-blue text-white border-hm-blue"
+                  : "bg-hm-bg text-hm-text-secondary border-hm-border hover:bg-hm-surface-high"
+              }`}
+            >
+              ALL
+            </button>
             {Object.values(DebtType).map((type) => {
               const config = DEBT_TYPE_CONFIG[type];
-              // Using mock selection state visually
-              const isSelected = type === DebtType.TODO;
+              const isSelected = selectedLabel === type;
               return (
                 <button
                   key={type}
-                  className={`h-8 px-3 rounded-md border-[0.5px] font-mono text-[11px] font-medium transition-colors flex items-center gap-1 ${
+                  onClick={() => onLabelChange?.(isSelected ? "" : type)}
+                  className={`h-8 px-3 rounded-md border-[0.5px] font-mono text-[11px] font-medium transition-colors flex items-center gap-1 cursor-pointer ${
                     isSelected
-                      ? `${config.bgClass} ${config.colorClass} border-current/20`
+                      ? `${config.bgClass} ${config.colorClass} border-current/20 font-bold ring-1 ring-current`
                       : `bg-hm-bg text-hm-text-secondary border-hm-border hover:bg-hm-surface-high`
                   }`}
                 >
@@ -133,13 +179,33 @@ export const GlobalDebtTable = ({ data }: GlobalDebtTableProps) => {
         <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
           {/* Status Toggle */}
           <div className="flex bg-hm-bg rounded-md p-0.5 border-[0.5px] border-hm-border">
-            <button className="px-3 py-1 rounded-sm bg-hm-surface text-hm-text-primary font-sans text-[11px] font-medium shadow-sm transition-all">Open</button>
-            <button className="px-3 py-1 rounded-sm text-hm-text-secondary font-sans text-[11px] font-medium hover:text-hm-text-primary transition-all">Resolved</button>
+            <button
+              onClick={() => onStatusChange?.("OPEN")}
+              className={`px-3 py-1 rounded-sm font-sans text-[11px] font-medium transition-all cursor-pointer ${
+                selectedStatus === "OPEN"
+                  ? "bg-hm-surface text-hm-text-primary shadow-sm"
+                  : "text-hm-text-secondary hover:text-hm-text-primary"
+              }`}
+            >
+              Open
+            </button>
+            <button
+              onClick={() => onStatusChange?.("RESOLVED")}
+              className={`px-3 py-1 rounded-sm font-sans text-[11px] font-medium transition-all cursor-pointer ${
+                selectedStatus === "RESOLVED"
+                  ? "bg-hm-surface text-hm-text-primary shadow-sm"
+                  : "text-hm-text-secondary hover:text-hm-text-primary"
+              }`}
+            >
+              Resolved
+            </button>
           </div>
           {/* Search */}
           <div className="relative w-[200px]">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-hm-text-secondary" size={16} />
             <input
+              value={searchQuery}
+              onChange={(e) => onSearchChange?.(e.target.value)}
               className="w-full h-8 pl-8 pr-3 rounded-md border-[0.5px] border-hm-border bg-hm-surface text-hm-text-primary font-sans text-[12px] focus:outline-none focus:border-hm-blue placeholder:text-hm-text-secondary/50"
               placeholder="Search content..."
               type="text"
@@ -149,7 +215,16 @@ export const GlobalDebtTable = ({ data }: GlobalDebtTableProps) => {
       </div>
 
       {/* Main Table */}
-      <div className="bg-hm-surface border-[0.5px] border-hm-border rounded-xl flex-1 flex flex-col overflow-hidden min-h-[400px]">
+      <div className="bg-hm-surface border-[0.5px] border-hm-border rounded-xl flex-1 flex flex-col overflow-hidden min-h-[400px] relative">
+        {isLoading && (
+          <div className="absolute inset-0 bg-hm-surface/70 backdrop-blur-[1px] z-20 flex items-center justify-center">
+            <div className="flex items-center gap-2 font-sans text-xs text-hm-text-primary bg-hm-bg px-4 py-2 rounded-lg border border-hm-border shadow-sm">
+              <div className="w-4 h-4 border-2 border-hm-blue border-t-transparent rounded-full animate-spin"></div>
+              Yükleniyor...
+            </div>
+          </div>
+        )}
+
         <div className="overflow-x-auto flex-1">
           <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
@@ -172,31 +247,51 @@ export const GlobalDebtTable = ({ data }: GlobalDebtTableProps) => {
               ))}
             </thead>
             <tbody className="font-sans text-hm-text-primary bg-hm-surface">
-              {table.getRowModel().rows.map((row) => (
-                <tr
-                  key={row.id}
-                  className="hover:bg-hm-bg/50 transition-colors group border-b-[0.5px] border-hm-border last:border-b-0"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="py-3 px-4 align-top">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
+              {!data || data.length === 0 ? (
+                <tr>
+                  <td colSpan={columns.length} className="py-12 text-center text-hm-text-secondary font-sans text-xs">
+                    Seçilen kriterlere uygun teknik borç kaydı bulunamadı. Temiz kod! 🎉
+                  </td>
                 </tr>
-              ))}
+              ) : (
+                table.getRowModel().rows.map((row) => (
+                  <tr
+                    key={row.id}
+                    className="hover:bg-hm-bg/50 transition-colors group border-b-[0.5px] border-hm-border last:border-b-0"
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id} className="py-3 px-4 align-top">
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
+        
         {/* Pagination Footer */}
         <div className="px-4 py-3 bg-hm-surface border-t-[0.5px] border-hm-border flex items-center justify-between mt-auto">
           <span className="font-sans text-[12px] text-hm-text-secondary">
-            Showing 1-{data.length} of 284
+            Showing {data.length > 0 ? currentPage * 20 + 1 : 0}-{Math.min((currentPage + 1) * 20, totalElements)} of {totalElements}
           </span>
           <div className="flex items-center gap-2">
-            <button disabled className="px-3 py-1.5 rounded-md border-[0.5px] border-hm-border bg-hm-surface text-hm-text-secondary hover:text-hm-text-primary hover:bg-hm-bg transition-colors font-sans text-[12px] disabled:opacity-50">
+            <button
+              onClick={() => onPageChange?.(currentPage - 1)}
+              disabled={currentPage <= 0 || isLoading}
+              className="px-3 py-1.5 rounded-md border-[0.5px] border-hm-border bg-hm-surface text-hm-text-secondary hover:text-hm-text-primary hover:bg-hm-bg transition-colors font-sans text-[12px] disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+            >
               Previous
             </button>
-            <button className="px-3 py-1.5 rounded-md border-[0.5px] border-hm-border bg-hm-surface text-hm-text-secondary hover:text-hm-text-primary hover:bg-hm-bg transition-colors font-sans text-[12px]">
+            <span className="font-sans text-[12px] text-hm-text-secondary px-2">
+              Page {currentPage + 1} of {Math.max(1, totalPages)}
+            </span>
+            <button
+              onClick={() => onPageChange?.(currentPage + 1)}
+              disabled={currentPage >= totalPages - 1 || isLoading}
+              className="px-3 py-1.5 rounded-md border-[0.5px] border-hm-border bg-hm-surface text-hm-text-secondary hover:text-hm-text-primary hover:bg-hm-bg transition-colors font-sans text-[12px] disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+            >
               Next
             </button>
           </div>

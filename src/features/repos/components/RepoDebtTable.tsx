@@ -13,8 +13,10 @@ interface DebtItem {
   id: string;
   type: DebtType;
   filePath: string;
-  line: number;
-  content: string;
+  line?: number;
+  lineNumber?: number;
+  content?: string;
+  message?: string;
   createdAt: string;
 }
 
@@ -24,8 +26,8 @@ const columns = [
   columnHelper.accessor("type", {
     header: "Label",
     cell: (info) => {
-      const type = info.getValue();
-      const config = DEBT_TYPE_CONFIG[type];
+      const type = info.getValue() as DebtType;
+      const config = DEBT_TYPE_CONFIG[type] || { bgClass: "bg-hm-todo-bg", colorClass: "text-hm-todo" };
       return (
         <span className={`px-2 py-0.5 rounded-lg font-mono text-[11px] font-medium border-[0.5px] border-current/20 ${config?.bgClass} ${config?.colorClass}`}>
           {type}
@@ -41,7 +43,8 @@ const columns = [
       </span>
     ),
   }),
-  columnHelper.accessor("line", {
+  columnHelper.accessor((row) => row.line ?? row.lineNumber ?? 0, {
+    id: "line",
     header: "Line",
     cell: (info) => (
       <span className="font-mono text-[13px] text-hm-text-secondary">
@@ -49,10 +52,11 @@ const columns = [
       </span>
     ),
   }),
-  columnHelper.accessor("content", {
+  columnHelper.accessor((row) => row.content ?? row.message ?? "", {
+    id: "content",
     header: "Content",
     cell: (info) => (
-      <span className="font-mono text-[13px] text-hm-text-primary truncate block max-w-[300px]">
+      <span className="font-mono text-[13px] text-hm-text-primary truncate block max-w-[300px]" title={info.getValue()}>
         {info.getValue()}
       </span>
     ),
@@ -129,18 +133,26 @@ export const RepoDebtTable = ({ data }: RepoDebtTableProps) => {
             ))}
           </thead>
           <tbody className="font-sans text-[13px]">
-            {table.getRowModel().rows.map((row) => (
-              <tr
-                key={row.id}
-                className="border-b-[0.5px] border-hm-border hover:bg-hm-bg transition-colors last:border-0"
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="py-3 px-4">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
+            {table.getRowModel().rows.length === 0 ? (
+              <tr>
+                <td colSpan={columns.length} className="py-8 text-center text-hm-text-secondary font-sans text-xs">
+                  Bu depoya ait teknik borç kaydı bulunamadı. Temiz kod! 🎉
+                </td>
               </tr>
-            ))}
+            ) : (
+              table.getRowModel().rows.map((row) => (
+                <tr
+                  key={row.id}
+                  className="border-b-[0.5px] border-hm-border hover:bg-hm-bg transition-colors last:border-0"
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id} className="py-3 px-4">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

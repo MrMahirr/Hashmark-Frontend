@@ -22,32 +22,40 @@ export const RecentDebts = ({ debts }: RecentDebtsProps) => {
             </tr>
           </thead>
           <tbody className="font-sans text-sm text-hm-text-primary">
-            {debts.map((debt) => {
-              const config = DEBT_TYPE_CONFIG[debt.type];
-              return (
-                <tr
-                  key={debt.id}
-                  className="bg-hm-surface border-b-[0.5px] border-hm-border hover:bg-hm-bg transition-colors"
-                >
-                  <td className="py-3 px-4">
-                    <span
-                      className={`font-mono text-xs px-2 py-1 rounded ${config.bgClass} ${config.colorClass}`}
-                    >
-                      {debt.type}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 font-mono text-xs text-hm-text-secondary">
-                    {debt.filePath}
-                  </td>
-                  <td className="py-3 px-4 truncate max-w-[200px]" title={debt.message}>
-                    {debt.message}
-                  </td>
-                  <td className="py-3 px-4 text-right text-hm-text-secondary">
-                    {debt.createdAt}
-                  </td>
-                </tr>
-              );
-            })}
+            {!debts || debts.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="py-8 text-center text-hm-text-secondary font-sans text-xs">
+                  Henüz teknik borç tespit edilmedi. Temiz kod! 🎉
+                </td>
+              </tr>
+            ) : (
+              debts.map((debt) => {
+                const config = DEBT_TYPE_CONFIG[debt.type] || { bgClass: "bg-hm-todo-bg", colorClass: "text-hm-todo" };
+                return (
+                  <tr
+                    key={debt.id}
+                    className="bg-hm-surface border-b-[0.5px] border-hm-border hover:bg-hm-bg transition-colors"
+                  >
+                    <td className="py-3 px-4">
+                      <span
+                        className={`font-mono text-xs px-2 py-1 rounded ${config.bgClass} ${config.colorClass}`}
+                      >
+                        {debt.type}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 font-mono text-xs text-hm-text-secondary">
+                      {debt.filePath}
+                    </td>
+                    <td className="py-3 px-4 truncate max-w-[200px]" title={debt.message}>
+                      {debt.message}
+                    </td>
+                    <td className="py-3 px-4 text-right text-hm-text-secondary">
+                      {debt.createdAt}
+                    </td>
+                  </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
       </div>

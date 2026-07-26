@@ -1,7 +1,7 @@
 import { apiClient } from "@/shared/api/client";
 import { ApiMethod } from "@/shared/api/methods";
 import { ApiEndpoint } from "@/shared/api/endpoints";
-import type { DebtResponse, DebtStatsResponse } from "./debts.types";
+import type { DebtResponse, DebtStatsResponse, PageResponse } from "./debts.types";
 
 /**
  * SRP (Single Responsibility Principle) ve DIP (Dependency Inversion Principle):
@@ -11,11 +11,11 @@ import type { DebtResponse, DebtStatsResponse } from "./debts.types";
 
 /** 
  * Sistemdeki tüm borçları veya filtrelenmiş borçları getirir.
- * @param {Record<string, unknown>} params - URL Query parametreleri (örn: ?repoId=1&severity=HIGH)
- * @returns {Promise<DebtResponse[]>} Borç listesi
+ * @param {Record<string, unknown>} params - URL Query parametreleri (örn: ?repoId=1&label=TODO)
+ * @returns {Promise<PageResponse<DebtResponse>>} Borç listesi (sayfalı)
  */
-export async function getDebts(params?: Record<string, unknown>): Promise<DebtResponse[]> {
-  const response = await apiClient.get<DebtResponse[]>(
+export async function getDebts(params?: Record<string, unknown>): Promise<PageResponse<DebtResponse>> {
+  const response = await apiClient.get<PageResponse<DebtResponse>>(
     ApiMethod.DEBTS,
     { params } // axios, objeyi query string'e çevirir
   );

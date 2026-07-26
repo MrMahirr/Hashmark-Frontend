@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/shared/api/query-keys";
+import { useToastStore } from "@/shared/store/toast.store";
 import { getScanStatus, startScan } from "../api/scanner.api";
 
 /**
@@ -38,15 +39,25 @@ export function useScanStatus(repoId: string) {
  */
 export function useStartScan() {
   const queryClient = useQueryClient();
+  const addToast = useToastStore((state) => state.addToast);
 
   return useMutation({
     mutationFn: (repoId: string) => startScan(repoId),
     onSuccess: (_, repoId) => {
-      // Tarama isteği başarılı olduğunda (HTTP 20x),
-      // bu repo'ya ait scanner status bilgisini eski/bayat (stale) olarak işaretle.
-      // Bu sayede useScanStatus hook'u tetiklenir ve polling sürecini arkaplanda otomatik başlatır.
       queryClient.invalidateQueries({
         queryKey: queryKeys.scanner.status(repoId),
+      });
+      addToast({
+        title: "Tarama Başlatıldı",
+        description: "Seçilen depo için kod analizi arkaplanda başladı.",
+        type: "success",
+      });
+    },
+    onError: (err: Error) => {
+      addToast({
+        title: "Tarama Başlatılamadı",
+        description: err.message || "Kod analizi tetiklenirken bir hata oluştu.",
+        type: "error",
       });
     },
   });

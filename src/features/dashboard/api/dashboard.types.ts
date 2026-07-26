@@ -1,26 +1,38 @@
 /**
  * Interface Segregation Principle (ISP) & Single Responsibility Principle (SRP):
  * Dashboard/Rapor ekranına özgü API Request ve Response modelleri burada tutulur.
- * Diğer sayfalardaki verileri gereksiz yere şişirmez. Backend tarafındaki ReportSummaryDto eşleşmesidir.
+ * Diğer sayfalardaki verileri gereksiz yere şişirmez. Backend tarafındaki SummaryResponse eşleşmesidir.
  */
 
 // ── Response Types ──
 
+export interface TrendDataPointDto {
+  weekStart: string;
+  totalDebts: number;
+  newDebts: number;
+  resolvedDebts: number;
+}
+
+export interface LabelStatsDto {
+  todoCount: number;
+  fixmeCount: number;
+  hackCount: number;
+  xxxCount: number;
+}
+
+export interface ModuleDebtInfoDto {
+  modulePath: string;
+  debtCount: number;
+}
+
 /** 
  * GET /report/summary
- * Backend DTO karşılığı: dev.hashmark.report.dto.ReportSummaryDto
+ * Backend DTO karşılığı: dev.hashmark.report.dto.SummaryResponse
  */
 export interface ReportSummaryResponse {
-  totalRepos: number;
-  totalDebts: number;
-  criticalDebts: number;
-  highDebts: number;
-  mediumDebts: number;
-  lowDebts: number;
-  // Reponun veya genel projenin sağlığını gösteren puan
-  healthScore: number; 
-  // A'dan F'ye kadar kalite notu
-  grade: "A" | "B" | "C" | "D" | "F";
+  trendData: TrendDataPointDto[];
+  labelStats: LabelStatsDto;
+  topModules: ModuleDebtInfoDto[];
 }
 
 // ── Request Types ──
