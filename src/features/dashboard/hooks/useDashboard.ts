@@ -44,13 +44,24 @@ export function useDashboardOverview(repoId?: string) {
   const activeDebts = Math.max(0, totalDebts - resolvedDebts);
   const resolutionRate = totalDebts > 0 ? Math.round((resolvedDebts / totalDebts) * 100) : 100;
 
-  // Sağlık Skoru ve Not Hesaplaması
-  const healthScore = Math.max(0, Math.min(100, 100 - Math.floor(totalDebts * 1.5)));
+  // Sağlık Skoru ve Not Hesaplaması (Sadece TODO, FIXME, HACK, XXX penalize edilir; NOTE, DOC, INFO skordan düşülmez)
+  const labelStats = summary?.labelStats;
+  const todoCnt = labelStats?.todoCount ?? 0;
+  const fixmeCnt = labelStats?.fixmeCount ?? 0;
+  const hackCnt = labelStats?.hackCount ?? 0;
+  const xxxCnt = labelStats?.xxxCount ?? 0;
+  const noteCnt = labelStats?.noteCount ?? 0;
+  const docCnt = labelStats?.docCount ?? 0;
+  const infoCnt = labelStats?.infoCount ?? 0;
+
+  const penalizableDebts = labelStats ? todoCnt + fixmeCnt + hackCnt + xxxCnt : totalDebts;
+
+  const healthScore = Math.max(0, Math.min(100, 100 - Math.floor(penalizableDebts * 1.5)));
   let grade: "A" | "B" | "C" | "D" | "F" = "A";
-  if (totalDebts > 80) grade = "F";
-  else if (totalDebts > 50) grade = "D";
-  else if (totalDebts > 30) grade = "C";
-  else if (totalDebts > 10) grade = "B";
+  if (penalizableDebts > 80) grade = "F";
+  else if (penalizableDebts > 50) grade = "D";
+  else if (penalizableDebts > 30) grade = "C";
+  else if (penalizableDebts > 10) grade = "B";
 
   // Trend Chart Verisinin Haritalanması
   const trendData: TrendDataPoint[] = summary?.trendData?.map((t) => ({
@@ -61,15 +72,17 @@ export function useDashboardOverview(repoId?: string) {
   })) ?? [];
 
   // Etiket Dağılımının (Label Distribution) Haritalanması
-  const labelStats = summary?.labelStats;
-  const totalLabels = labelStats ? labelStats.todoCount + labelStats.fixmeCount + labelStats.hackCount + labelStats.xxxCount : 0;
+  const totalLabels = todoCnt + fixmeCnt + hackCnt + xxxCnt + noteCnt + docCnt + infoCnt;
   
   const labelDistribution: LabelDistribution[] = labelStats
     ? [
-        { type: DebtType.TODO, count: labelStats.todoCount, percentage: totalLabels > 0 ? Math.round((labelStats.todoCount / totalLabels) * 100) : 0 },
-        { type: DebtType.FIXME, count: labelStats.fixmeCount, percentage: totalLabels > 0 ? Math.round((labelStats.fixmeCount / totalLabels) * 100) : 0 },
-        { type: DebtType.HACK, count: labelStats.hackCount, percentage: totalLabels > 0 ? Math.round((labelStats.hackCount / totalLabels) * 100) : 0 },
-        { type: DebtType.XXX, count: labelStats.xxxCount, percentage: totalLabels > 0 ? Math.round((labelStats.xxxCount / totalLabels) * 100) : 0 },
+        { type: DebtType.TODO, count: todoCnt, percentage: totalLabels > 0 ? Math.round((todoCnt / totalLabels) * 100) : 0 },
+        { type: DebtType.FIXME, count: fixmeCnt, percentage: totalLabels > 0 ? Math.round((fixmeCnt / totalLabels) * 100) : 0 },
+        { type: DebtType.HACK, count: hackCnt, percentage: totalLabels > 0 ? Math.round((hackCnt / totalLabels) * 100) : 0 },
+        { type: DebtType.XXX, count: xxxCnt, percentage: totalLabels > 0 ? Math.round((xxxCnt / totalLabels) * 100) : 0 },
+        { type: DebtType.NOTE, count: noteCnt, percentage: totalLabels > 0 ? Math.round((noteCnt / totalLabels) * 100) : 0 },
+        { type: DebtType.DOC, count: docCnt, percentage: totalLabels > 0 ? Math.round((docCnt / totalLabels) * 100) : 0 },
+        { type: DebtType.INFO, count: infoCnt, percentage: totalLabels > 0 ? Math.round((infoCnt / totalLabels) * 100) : 0 },
       ].filter((l) => l.count > 0)
     : [];
 

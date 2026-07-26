@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useMemo } from "react";
+
 import {
   createColumnHelper,
   flexRender,
@@ -76,8 +78,36 @@ interface RepoDebtTableProps {
 }
 
 export const RepoDebtTable = ({ data }: RepoDebtTableProps) => {
+  const [labelFilter, setLabelFilter] = useState<string>("");
+  const [moduleFilter, setModuleFilter] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
+  const modules = useMemo(() => {
+    const mods = new Set<string>();
+    data.forEach((item) => {
+      const parts = item.filePath.split("/");
+      if (parts.length > 0) mods.add(parts[0]);
+    });
+    return Array.from(mods);
+  }, [data]);
+
+  const filteredData = useMemo(() => {
+    return data.filter((item) => {
+      if (labelFilter && item.type !== labelFilter) return false;
+      if (moduleFilter && !item.filePath.startsWith(moduleFilter)) return false;
+      if (searchQuery) {
+        const content = (item.content ?? item.message ?? "").toLowerCase();
+        const path = item.filePath.toLowerCase();
+        if (!content.includes(searchQuery.toLowerCase()) && !path.includes(searchQuery.toLowerCase())) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [data, labelFilter, moduleFilter, searchQuery]);
+
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
@@ -87,22 +117,36 @@ export const RepoDebtTable = ({ data }: RepoDebtTableProps) => {
       {/* Filter Bar */}
       <div className="p-3 border-b-[0.5px] border-hm-border flex flex-col sm:flex-row items-center justify-between gap-4 bg-hm-bg rounded-t-card">
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <select className="bg-hm-surface border-[0.5px] border-hm-border text-hm-text-primary font-sans text-[12px] py-1.5 px-3 rounded-md outline-none focus:border-hm-blue cursor-pointer">
+          <select 
+            value={labelFilter}
+            onChange={(e) => setLabelFilter(e.target.value)}
+            className="bg-hm-surface border-[0.5px] border-hm-border text-hm-text-primary font-sans text-[12px] py-1.5 px-3 rounded-md outline-none focus:border-hm-blue cursor-pointer"
+          >
             <option value="">All Labels</option>
-            <option value="TODO">TODO</option>
-            <option value="FIXME">FIXME</option>
-            <option value="HACK">HACK</option>
-            <option value="XXX">XXX</option>
+            {Object.values(DebtType).map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
           </select>
-          <select className="bg-hm-surface border-[0.5px] border-hm-border text-hm-text-primary font-sans text-[12px] py-1.5 px-3 rounded-md outline-none focus:border-hm-blue cursor-pointer">
+          <select 
+            value={moduleFilter}
+            onChange={(e) => setModuleFilter(e.target.value)}
+            className="bg-hm-surface border-[0.5px] border-hm-border text-hm-text-primary font-sans text-[12px] py-1.5 px-3 rounded-md outline-none focus:border-hm-blue cursor-pointer"
+          >
             <option value="">All Modules</option>
-            <option value="auth">src/auth</option>
-            <option value="core">src/core</option>
+            {modules.map((mod) => (
+              <option key={mod} value={mod}>
+                {mod}
+              </option>
+            ))}
           </select>
         </div>
         <div className="relative w-full sm:w-64">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-hm-text-secondary" size={16} />
           <input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-hm-surface border-[0.5px] border-hm-border text-hm-text-primary font-sans text-[12px] py-1.5 pl-8 pr-3 rounded-md outline-none focus:border-hm-blue"
             placeholder="Search content..."
             type="text"

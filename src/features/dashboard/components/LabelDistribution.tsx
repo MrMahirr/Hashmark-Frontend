@@ -16,6 +16,12 @@ export const LabelDistribution = ({ data }: LabelDistributionProps) => {
         return "bg-[#EA580C]";
       case DebtType.XXX:
         return "bg-[#7C3AED]";
+      case DebtType.NOTE:
+        return "bg-[#0D9488]";
+      case DebtType.DOC:
+        return "bg-[#4F46E5]";
+      case DebtType.INFO:
+        return "bg-[#0284C7]";
       default:
         return "bg-hm-border";
     }

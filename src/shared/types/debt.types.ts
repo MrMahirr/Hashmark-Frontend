@@ -3,6 +3,9 @@ export enum DebtType {
   FIXME = "FIXME",
   HACK = "HACK",
   XXX = "XXX",
+  NOTE = "NOTE",
+  DOC = "DOC",
+  INFO = "INFO",
 }
 
 export enum DebtStatus {
@@ -55,5 +58,23 @@ export const DEBT_TYPE_CONFIG: Record<
     pillClass: "bg-hm-xxx-bg text-hm-xxx",
     colorClass: "text-hm-xxx",
     bgClass: "bg-hm-xxx-bg",
+  },
+  [DebtType.NOTE]: {
+    label: "NOTE",
+    pillClass: "bg-hm-note-bg text-hm-note",
+    colorClass: "text-hm-note",
+    bgClass: "bg-hm-note-bg",
+  },
+  [DebtType.DOC]: {
+    label: "DOC",
+    pillClass: "bg-hm-doc-bg text-hm-doc",
+    colorClass: "text-hm-doc",
+    bgClass: "bg-hm-doc-bg",
+  },
+  [DebtType.INFO]: {
+    label: "INFO",
+    pillClass: "bg-hm-info-bg text-hm-info",
+    colorClass: "text-hm-info",
+    bgClass: "bg-hm-info-bg",
   },
 };

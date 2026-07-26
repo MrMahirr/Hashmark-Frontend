@@ -35,6 +35,12 @@
   --hm-hack-bg: #FFF7ED;
   --hm-xxx: #7C3AED;
   --hm-xxx-bg: #F5F3FF;
+  --hm-note: #0D9488;
+  --hm-note-bg: #F0FDFA;
+  --hm-doc: #4F46E5;
+  --hm-doc-bg: #EEF2FF;
+  --hm-info: #0284C7;
+  --hm-info-bg: #F0F9FF;
 
   /* Status */
   --hm-success: #059669;
@@ -79,6 +85,12 @@
   --color-hm-hack-bg: var(--hm-hack-bg);
   --color-hm-xxx: var(--hm-xxx);
   --color-hm-xxx-bg: var(--hm-xxx-bg);
+  --color-hm-note: var(--hm-note);
+  --color-hm-note-bg: var(--hm-note-bg);
+  --color-hm-doc: var(--hm-doc);
+  --color-hm-doc-bg: var(--hm-doc-bg);
+  --color-hm-info: var(--hm-info);
+  --color-hm-info-bg: var(--hm-info-bg);
 
   --color-hm-success: var(--hm-success);
   --color-hm-success-bg: var(--hm-success-bg);

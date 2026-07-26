@@ -20,10 +20,13 @@ export const MOCK_TREND_DATA: TrendDataPoint[] = [
 ];
 
 export const MOCK_LABEL_DISTRIBUTION: LabelDistribution[] = [
-  { type: DebtType.TODO, count: 142, percentage: 50 },
-  { type: DebtType.FIXME, count: 86, percentage: 30.28 },
-  { type: DebtType.HACK, count: 41, percentage: 14.43 },
-  { type: DebtType.XXX, count: 15, percentage: 5.28 },
+  { type: DebtType.TODO, count: 142, percentage: 38 },
+  { type: DebtType.FIXME, count: 86, percentage: 23 },
+  { type: DebtType.HACK, count: 41, percentage: 11 },
+  { type: DebtType.XXX, count: 15, percentage: 4 },
+  { type: DebtType.NOTE, count: 48, percentage: 13 },
+  { type: DebtType.DOC, count: 26, percentage: 7 },
+  { type: DebtType.INFO, count: 16, percentage: 4 },
 ];
 
 export const MOCK_RECENT_DEBTS: RecentDebt[] = [
@@ -50,5 +53,21 @@ export const MOCK_RECENT_DEBTS: RecentDebt[] = [
     filePath: "utils/formatters.js:22",
     repoName: "legacy-utils",
     createdAt: "1d ago",
+  },
+  {
+    id: "4",
+    type: DebtType.NOTE,
+    message: "Refactored module structure, monitor memory usage",
+    filePath: "services/analytics.ts:14",
+    repoName: "backend-api",
+    createdAt: "2d ago",
+  },
+  {
+    id: "5",
+    type: DebtType.DOC,
+    message: "@return Updated user session object with permissions",
+    filePath: "src/auth/session.ts:88",
+    repoName: "frontend-core",
+    createdAt: "3d ago",
   },
 ];

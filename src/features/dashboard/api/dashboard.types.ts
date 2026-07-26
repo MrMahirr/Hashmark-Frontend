@@ -18,6 +18,9 @@ export interface LabelStatsDto {
   fixmeCount: number;
   hackCount: number;
   xxxCount: number;
+  noteCount?: number;
+  docCount?: number;
+  infoCount?: number;
 }
 
 export interface ModuleDebtInfoDto {
