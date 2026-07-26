@@ -4,6 +4,9 @@ import { getReportSummary, sendTestReport } from "../api/dashboard.api";
 import { useDebtStats } from "@/features/debts/hooks/useDebts";
 import { DebtType, type LabelDistribution, type ModuleDistribution, type TrendDataPoint } from "@/shared/types";
 
+// NOTE: This hook acts as an Adapter between backend DTOs and UI presentation models
+// config: default retry count is inherited from React Query Client provider settings
+
 /**
  * SRP (Single Responsibility Principle) ve Adapter Pattern:
  * Dashboard (Raporlama) ekranlarındaki UI componentleri, doğrudan API çağrıları yapmak yerine
@@ -17,6 +20,7 @@ import { DebtType, type LabelDistribution, type ModuleDistribution, type TrendDa
  * @param {string} [repoId] - Opsiyonel repo id. (Global analiz sayfası ise boş yollanır)
  */
 export function useReportSummary(repoId?: string) {
+  // TODO: Implement custom staleTime and gcTime configuration from global settings
   return useQuery({
     // Query Key Factory: Repo ID verilmişse o repoya özel, yoksa genel rapor key'i oluşturur.
     queryKey: queryKeys.dashboard.summary(repoId),
@@ -44,6 +48,7 @@ export function useDashboardOverview(repoId?: string) {
   const activeDebts = Math.max(0, totalDebts - resolvedDebts);
   const resolutionRate = totalDebts > 0 ? Math.round((resolvedDebts / totalDebts) * 100) : 100;
 
+  // HACK: Temporary fallback to totalDebts when backend labelStats is null during initial load
   // Sağlık Skoru ve Not Hesaplaması (Sadece TODO, FIXME, HACK, XXX penalize edilir; NOTE, DOC, INFO skordan düşülmez)
   const labelStats = summary?.labelStats;
   const todoCnt = labelStats?.todoCount ?? 0;
@@ -71,6 +76,7 @@ export function useDashboardOverview(repoId?: string) {
     resolved: t.resolvedDebts,
   })) ?? [];
 
+  // FIXME: Verify percentage rounding precision when totalLabels sum exceeds 100% due to Math.round
   // Etiket Dağılımının (Label Distribution) Haritalanması
   const totalLabels = todoCnt + fixmeCnt + hackCnt + xxxCnt + noteCnt + docCnt + infoCnt;
   
@@ -92,6 +98,8 @@ export function useDashboardOverview(repoId?: string) {
     count: m.debtCount,
   })) ?? [];
 
+  // XXX: Critical: Ensure refetching queries does not trigger unnecessary component re-renders
+  /** @return Formatted dashboard overview object containing health grade and chart datasets */
   return {
     isLoading,
     isError,
