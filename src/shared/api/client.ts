@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosError } from "axios";
+import { useAuthStore } from "@/features/auth/store/auth.store";
 
 /**
  * Merkezi axios instance.
@@ -23,18 +24,16 @@ export interface AuthProvider {
 }
 
 /**
- * Varsayılan (default) auth sağlayıcısı. Auth Store entegrasyonuna kadar
- * doğrudan localStorage işlemlerini yönetir. (Daha sonra store üzerinden inject edilecek)
+ * Zustand Store tabanlı auth sağlayıcısı.
+ * Interceptor işlemleri için doğrudan global state okumasını ve temizliğini yapar.
  */
-export const defaultAuthProvider: AuthProvider = {
+export const zustandAuthProvider: AuthProvider = {
   getToken: () => {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem("accessToken");
+    return useAuthStore.getState().accessToken;
   },
   onUnauthorized: () => {
     if (typeof window !== "undefined") {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
+      useAuthStore.getState().clearTokens();
       window.location.href = "/auth/login";
     }
   }
@@ -69,5 +68,5 @@ export const setupInterceptors = (client: AxiosInstance, authProvider: AuthProvi
   );
 };
 
-// Uygulama başlarken varsayılan sağlayıcı ile interceptor'ları kuruyoruz
-setupInterceptors(apiClient, defaultAuthProvider);
+// Uygulama başlarken Zustand Store (IOC Container) ile interceptor'ları kuruyoruz
+setupInterceptors(apiClient, zustandAuthProvider);

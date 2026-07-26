@@ -1,20 +1,22 @@
 "use client";
 
-import { useEffect, Suspense } from "react";
+import { useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuthCallback } from "../hooks/useAuth";
 
 function OAuthCallbackContent() {
   const searchParams = useSearchParams();
   const { mutate: handleCallback, isError } = useAuthCallback();
+  const isCalledRef = useRef(false);
 
   useEffect(() => {
-    // URL üzerinden ?code= parametresini alıyoruz
     const code = searchParams.get("code");
-    if (code) {
+    if (code && !isCalledRef.current) {
+      isCalledRef.current = true;
       handleCallback(code);
     }
-  }, [searchParams, handleCallback]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   return (
     <main className="flex flex-col items-center justify-center space-y-8 p-6 text-center min-h-screen bg-hm-bg">
