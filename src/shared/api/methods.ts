@@ -9,4 +9,5 @@ export enum ApiMethod {
   SCAN = "/scan",
   SETTINGS = "/settings",
   REPORT = "/report",
+  USER = "/user",
 }

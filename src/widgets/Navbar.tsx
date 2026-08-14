@@ -1,4 +1,8 @@
+"use client";
+
 import { Search, Bell } from "lucide-react";
+import { useUserProfile } from "@/features/auth/hooks/useUserProfile";
+import Link from "next/link";
 
 interface NavbarProps {
   title: string | React.ReactNode;
@@ -6,6 +10,7 @@ interface NavbarProps {
 }
 
 export const Navbar = ({ title, action }: NavbarProps) => {
+  const { data: profile } = useUserProfile();
   return (
     <header className="flex justify-between items-center px-6 py-4 bg-hm-surface border-b-[0.5px] border-hm-border sticky top-0 z-20">
       <div className="flex items-center gap-4">
@@ -31,12 +36,22 @@ export const Navbar = ({ title, action }: NavbarProps) => {
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-hm-danger rounded-full"></span>
         </button>
 
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          alt="Profile"
-          className="w-8 h-8 rounded-full object-cover border-[0.5px] border-hm-border ml-1 cursor-pointer hover:ring-2 hover:ring-hm-border transition-all"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7ECnkq-KLdwyn2KgzfqMBOUSCIO-o4IvZss-JoTZVyw8XSpHFCTGDZuT7yOyzg1kmyJORmdGWC3hs80Ezl2wLrEvEVQVgIxDIvWtyJlRkMSIShGyBVSF9aYmkFP0L9RcMkqBajEx6fnu1ub2SfxWlBcF_5qj6HZUvvewY1sOYXfVSlVfadNHiR8m-oTntk05Vuch2I5CvgDh5YJNwbkssctOSqp_RWXISjVOlGy0Jgwyxw5Z9OXiDOaBHxuC42mU13IP0Fe36yQ"
-        />
+        <Link href="/dashboard/profile">
+          {profile?.avatarUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              alt={profile.name ?? "Profile"}
+              className="w-8 h-8 rounded-full object-cover border-[0.5px] border-hm-border ml-1 cursor-pointer hover:ring-2 hover:ring-hm-border transition-all"
+              src={profile.avatarUrl}
+            />
+          ) : (
+            <div className="w-8 h-8 rounded-full bg-hm-bg border-[0.5px] border-hm-border ml-1 cursor-pointer hover:ring-2 hover:ring-hm-border transition-all flex items-center justify-center">
+              <span className="font-medium text-sm text-hm-text-primary">
+                {profile?.name?.charAt(0) ?? profile?.githubLogin?.charAt(0) ?? "U"}
+              </span>
+            </div>
+          )}
+        </Link>
       </div>
     </header>
   );

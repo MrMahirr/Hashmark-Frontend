@@ -1,8 +1,3 @@
-export const MOCK_USER_PROFILE = {
-  name: "M. Developer",
-  email: "m.dev@example.com",
-  initials: "M",
-};
 
 export const MOCK_NOTIFICATION_SETTINGS = {
   weeklyReport: true,

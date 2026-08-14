@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, Folder, List, Settings } from "lucide-react";
+import { useUserProfile } from "@/features/auth/hooks/useUserProfile";
 
 export const Sidebar = () => {
   const pathname = usePathname();
+  const { data: profile } = useUserProfile();
 
   const navItems = [
     { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
@@ -52,16 +54,22 @@ export const Sidebar = () => {
       {/* Footer Profile */}
       <div className="mt-auto pt-4 border-t-[0.5px] border-hm-border">
         <Link
-          href="/dashboard/settings"
+          href="/dashboard/profile"
           className="flex items-center gap-2 px-3 py-2 rounded-lg text-hm-text-secondary font-sans text-sm hover:bg-hm-bg transition-colors"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            alt="Hashmark Logo"
-            className="w-6 h-6 rounded-full object-cover border-[0.5px] border-hm-border"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7ECnkq-KLdwyn2KgzfqMBOUSCIO-o4IvZss-JoTZVyw8XSpHFCTGDZuT7yOyzg1kmyJORmdGWC3hs80Ezl2wLrEvEVQVgIxDIvWtyJlRkMSIShGyBVSF9aYmkFP0L9RcMkqBajEx6fnu1ub2SfxWlBcF_5qj6HZUvvewY1sOYXfVSlVfadNHiR8m-oTntk05Vuch2I5CvgDh5YJNwbkssctOSqp_RWXISjVOlGy0Jgwyxw5Z9OXiDOaBHxuC42mU13IP0Fe36yQ"
-          />
-          <span>Profile</span>
+          {profile?.avatarUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              alt={profile.name ?? "Profile"}
+              className="w-6 h-6 rounded-full object-cover border-[0.5px] border-hm-border"
+              src={profile.avatarUrl}
+            />
+          ) : (
+            <div className="w-6 h-6 rounded-full bg-hm-bg border-[0.5px] border-hm-border flex items-center justify-center text-[10px] font-medium text-hm-text-primary">
+              {profile?.name?.charAt(0) ?? profile?.githubLogin?.charAt(0) ?? "U"}
+            </div>
+          )}
+          <span className="truncate max-w-[120px]">{profile?.name ?? profile?.githubLogin ?? "Profile"}</span>
         </Link>
       </div>
     </aside>

@@ -23,4 +23,7 @@ export const queryKeys = {
   settings: {
     current: ["settings"] as const,
   },
+  user: {
+    me: ["user", "me"] as const,
+  },
 } as const;
