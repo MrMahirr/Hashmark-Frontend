@@ -1,7 +1,8 @@
 "use client";
 
-import { Search, Bell } from "lucide-react";
+import { Search } from "lucide-react";
 import { useUserProfile } from "@/features/auth/hooks/useUserProfile";
+import { NotificationBell } from "./NotificationBell";
 import Link from "next/link";
 
 interface NavbarProps {
@@ -31,10 +32,7 @@ export const Navbar = ({ title, action }: NavbarProps) => {
         
         <div className="h-6 w-[1px] bg-hm-border mx-2"></div>
         
-        <button className="p-2 text-hm-text-secondary hover:text-hm-text-primary hover:bg-hm-bg rounded-full transition-colors relative">
-          <Bell size={18} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-hm-danger rounded-full"></span>
-        </button>
+        <NotificationBell />
 
         <Link href="/dashboard/profile">
           {profile?.avatarUrl ? (

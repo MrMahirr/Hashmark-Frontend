@@ -9,11 +9,13 @@ interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
   isAuthenticated: boolean;
+  sessionExpired: boolean;
 }
 
 interface AuthActions {
   setTokens: (accessToken: string, refreshToken: string) => void;
   clearTokens: () => void;
+  setSessionExpired: (expired: boolean) => void;
 }
 
 /**
@@ -33,6 +35,7 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
   isAuthenticated: typeof window !== "undefined" 
     ? !!localStorage.getItem("accessToken") 
     : false,
+  sessionExpired: false,
 
   // Tokenları ve Auth State'i Kaydet
   setTokens: (accessToken, refreshToken) => {
@@ -45,6 +48,10 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
   clearTokens: () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
-    set({ accessToken: null, refreshToken: null, isAuthenticated: false });
+    set({ accessToken: null, refreshToken: null, isAuthenticated: false, sessionExpired: false });
+  },
+
+  setSessionExpired: (expired: boolean) => {
+    set({ sessionExpired: expired });
   },
 }));

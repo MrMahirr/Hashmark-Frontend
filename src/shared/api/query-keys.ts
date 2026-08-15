@@ -26,4 +26,7 @@ export const queryKeys = {
   user: {
     me: ["user", "me"] as const,
   },
+  notifications: {
+    all: ["notifications"] as const,
+  },
 } as const;

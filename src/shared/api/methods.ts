@@ -10,4 +10,5 @@ export enum ApiMethod {
   SETTINGS = "/settings",
   REPORT = "/report",
   USER = "/user",
+  NOTIFICATIONS = "/notifications",
 }

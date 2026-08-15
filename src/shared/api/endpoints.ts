@@ -24,4 +24,8 @@ export enum ApiEndpoint {
 
   // User
   ME = "me",
+
+  // Notifications
+  READ = "read",
+  READ_ALL = "read-all",
 }

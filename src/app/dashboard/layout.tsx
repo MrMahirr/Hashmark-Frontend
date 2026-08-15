@@ -2,6 +2,7 @@
 
 import { Sidebar } from "@/widgets/Sidebar";
 import { useAuthGuard } from "@/features/auth/hooks/useAuthGuard";
+import { SessionExpiredPopup } from "@/features/auth/components/SessionExpiredPopup";
 
 export default function DashboardLayout({
   children,
@@ -17,11 +18,12 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="h-full flex overflow-hidden">
+    <div className="h-full flex overflow-hidden relative">
       <Sidebar />
       <main className="flex-1 flex flex-col h-full overflow-y-auto md:ml-[220px] bg-hm-bg">
         {children}
       </main>
+      <SessionExpiredPopup />
     </div>
   );
 }

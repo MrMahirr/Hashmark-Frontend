@@ -33,8 +33,7 @@ export const zustandAuthProvider: AuthProvider = {
   },
   onUnauthorized: () => {
     if (typeof window !== "undefined") {
-      useAuthStore.getState().clearTokens();
-      window.location.href = "/auth/login";
+      useAuthStore.getState().setSessionExpired(true);
     }
   }
 };
@@ -60,7 +59,7 @@ export const setupInterceptors = (client: AxiosInstance, authProvider: AuthProvi
   client.interceptors.response.use(
     (response: AxiosResponse) => response,
     (error: AxiosError) => {
-      if (error.response?.status === 401) {
+      if (error.response?.status === 401 || error.response?.status === 403) {
         authProvider.onUnauthorized();
       }
       return Promise.reject(error);
