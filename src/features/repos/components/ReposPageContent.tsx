@@ -24,7 +24,7 @@ export function ReposPageContent() {
     <>
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
-        <h2 className="text-[16px] font-medium text-hm-text-primary">Your repos</h2>
+        <h2 className="text-[16px] font-medium text-hm-text-primary">Depolarınız</h2>
         <button
           onClick={handleSync}
           disabled={syncMutation.isPending}
@@ -35,7 +35,7 @@ export function ReposPageContent() {
           ) : (
             <Plus size={18} />
           )}
-          {syncMutation.isPending ? "Syncing..." : "Connect a repo"}
+          {syncMutation.isPending ? "Senkronize ediliyor..." : "Depo Bağla"}
         </button>
       </div>
 

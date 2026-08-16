@@ -40,7 +40,7 @@ export const RepoCard = ({ repo }: RepoCardProps) => {
           <div className="flex items-center gap-2">
             <span className="font-mono text-[13px] font-medium text-hm-text-primary">{repo.fullName}</span>
             <span className="font-sans text-[11px] font-medium bg-hm-bg border-[0.5px] border-hm-border text-hm-text-secondary px-2 py-0.5 rounded-lg">
-              {repo.isPrivate ? "private" : "public"}
+              {repo.isPrivate ? "özel" : "genel"}
             </span>
           </div>
           <div className="flex flex-wrap items-center gap-2 mt-2">
@@ -63,10 +63,10 @@ export const RepoCard = ({ repo }: RepoCardProps) => {
       <div className="flex items-center gap-6 justify-between md:justify-end border-t-[0.5px] border-hm-border md:border-t-0 pt-3 md:pt-0 pointer-events-none">
         <div className="flex flex-col text-right">
           <span className="font-sans text-[12px] text-hm-text-secondary">
-            Last scan {repo.lastScanAt || "never"}
+            Son tarama {repo.lastScanAt || "hiç"}
           </span>
           <span className="font-sans text-[13px] font-medium text-hm-text-primary mt-0.5">
-            {repo.debtCount} debts
+            {repo.debtCount} borç
           </span>
         </div>
         <div className="flex items-center gap-2 pointer-events-auto">
@@ -76,10 +76,10 @@ export const RepoCard = ({ repo }: RepoCardProps) => {
             disabled={scanMutation.isPending}
           >
             {scanMutation.isPending ? <Loader2 size={12} className="animate-spin" /> : null}
-            {scanMutation.isPending ? "Scanning..." : "Scan now"}
+            {scanMutation.isPending ? "Taranıyor..." : "Şimdi Tara"}
           </button>
           <span className="font-sans text-[13px] font-medium text-hm-blue group-hover:underline px-2 relative z-10">
-            View
+            Görüntüle
           </span>
         </div>
       </div>

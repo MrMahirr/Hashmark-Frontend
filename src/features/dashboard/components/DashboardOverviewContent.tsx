@@ -77,20 +77,20 @@ export function DashboardOverviewContent() {
     <div className="flex flex-col gap-4 w-full">
       {/* Stat Cards Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Total debts" value={stats.totalDebts} />
+        <StatCard title="Toplam Borç" value={stats.totalDebts} />
         <StatCard
-          title="Added this week"
+          title="Bu Hafta Eklenen"
           value={trendData.length > 0 ? `+${trendData[trendData.length - 1].added}` : "+0"}
-          badgeText="High"
+          badgeText="Yüksek"
           badgeType="high"
         />
         <StatCard
-          title="Resolved"
+          title="Çözülen"
           value={stats.resolvedDebts}
-          badgeText="Good"
+          badgeText="İyi"
           badgeType="good"
         />
-        <StatCard title="Repos" value={stats.activeRepos} />
+        <StatCard title="Depolar" value={stats.activeRepos} />
       </div>
 
       {/* Charts Row */}

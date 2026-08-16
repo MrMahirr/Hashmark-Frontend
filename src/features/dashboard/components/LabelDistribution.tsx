@@ -29,7 +29,7 @@ export const LabelDistribution = ({ data }: LabelDistributionProps) => {
 
   return (
     <div className="bg-hm-surface border-[0.5px] border-hm-border rounded-card p-4 flex flex-col min-h-[300px]">
-      <h2 className="font-sans text-sm font-medium text-hm-text-primary mb-6">By label</h2>
+      <h2 className="font-sans text-sm font-medium text-hm-text-primary mb-6">Etikete Göre</h2>
       <div className="flex-1 flex flex-col gap-4 justify-center">
         {!data || data.length === 0 ? (
           <p className="font-sans text-xs text-hm-text-secondary text-center py-8">

@@ -9,16 +9,16 @@ export const RecentDebts = ({ debts }: RecentDebtsProps) => {
   return (
     <div className="bg-hm-surface border-[0.5px] border-hm-border rounded-card overflow-hidden">
       <div className="p-4 border-b-[0.5px] border-hm-border bg-hm-surface">
-        <h2 className="font-sans text-sm font-medium text-hm-text-primary">Recent debts</h2>
+        <h2 className="font-sans text-sm font-medium text-hm-text-primary">Son Borçlar</h2>
       </div>
       <div className="w-full overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-hm-bg border-b-[0.5px] border-hm-border font-sans text-sm font-medium text-hm-text-secondary">
-              <th className="py-2 px-4 font-medium">Label</th>
-              <th className="py-2 px-4 font-medium">File path</th>
-              <th className="py-2 px-4 font-medium">Note</th>
-              <th className="py-2 px-4 font-medium text-right">Date</th>
+              <th className="py-2 px-4 font-medium">Etiket</th>
+              <th className="py-2 px-4 font-medium">Dosya Yolu</th>
+              <th className="py-2 px-4 font-medium">Not</th>
+              <th className="py-2 px-4 font-medium text-right">Tarih</th>
             </tr>
           </thead>
           <tbody className="font-sans text-sm text-hm-text-primary">

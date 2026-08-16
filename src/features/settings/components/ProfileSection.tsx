@@ -46,7 +46,7 @@ export function ProfileSection() {
             {profile.name ?? profile.githubLogin}
           </h3>
           <p className="text-sm text-hm-text-secondary mt-0.5">
-            {profile.email ?? "No email provided"}
+            {profile.email ?? "E-posta bulunamadı"}
           </p>
         </div>
       </div>
@@ -60,7 +60,7 @@ export function ProfileSection() {
         disabled={logoutMutation.isPending}
         leftIcon={logoutMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : undefined}
       >
-        {logoutMutation.isPending ? "Çıkış yapılıyor..." : "Sign out"}
+        {logoutMutation.isPending ? "Çıkış yapılıyor..." : "Çıkış Yap"}
       </Button>
     </section>
   );

@@ -10,10 +10,10 @@ export const Sidebar = () => {
   const { data: profile } = useUserProfile();
 
   const navItems = [
-    { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Repos", href: "/dashboard/repos", icon: Folder },
-    { name: "All debts", href: "/dashboard/debts", icon: List },
-    { name: "Settings", href: "/dashboard/settings", icon: Settings },
+    { name: "Genel Bakış", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Depolar", href: "/dashboard/repos", icon: Folder },
+    { name: "Tüm Borçlar", href: "/dashboard/debts", icon: List },
+    { name: "Ayarlar", href: "/dashboard/settings", icon: Settings },
   ];
 
   return (
@@ -24,7 +24,7 @@ export const Sidebar = () => {
           # Hashmark
         </span>
         <span className="font-sans text-sm text-hm-text-secondary mt-1">
-          Technical Debt Scanner
+          Teknik Borç Tarayıcı
         </span>
       </div>
 
@@ -60,7 +60,7 @@ export const Sidebar = () => {
           {profile?.avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              alt={profile.name ?? "Profile"}
+              alt={profile.name ?? "Profil"}
               className="w-6 h-6 rounded-full object-cover border-[0.5px] border-hm-border"
               src={profile.avatarUrl}
             />
@@ -69,7 +69,7 @@ export const Sidebar = () => {
               {profile?.name?.charAt(0) ?? profile?.githubLogin?.charAt(0) ?? "U"}
             </div>
           )}
-          <span className="truncate max-w-[120px]">{profile?.name ?? profile?.githubLogin ?? "Profile"}</span>
+          <span className="truncate max-w-[120px]">{profile?.name ?? profile?.githubLogin ?? "Profil"}</span>
         </Link>
       </div>
     </aside>

@@ -14,7 +14,7 @@ const columnHelper = createColumnHelper<Debt>();
 
 const columns = [
   columnHelper.accessor("type", {
-    header: "Label",
+    header: "Etiket",
     cell: (info) => {
       const type = info.getValue();
       const config = DEBT_TYPE_CONFIG[type];
@@ -26,7 +26,7 @@ const columns = [
     },
   }),
   columnHelper.accessor("repoName", {
-    header: "Repo",
+    header: "Depo",
     cell: (info) => (
       <span className="font-sans text-[13px] text-hm-text-primary">
         {info.getValue()}
@@ -34,7 +34,7 @@ const columns = [
     ),
   }),
   columnHelper.accessor("filePath", {
-    header: "File path",
+    header: "Dosya Yolu",
     cell: (info) => (
       <span className="font-mono text-[11px] text-hm-text-secondary truncate block max-w-[200px]">
         {info.getValue()}
@@ -42,7 +42,7 @@ const columns = [
     ),
   }),
   columnHelper.accessor("lineNumber", {
-    header: "Line",
+    header: "Satır",
     cell: (info) => (
       <span className="font-mono text-[11px] text-hm-text-secondary text-right block">
         {info.getValue()}
@@ -50,7 +50,7 @@ const columns = [
     ),
   }),
   columnHelper.accessor("message", {
-    header: "Content",
+    header: "İçerik",
     cell: (info) => (
       <span className="font-mono text-[12px] text-hm-text-primary truncate block max-w-[250px]" title={info.getValue()}>
         {info.getValue()}
@@ -58,7 +58,7 @@ const columns = [
     ),
   }),
   columnHelper.accessor("createdAt", {
-    header: "Detected",
+    header: "Tespit Tarihi",
     cell: (info) => (
       <span className="font-sans text-[12px] text-hm-text-secondary">
         {info.getValue()}
@@ -67,7 +67,7 @@ const columns = [
   }),
   columnHelper.display({
     id: "actions",
-    header: () => <div className="text-center">Link</div>,
+    header: () => <div className="text-center">Bağlantı</div>,
     cell: (info) => (
       <div className="text-center">
         <Link
@@ -134,7 +134,7 @@ export const GlobalDebtTable = ({
               onChange={(e) => onRepoChange?.(e.target.value)}
               className="w-full sm:w-[160px] h-8 pl-3 pr-8 py-0 rounded-md border-[0.5px] border-hm-border bg-transparent text-hm-text-primary font-sans text-[12px] appearance-none focus:outline-none focus:border-hm-blue cursor-pointer"
             >
-              <option value="">All Repositories</option>
+              <option value="">Tüm Depolar</option>
               {repos.map((r) => (
                 <option key={r.id} value={r.id}>
                   {r.name}
@@ -187,7 +187,7 @@ export const GlobalDebtTable = ({
                   : "text-hm-text-secondary hover:text-hm-text-primary"
               }`}
             >
-              Open
+              Açık
             </button>
             <button
               onClick={() => onStatusChange?.("RESOLVED")}
@@ -197,7 +197,7 @@ export const GlobalDebtTable = ({
                   : "text-hm-text-secondary hover:text-hm-text-primary"
               }`}
             >
-              Resolved
+              Çözülen
             </button>
           </div>
           {/* Search */}
@@ -207,7 +207,7 @@ export const GlobalDebtTable = ({
               value={searchQuery}
               onChange={(e) => onSearchChange?.(e.target.value)}
               className="w-full h-8 pl-8 pr-3 rounded-md border-[0.5px] border-hm-border bg-hm-surface text-hm-text-primary font-sans text-[12px] focus:outline-none focus:border-hm-blue placeholder:text-hm-text-secondary/50"
-              placeholder="Search content..."
+              placeholder="İçerikte ara..."
               type="text"
             />
           </div>
@@ -274,7 +274,7 @@ export const GlobalDebtTable = ({
         {/* Pagination Footer */}
         <div className="px-4 py-3 bg-hm-surface border-t-[0.5px] border-hm-border flex items-center justify-between mt-auto">
           <span className="font-sans text-[12px] text-hm-text-secondary">
-            Showing {data.length > 0 ? currentPage * 20 + 1 : 0}-{Math.min((currentPage + 1) * 20, totalElements)} of {totalElements}
+            {totalElements} kayıttan {data.length > 0 ? currentPage * 20 + 1 : 0}-{Math.min((currentPage + 1) * 20, totalElements)} arası gösteriliyor
           </span>
           <div className="flex items-center gap-2">
             <button
@@ -282,17 +282,17 @@ export const GlobalDebtTable = ({
               disabled={currentPage <= 0 || isLoading}
               className="px-3 py-1.5 rounded-md border-[0.5px] border-hm-border bg-hm-surface text-hm-text-secondary hover:text-hm-text-primary hover:bg-hm-bg transition-colors font-sans text-[12px] disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
             >
-              Previous
+              Önceki
             </button>
             <span className="font-sans text-[12px] text-hm-text-secondary px-2">
-              Page {currentPage + 1} of {Math.max(1, totalPages)}
+              Sayfa {currentPage + 1} / {Math.max(1, totalPages)}
             </span>
             <button
               onClick={() => onPageChange?.(currentPage + 1)}
               disabled={currentPage >= totalPages - 1 || isLoading}
               className="px-3 py-1.5 rounded-md border-[0.5px] border-hm-border bg-hm-surface text-hm-text-secondary hover:text-hm-text-primary hover:bg-hm-bg transition-colors font-sans text-[12px] disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
             >
-              Next
+              Sonraki
             </button>
           </div>
         </div>

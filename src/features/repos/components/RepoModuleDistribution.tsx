@@ -11,7 +11,7 @@ interface RepoModuleDistributionProps {
 export const RepoModuleDistribution = ({ data }: RepoModuleDistributionProps) => {
   return (
     <div className="bg-hm-surface rounded-card border-[0.5px] border-hm-border p-4 mb-4 h-full flex flex-col">
-      <h3 className="font-sans text-sm font-medium text-hm-text-primary mb-4">By module</h3>
+      <h3 className="font-sans text-sm font-medium text-hm-text-primary mb-4">Modüle Göre</h3>
       <div className="flex flex-col gap-3 justify-center flex-1">
         {data.map((item, index) => {
           const colors = ["bg-hm-blue", "bg-hm-text-primary", "bg-hm-text-secondary", "bg-hm-border"];

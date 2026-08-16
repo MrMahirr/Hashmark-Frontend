@@ -21,7 +21,7 @@ export const RepoList = ({ repos, onConnectClick }: RepoListProps) => {
       >
         <PlusCircle className="text-hm-border group-hover:text-hm-text-primary transition-colors" size={24} />
         <span className="font-sans text-[13px] font-medium text-hm-text-secondary group-hover:text-hm-text-primary transition-colors">
-          Connect another repo
+          Başka bir depo bağla
         </span>
       </button>
     </div>

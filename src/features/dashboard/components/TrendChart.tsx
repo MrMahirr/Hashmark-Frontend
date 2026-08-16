@@ -10,7 +10,7 @@ interface TrendChartProps {
 export const TrendChart = ({ data }: TrendChartProps) => {
   return (
     <div className="bg-hm-surface border-[0.5px] border-hm-border rounded-card p-4 flex flex-col min-h-[300px]">
-      <h2 className="font-sans text-sm font-medium text-hm-text-primary mb-6">Debt over time</h2>
+      <h2 className="font-sans text-sm font-medium text-hm-text-primary mb-6">Zaman İçinde Borç</h2>
       <div className="flex-1 w-full h-full min-h-[220px] flex items-center justify-center">
         {!data || data.length === 0 ? (
           <p className="font-sans text-xs text-hm-text-secondary text-center">

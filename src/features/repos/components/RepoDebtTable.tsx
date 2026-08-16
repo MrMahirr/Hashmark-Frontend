@@ -26,7 +26,7 @@ const columnHelper = createColumnHelper<DebtItem>();
 
 const columns = [
   columnHelper.accessor("type", {
-    header: "Label",
+    header: "Etiket",
     cell: (info) => {
       const type = info.getValue() as DebtType;
       const config = DEBT_TYPE_CONFIG[type] || { bgClass: "bg-hm-todo-bg", colorClass: "text-hm-todo" };
@@ -38,7 +38,7 @@ const columns = [
     },
   }),
   columnHelper.accessor("filePath", {
-    header: "File path",
+    header: "Dosya Yolu",
     cell: (info) => (
       <span className="font-mono text-[13px] text-hm-text-secondary hover:text-hm-blue cursor-pointer truncate block max-w-[250px]">
         {info.getValue()}
@@ -47,7 +47,7 @@ const columns = [
   }),
   columnHelper.accessor((row) => row.line ?? row.lineNumber ?? 0, {
     id: "line",
-    header: "Line",
+    header: "Satır",
     cell: (info) => (
       <span className="font-mono text-[13px] text-hm-text-secondary">
         {info.getValue()}
@@ -56,7 +56,7 @@ const columns = [
   }),
   columnHelper.accessor((row) => row.content ?? row.message ?? "", {
     id: "content",
-    header: "Content",
+    header: "İçerik",
     cell: (info) => (
       <span className="font-mono text-[13px] text-hm-text-primary truncate block max-w-[300px]" title={info.getValue()}>
         {info.getValue()}
@@ -64,7 +64,7 @@ const columns = [
     ),
   }),
   columnHelper.accessor("createdAt", {
-    header: "Detected",
+    header: "Tespit Tarihi",
     cell: (info) => (
       <span className="text-[12px] text-hm-text-secondary">
         {info.getValue()}
@@ -122,7 +122,7 @@ export const RepoDebtTable = ({ data }: RepoDebtTableProps) => {
             onChange={(e) => setLabelFilter(e.target.value)}
             className="bg-hm-surface border-[0.5px] border-hm-border text-hm-text-primary font-sans text-[12px] py-1.5 px-3 rounded-md outline-none focus:border-hm-blue cursor-pointer"
           >
-            <option value="">All Labels</option>
+            <option value="">Tüm Etiketler</option>
             {Object.values(DebtType).map((type) => (
               <option key={type} value={type}>
                 {type}
@@ -134,7 +134,7 @@ export const RepoDebtTable = ({ data }: RepoDebtTableProps) => {
             onChange={(e) => setModuleFilter(e.target.value)}
             className="bg-hm-surface border-[0.5px] border-hm-border text-hm-text-primary font-sans text-[12px] py-1.5 px-3 rounded-md outline-none focus:border-hm-blue cursor-pointer"
           >
-            <option value="">All Modules</option>
+            <option value="">Tüm Modüller</option>
             {modules.map((mod) => (
               <option key={mod} value={mod}>
                 {mod}
@@ -148,7 +148,7 @@ export const RepoDebtTable = ({ data }: RepoDebtTableProps) => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-hm-surface border-[0.5px] border-hm-border text-hm-text-primary font-sans text-[12px] py-1.5 pl-8 pr-3 rounded-md outline-none focus:border-hm-blue"
-            placeholder="Search content..."
+            placeholder="İçerikte ara..."
             type="text"
           />
         </div>

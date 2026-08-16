@@ -55,9 +55,9 @@ export function DebtsPageContent() {
 
   const title = (
     <div className="flex items-center gap-3">
-      <h2 className="text-[16px] font-medium text-hm-text-primary leading-tight">All debts</h2>
+      <h2 className="text-[16px] font-medium text-hm-text-primary leading-tight">Tüm Borçlar</h2>
       <span className="font-sans text-hm-text-secondary bg-hm-bg border-[0.5px] border-hm-border px-2 py-0.5 rounded-full text-xs">
-        {totalElements} total
+        {totalElements} toplam
       </span>
     </div>
   );
@@ -69,7 +69,7 @@ export function DebtsPageContent() {
       className="h-8 px-3 rounded-md bg-hm-text-primary text-hm-surface font-sans text-xs font-medium hover:bg-hm-text-primary/90 transition-colors flex items-center gap-2 cursor-pointer disabled:opacity-50"
     >
       {isScanning ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
-      {isScanning ? "Scanning..." : "Scan Now"}
+      {isScanning ? "Taranıyor..." : "Şimdi Tara"}
     </button>
   );
 
