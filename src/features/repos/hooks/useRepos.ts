@@ -33,7 +33,7 @@ export function mapRepoResponseToRepo(dto: RepoResponse): Repo {
     isPrivate: dto.isPrivate ?? false,
     lastScanAt: dto.lastScannedAt ? new Date(dto.lastScannedAt).toLocaleDateString() : null,
     scanStatus: dto.lastScannedAt ? ScanStatus.COMPLETED : ScanStatus.IDLE,
-    debtCount: 0,
+    debtCount: dto.debtCount ?? 0,
     resolvedCount: 0,
     connectedAt: dto.createdAt ? new Date(dto.createdAt).toLocaleDateString() : "",
   };

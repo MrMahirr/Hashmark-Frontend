@@ -78,9 +78,12 @@ export const RepoCard = ({ repo }: RepoCardProps) => {
             {scanMutation.isPending ? <Loader2 size={12} className="animate-spin" /> : null}
             {scanMutation.isPending ? "Taranıyor..." : "Şimdi Tara"}
           </button>
-          <span className="font-sans text-[13px] font-medium text-hm-blue group-hover:underline px-2 relative z-10">
+          <Link 
+            href={`/dashboard/repos/${repo.id}`} 
+            className="font-sans text-[13px] font-medium text-hm-blue group-hover:underline px-2 relative z-10"
+          >
             Görüntüle
-          </span>
+          </Link>
         </div>
       </div>
     </div>

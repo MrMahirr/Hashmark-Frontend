@@ -19,6 +19,7 @@ export interface RepoResponse {
   isPrivate: boolean;
   lastScannedAt: string | null;
   createdAt: string;
+  debtCount?: number;
 }
 
 // ── Request Types ──
