@@ -20,7 +20,11 @@ export default function DashboardLayout({
   return (
     <div className="h-full flex overflow-hidden relative">
       <Sidebar />
-      <main className="flex-1 flex flex-col h-full overflow-y-auto md:ml-[220px] bg-hm-bg">
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="flex-1 flex flex-col h-full overflow-y-auto md:ml-[220px] bg-hm-bg focus:outline-none"
+      >
         {children}
       </main>
       <SessionExpiredPopup />

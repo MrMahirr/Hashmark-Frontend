@@ -2,53 +2,64 @@
 
 import React from "react";
 import { useToastStore, ToastType } from "../store/toast.store";
+import { useI18n } from "@/shared/i18n/I18nProvider";
 import { CheckCircle2, AlertCircle, Info, Loader2, X } from "lucide-react";
 
 const icons: Record<ToastType, React.ReactNode> = {
-  success: <CheckCircle2 className="w-4 h-4 text-hm-success shrink-0" />,
-  error: <AlertCircle className="w-4 h-4 text-hm-danger shrink-0" />,
-  info: <Info className="w-4 h-4 text-hm-blue shrink-0" />,
-  loading: <Loader2 className="w-4 h-4 text-hm-text-primary animate-spin shrink-0" />,
+  success: <CheckCircle2 aria-hidden="true" className="w-4 h-4 text-hm-success shrink-0" />,
+  error: <AlertCircle aria-hidden="true" className="w-4 h-4 text-hm-danger shrink-0" />,
+  info: <Info aria-hidden="true" className="w-4 h-4 text-hm-blue shrink-0" />,
+  loading: <Loader2 aria-hidden="true" className="w-4 h-4 text-hm-text-primary animate-spin shrink-0" />,
 };
 
 const borderColors: Record<ToastType, string> = {
-  success: "border-hm-success/30 bg-hm-success-bg/80",
-  error: "border-hm-danger/30 bg-hm-danger-bg/80",
-  info: "border-hm-blue/30 bg-hm-blue-bg/80",
-  loading: "border-hm-border bg-hm-surface/90",
+  success: "border-hm-success/30 bg-hm-success-bg",
+  error: "border-hm-danger/30 bg-hm-danger-bg",
+  info: "border-hm-blue/30 bg-hm-blue-light",
+  loading: "border-hm-border bg-hm-surface",
 };
 
+/**
+ * Bildirim kutuları. `role="status"` / `aria-live` ile ekran okuyuculara duyurulur;
+ * hata bildirimleri `alert` olarak kesintiye uğratıcı biçimde okunur.
+ */
 export function ToastContainer() {
   const { toasts, removeToast } = useToastStore();
+  const { t } = useI18n();
 
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none">
-      {toasts.map((t) => (
+    <div
+      aria-live="polite"
+      className="fixed bottom-6 right-6 z-[300] flex flex-col gap-2 max-w-sm w-full pointer-events-none"
+    >
+      {toasts.map((toast) => (
         <div
-          key={t.id}
-          className={`pointer-events-auto flex items-start gap-3 p-3.5 rounded-card border-[0.5px] backdrop-blur-md shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-2 ${
-            borderColors[t.type]
+          key={toast.id}
+          role={toast.type === "error" ? "alert" : "status"}
+          className={`pointer-events-auto hm-anim-fade-in flex items-start gap-3 p-3.5 rounded-card border-[0.5px] shadow-lg ${
+            borderColors[toast.type]
           }`}
         >
-          <div className="mt-0.5">{icons[t.type]}</div>
+          <div className="mt-0.5">{icons[toast.type]}</div>
           <div className="flex-1 min-w-0">
             <h4 className="font-sans text-[13px] font-medium text-hm-text-primary leading-tight">
-              {t.title}
+              {toast.title}
             </h4>
-            {t.description && (
+            {toast.description && (
               <p className="font-sans text-[12px] text-hm-text-secondary mt-1 leading-normal">
-                {t.description}
+                {toast.description}
               </p>
             )}
           </div>
           <button
-            onClick={() => removeToast(t.id)}
+            type="button"
+            onClick={() => removeToast(toast.id)}
             className="text-hm-text-secondary hover:text-hm-text-primary transition-colors p-0.5 rounded"
-            aria-label="Kapat"
+            aria-label={t("common.close")}
           >
-            <X className="w-3.5 h-3.5" />
+            <X aria-hidden="true" className="w-3.5 h-3.5" />
           </button>
         </div>
       ))}

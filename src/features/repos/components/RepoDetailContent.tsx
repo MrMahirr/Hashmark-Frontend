@@ -5,12 +5,14 @@ import { useParams } from "next/navigation";
 import { RepoHeader } from "./RepoHeader";
 import { RepoStatsRow } from "./RepoStatsRow";
 import { RepoModuleDistribution } from "./RepoModuleDistribution";
-import { RepoDebtTable } from "./RepoDebtTable";
-import { TrendChart } from "@/features/dashboard/components/TrendChart";
+import { BranchSetting } from "./BranchSetting";
+import { LazyTrendChart } from "@/features/dashboard/components/LazyCharts";
 import { LabelDistribution } from "@/features/dashboard/components/LabelDistribution";
+import { DebtExplorer } from "@/features/debts/components/DebtExplorer";
+import { ScanProgress } from "@/features/scanner/components/ScanProgress";
 import { useRepo, mapRepoResponseToRepo } from "../hooks/useRepos";
 import { useDashboardOverview } from "@/features/dashboard/hooks/useDashboard";
-import { useMappedDebts } from "@/features/debts/hooks/useDebts";
+import { useI18n } from "@/shared/i18n/I18nProvider";
 import { Loader2, AlertCircle, RefreshCw } from "lucide-react";
 
 interface RepoDetailContentProps {
@@ -23,6 +25,7 @@ interface RepoDetailContentProps {
  * canlı API verileriyle entegre eder.
  */
 export function RepoDetailContent({ repoId: propRepoId }: RepoDetailContentProps) {
+  const { t } = useI18n();
   const params = useParams();
   const repoId = propRepoId || (params?.repoId as string) || "";
   const {
@@ -42,23 +45,14 @@ export function RepoDetailContent({ repoId: propRepoId }: RepoDetailContentProps
     refetch: refetchOverview,
   } = useDashboardOverview(repoId);
 
-  const {
-    data: debtsPage,
-    isLoading: isDebtsLoading,
-    isError: isDebtsError,
-    refetch: refetchDebts,
-  } = useMappedDebts({ repoId }, repoDto?.fullName || "");
-
-  const isLoading = isRepoLoading || isOverviewLoading || isDebtsLoading;
-  const isError = isRepoError || isOverviewError || isDebtsError;
+  const isLoading = isRepoLoading || isOverviewLoading;
+  const isError = isRepoError || isOverviewError;
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[500px] w-full gap-3">
-        <Loader2 className="w-8 h-8 text-hm-blue animate-spin" />
-        <p className="font-sans text-xs text-hm-text-secondary animate-pulse">
-          Depo detayları ve analitiği yükleniyor...
-        </p>
+      <div role="status" className="flex flex-col items-center justify-center min-h-[500px] w-full gap-3">
+        <Loader2 className="w-8 h-8 text-hm-blue animate-spin" aria-hidden="true" />
+        <p className="font-sans text-xs text-hm-text-secondary animate-pulse">{t("repos.detail.loading")}</p>
       </div>
     );
   }
@@ -67,26 +61,24 @@ export function RepoDetailContent({ repoId: propRepoId }: RepoDetailContentProps
     return (
       <div className="bg-hm-surface border-[0.5px] border-hm-border rounded-card p-8 flex flex-col items-center justify-center text-center gap-4 my-8">
         <div className="w-12 h-12 rounded-full bg-hm-danger-bg flex items-center justify-center text-hm-danger">
-          <AlertCircle className="w-6 h-6" />
+          <AlertCircle className="w-6 h-6" aria-hidden="true" />
         </div>
-        <div>
-          <h3 className="font-sans text-base font-medium text-hm-text-primary">
-            Depo Bilgileri Alınamadı
-          </h3>
+        <div role="alert">
+          <h3 className="font-sans text-base font-medium text-hm-text-primary">{t("repos.detail.errorTitle")}</h3>
           <p className="font-sans text-xs text-hm-text-secondary mt-1 max-w-md">
-            Seçilen depoya ait verileri çekerken bir sorun oluştu veya depo bulunamadı. Lütfen tekrar deneyin.
+            {t("repos.detail.errorDescription")}
           </p>
         </div>
         <button
+          type="button"
           onClick={() => {
             refetchRepo();
             refetchOverview();
-            refetchDebts();
           }}
           className="px-4 py-2 bg-hm-text-primary text-hm-surface rounded text-xs font-medium flex items-center gap-2 hover:opacity-90 transition-opacity cursor-pointer"
         >
-          <RefreshCw className="w-3.5 h-3.5" />
-          Yeniden Dene
+          <RefreshCw className="w-3.5 h-3.5" aria-hidden="true" />
+          {t("common.retry")}
         </button>
       </div>
     );
@@ -96,10 +88,9 @@ export function RepoDetailContent({ repoId: propRepoId }: RepoDetailContentProps
   repo.debtCount = stats.totalDebts;
   repo.resolvedCount = stats.resolvedDebts;
 
-  // ModuleDistribution stat transformasyonu
   const totalModuleDebts = moduleDistribution.reduce((acc, curr) => acc + curr.count, 0);
   const formattedModules = moduleDistribution.map((m) => ({
-    name: m.module || "Root",
+    name: m.module || t("repos.modules.root"),
     count: m.count,
     percentage: totalModuleDebts > 0 ? Math.round((m.count / totalModuleDebts) * 100) : 0,
   }));
@@ -108,21 +99,24 @@ export function RepoDetailContent({ repoId: propRepoId }: RepoDetailContentProps
 
   return (
     <>
-      {/* Header */}
       <RepoHeader repo={repo} />
 
-      {/* Stats Row */}
+      <div className="mb-4">
+        <ScanProgress repoId={repoId} />
+      </div>
+
       <RepoStatsRow
         totalCount={stats.totalDebts}
         addedCount={addedThisWeek}
         resolvedCount={stats.resolvedDebts}
       />
 
-      {/* Charts Row */}
+      <BranchSetting repoId={repoId} currentBranch={repo.trackedBranch} />
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
         <div className="lg:col-span-2 flex">
           <div className="w-full h-full min-w-0">
-            <TrendChart data={trendData} />
+            <LazyTrendChart data={trendData} />
           </div>
         </div>
         <div className="flex">
@@ -132,15 +126,14 @@ export function RepoDetailContent({ repoId: propRepoId }: RepoDetailContentProps
         </div>
       </div>
 
-      {/* Module Distribution and Table */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
         <div className="lg:col-span-1">
           <RepoModuleDistribution data={formattedModules} />
         </div>
-        <div className="lg:col-span-2">
-          <RepoDebtTable data={debtsPage?.content || []} />
-        </div>
+        <div className="lg:col-span-2" />
       </div>
+
+      <DebtExplorer fixedRepoId={repoId} fixedRepoName={repoDto.fullName} />
     </>
   );
 }

@@ -10,7 +10,7 @@ import type { SettingsResponse, UpdateSettingsRequest } from "./settings.types";
  */
 
 /** 
- * Oturum açmış kullanıcının ayarlarını (webhook, notify tercihi vb.) backend'den getirir.
+ * Oturum açmış kullanıcının ayarlarını (e-posta bildirimi, gün) backend'den getirir.
  * 
  * @returns {Promise<SettingsResponse>} Kullanıcı ayarları
  */
@@ -28,7 +28,7 @@ export async function getSettings(): Promise<SettingsResponse> {
  * @returns {Promise<SettingsResponse>} Güncelleme sonrası oluşan yeni ayarlar
  */
 export async function updateSettings(payload: UpdateSettingsRequest): Promise<SettingsResponse> {
-  const response = await apiClient.patch<SettingsResponse>(
+  const response = await apiClient.put<SettingsResponse>(
     ApiMethod.SETTINGS,
     payload
   );

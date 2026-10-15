@@ -19,6 +19,10 @@ export interface RepoResponse {
   isPrivate: boolean;
   lastScannedAt: string | null;
   createdAt: string;
+  debtCount?: number;
+  /** Taranan dal; null = varsayılan dal */
+  trackedBranch?: string | null;
+  lastScannedSha?: string | null;
 }
 
 // ── Request Types ──

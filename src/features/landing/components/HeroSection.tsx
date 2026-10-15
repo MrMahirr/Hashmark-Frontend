@@ -1,5 +1,6 @@
 import { Button } from "@/shared/components";
 import Link from "next/link";
+import { getServerI18n } from "@/shared/i18n/server";
 
 const GithubIcon = () => (
   <svg aria-hidden="true" className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -7,24 +8,20 @@ const GithubIcon = () => (
   </svg>
 );
 
-export function HeroSection() {
+export async function HeroSection() {
+  const { t } = await getServerI18n();
+
   return (
     <section className="flex flex-col items-start gap-6">
       <div className="bg-hm-bg border-[0.5px] border-hm-border px-3 py-1 rounded-full w-max flex items-center gap-2">
-        <span className="text-[11px] font-medium text-hm-text-secondary tracking-wide">
-          Ücretsiz · Açık Kaynak
-        </span>
+        <span className="text-[11px] font-medium text-hm-text-secondary tracking-wide">{t("landing.badge")}</span>
       </div>
 
       <div className="flex flex-col gap-4">
         <h1 className="text-[32px] md:text-[40px] font-semibold text-hm-text-primary max-w-[600px] leading-tight tracking-tight">
-          Kod tabanınızda düşündüğünüzden daha fazla borç var.
+          {t("landing.heroTitle")}
         </h1>
-        <p className="text-[15px] text-hm-text-secondary max-w-[540px] leading-relaxed">
-          Hashmark, repolarınızı teknik borç işaretleri (TODO, FIXME ve özel anotasyonlar)
-          için otomatik olarak tarayarak, neye dikkat etmeniz gerektiğine dair net ve
-          ölçülebilir bir tablo sunar.
-        </p>
+        <p className="text-[15px] text-hm-text-secondary max-w-[540px] leading-relaxed">{t("landing.heroText")}</p>
       </div>
 
       <div className="flex items-center gap-4 pt-2">
@@ -34,7 +31,7 @@ export function HeroSection() {
             size="lg"
             leftIcon={<GithubIcon />}
           >
-            {"GitHub'ı Bağla"}
+            {t("landing.connectGithub")}
           </Button>
         </Link>
       </div>

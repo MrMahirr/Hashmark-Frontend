@@ -2,76 +2,84 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Folder, List, Settings } from "lucide-react";
 import { useUserProfile } from "@/features/auth/hooks/useUserProfile";
+import { useI18n } from "@/shared/i18n/I18nProvider";
+import { NAV_ITEMS, isNavActive } from "./navItems";
 
-export const Sidebar = () => {
+interface SidebarNavProps {
+  /** Mobil çekmecede bir bağlantıya tıklanınca menüyü kapatmak için. */
+  onNavigate?: () => void;
+}
+
+/** Masaüstü kenar çubuğu ve mobil çekmecenin paylaştığı içerik. */
+export function SidebarContent({ onNavigate }: SidebarNavProps) {
   const pathname = usePathname();
   const { data: profile } = useUserProfile();
-
-  const navItems = [
-    { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Repos", href: "/dashboard/repos", icon: Folder },
-    { name: "All debts", href: "/dashboard/debts", icon: List },
-    { name: "Settings", href: "/dashboard/settings", icon: Settings },
-  ];
+  const { t } = useI18n();
 
   return (
-    <aside className="h-full w-[220px] fixed left-0 top-0 bg-hm-surface border-r-[0.5px] border-hm-border flex flex-col py-6 px-4 z-10 hidden md:flex">
-      {/* Brand */}
+    <>
       <div className="flex flex-col mb-8 px-2">
-        <span className="font-mono text-xl font-medium text-hm-text-primary">
-          # Hashmark
-        </span>
-        <span className="font-sans text-sm text-hm-text-secondary mt-1">
-          Technical Debt Scanner
-        </span>
+        <span className="font-mono text-xl font-medium text-hm-text-primary"># Hashmark</span>
+        <span className="font-sans text-sm text-hm-text-secondary mt-1">{t("nav.tagline")}</span>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 space-y-1">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href;
+      <nav aria-label={t("nav.main")} className="flex-1 space-y-1">
+        {NAV_ITEMS.map((item) => {
+          const active = isNavActive(pathname, item.href);
           const Icon = item.icon;
-
           return (
             <Link
-              key={item.name}
+              key={item.href}
               href={item.href}
+              onClick={onNavigate}
+              aria-current={active ? "page" : undefined}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors font-sans text-sm ${
-                isActive
-                  ? "text-hm-blue font-medium bg-hm-bg"
-                  : "text-hm-text-secondary hover:bg-hm-bg"
+                active ? "text-hm-blue font-medium bg-hm-bg" : "text-hm-text-secondary hover:bg-hm-bg"
               }`}
             >
-              <Icon size={18} className={isActive ? "text-hm-blue" : ""} />
-              <span>{item.name}</span>
+              <Icon size={18} aria-hidden="true" className={active ? "text-hm-blue" : ""} />
+              <span>{t(item.labelKey)}</span>
             </Link>
           );
         })}
       </nav>
 
-      {/* Footer Profile */}
       <div className="mt-auto pt-4 border-t-[0.5px] border-hm-border">
         <Link
           href="/dashboard/profile"
+          onClick={onNavigate}
+          aria-current={pathname === "/dashboard/profile" ? "page" : undefined}
           className="flex items-center gap-2 px-3 py-2 rounded-lg text-hm-text-secondary font-sans text-sm hover:bg-hm-bg transition-colors"
         >
           {profile?.avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              alt={profile.name ?? "Profile"}
+              alt=""
               className="w-6 h-6 rounded-full object-cover border-[0.5px] border-hm-border"
               src={profile.avatarUrl}
             />
           ) : (
-            <div className="w-6 h-6 rounded-full bg-hm-bg border-[0.5px] border-hm-border flex items-center justify-center text-[10px] font-medium text-hm-text-primary">
+            <div
+              aria-hidden="true"
+              className="w-6 h-6 rounded-full bg-hm-bg border-[0.5px] border-hm-border flex items-center justify-center text-[10px] font-medium text-hm-text-primary"
+            >
               {profile?.name?.charAt(0) ?? profile?.githubLogin?.charAt(0) ?? "U"}
             </div>
           )}
-          <span className="truncate max-w-[120px]">{profile?.name ?? profile?.githubLogin ?? "Profile"}</span>
+          <span className="truncate max-w-[120px]">
+            {profile?.name ?? profile?.githubLogin ?? t("nav.profile")}
+          </span>
         </Link>
       </div>
+    </>
+  );
+}
+
+export const Sidebar = () => {
+  return (
+    <aside className="h-full w-[220px] fixed left-0 top-0 bg-hm-surface border-r-[0.5px] border-hm-border flex-col py-6 px-4 z-10 hidden md:flex">
+      <SidebarContent />
     </aside>
   );
 };

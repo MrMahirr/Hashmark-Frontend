@@ -25,7 +25,7 @@ export function Spinner({ size = "md", className = "", label }: SpinnerProps) {
       role="status"
       aria-label={label ?? "Loading"}
     >
-      <Loader2 className={`animate-spin ${sizeMap[size]}`} />
+      <Loader2 aria-hidden="true" className={`animate-spin ${sizeMap[size]}`} />
       {label && <span className="text-sm font-medium">{label}</span>}
     </div>
   );

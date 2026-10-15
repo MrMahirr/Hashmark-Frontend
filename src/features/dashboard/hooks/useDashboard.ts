@@ -1,11 +1,12 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryKeys } from "@/shared/api/query-keys";
+import { queryConfig } from "@/shared/config/query.config";
+import { distributePercentages } from "@/shared/utils/percentages";
 import { getReportSummary, sendTestReport } from "../api/dashboard.api";
+import { calculateHealth } from "../utils/health";
 import { useDebtStats } from "@/features/debts/hooks/useDebts";
+import { useMappedRepos } from "@/features/repos/hooks/useRepos";
 import { DebtType, type LabelDistribution, type ModuleDistribution, type TrendDataPoint } from "@/shared/types";
-
-// NOTE: This hook acts as an Adapter between backend DTOs and UI presentation models
-// config: default retry count is inherited from React Query Client provider settings
 
 /**
  * SRP (Single Responsibility Principle) ve Adapter Pattern:
@@ -14,17 +15,19 @@ import { DebtType, type LabelDistribution, type ModuleDistribution, type TrendDa
  * React Query aracılığıyla caching, loading (yükleniyor) ve error handling süreçleri otomatik yönetilir.
  */
 
-/** 
- * Dashboard için (global veya tekil repo) rapor özet verilerini (A-F notu, istatistikler vs) getirir.
- * 
+/**
+ * Dashboard için (global veya tekil repo) rapor özet verilerini getirir.
+ * Zamanlama ayarları `queryConfig` içinden gelir.
+ *
  * @param {string} [repoId] - Opsiyonel repo id. (Global analiz sayfası ise boş yollanır)
  */
 export function useReportSummary(repoId?: string) {
-  // TODO: Implement custom staleTime and gcTime configuration from global settings
   return useQuery({
     // Query Key Factory: Repo ID verilmişse o repoya özel, yoksa genel rapor key'i oluşturur.
     queryKey: queryKeys.dashboard.summary(repoId),
     queryFn: () => getReportSummary(repoId),
+    staleTime: queryConfig.reportStaleTime,
+    gcTime: queryConfig.gcTime,
   });
 }
 
@@ -36,6 +39,7 @@ export function useReportSummary(repoId?: string) {
 export function useDashboardOverview(repoId?: string) {
   const summaryQuery = useReportSummary(repoId);
   const statsQuery = useDebtStats(repoId);
+  const reposQuery = useMappedRepos();
 
   const isLoading = summaryQuery.isLoading || statsQuery.isLoading;
   const isError = summaryQuery.isError || statsQuery.isError;
@@ -48,8 +52,6 @@ export function useDashboardOverview(repoId?: string) {
   const activeDebts = Math.max(0, totalDebts - resolvedDebts);
   const resolutionRate = totalDebts > 0 ? Math.round((resolvedDebts / totalDebts) * 100) : 100;
 
-  // HACK: Temporary fallback to totalDebts when backend labelStats is null during initial load
-  // Sağlık Skoru ve Not Hesaplaması (Sadece TODO, FIXME, HACK, XXX penalize edilir; NOTE, DOC, INFO skordan düşülmez)
   const labelStats = summary?.labelStats;
   const todoCnt = labelStats?.todoCount ?? 0;
   const fixmeCnt = labelStats?.fixmeCount ?? 0;
@@ -59,16 +61,11 @@ export function useDashboardOverview(repoId?: string) {
   const docCnt = labelStats?.docCount ?? 0;
   const infoCnt = labelStats?.infoCount ?? 0;
 
+  // Etiket istatistiği henüz gelmediyse (ilk yükleme) toplam borç sayısı kullanılır.
+  // Sağlık hesabında yalnızca TODO, FIXME, HACK, XXX penalize edilir; NOTE, DOC, INFO edilmez.
   const penalizableDebts = labelStats ? todoCnt + fixmeCnt + hackCnt + xxxCnt : totalDebts;
+  const { score: healthScore, grade } = calculateHealth(penalizableDebts);
 
-  const healthScore = Math.max(0, Math.min(100, 100 - Math.floor(penalizableDebts * 1.5)));
-  let grade: "A" | "B" | "C" | "D" | "F" = "A";
-  if (penalizableDebts > 80) grade = "F";
-  else if (penalizableDebts > 50) grade = "D";
-  else if (penalizableDebts > 30) grade = "C";
-  else if (penalizableDebts > 10) grade = "B";
-
-  // Trend Chart Verisinin Haritalanması
   const trendData: TrendDataPoint[] = summary?.trendData?.map((t) => ({
     date: t.weekStart,
     total: t.totalDebts,
@@ -76,30 +73,29 @@ export function useDashboardOverview(repoId?: string) {
     resolved: t.resolvedDebts,
   })) ?? [];
 
-  // FIXME: Verify percentage rounding precision when totalLabels sum exceeds 100% due to Math.round
-  // Etiket Dağılımının (Label Distribution) Haritalanması
-  const totalLabels = todoCnt + fixmeCnt + hackCnt + xxxCnt + noteCnt + docCnt + infoCnt;
-  
+  // Etiket dağılımı: yüzdelerin toplamı her zaman 100 (en büyük kalan yöntemi)
+  const labelCounts: Array<{ type: DebtType; count: number }> = [
+    { type: DebtType.TODO, count: todoCnt },
+    { type: DebtType.FIXME, count: fixmeCnt },
+    { type: DebtType.HACK, count: hackCnt },
+    { type: DebtType.XXX, count: xxxCnt },
+    { type: DebtType.NOTE, count: noteCnt },
+    { type: DebtType.DOC, count: docCnt },
+    { type: DebtType.INFO, count: infoCnt },
+  ];
+  const percentages = distributePercentages(labelCounts.map((l) => l.count));
+
   const labelDistribution: LabelDistribution[] = labelStats
-    ? [
-        { type: DebtType.TODO, count: todoCnt, percentage: totalLabels > 0 ? Math.round((todoCnt / totalLabels) * 100) : 0 },
-        { type: DebtType.FIXME, count: fixmeCnt, percentage: totalLabels > 0 ? Math.round((fixmeCnt / totalLabels) * 100) : 0 },
-        { type: DebtType.HACK, count: hackCnt, percentage: totalLabels > 0 ? Math.round((hackCnt / totalLabels) * 100) : 0 },
-        { type: DebtType.XXX, count: xxxCnt, percentage: totalLabels > 0 ? Math.round((xxxCnt / totalLabels) * 100) : 0 },
-        { type: DebtType.NOTE, count: noteCnt, percentage: totalLabels > 0 ? Math.round((noteCnt / totalLabels) * 100) : 0 },
-        { type: DebtType.DOC, count: docCnt, percentage: totalLabels > 0 ? Math.round((docCnt / totalLabels) * 100) : 0 },
-        { type: DebtType.INFO, count: infoCnt, percentage: totalLabels > 0 ? Math.round((infoCnt / totalLabels) * 100) : 0 },
-      ].filter((l) => l.count > 0)
+    ? labelCounts
+        .map((l, index) => ({ type: l.type, count: l.count, percentage: percentages[index] }))
+        .filter((l) => l.count > 0)
     : [];
 
-  // Modül Dağılımının Haritalanması
   const moduleDistribution: ModuleDistribution[] = summary?.topModules?.map((m) => ({
     module: m.modulePath,
     count: m.debtCount,
   })) ?? [];
 
-  // XXX: Critical: Ensure refetching queries does not trigger unnecessary component re-renders
-  /** @return Formatted dashboard overview object containing health grade and chart datasets */
   return {
     isLoading,
     isError,
@@ -109,7 +105,8 @@ export function useDashboardOverview(repoId?: string) {
       totalDebts,
       activeDebts,
       resolvedDebts,
-      activeRepos: 1,
+      // Tek depo görünümünde 1, genel bakışta bağlı depo sayısı
+      activeRepos: repoId ? 1 : (reposQuery.data?.length ?? 0),
       resolutionRate,
     },
     trendData,
@@ -122,8 +119,8 @@ export function useDashboardOverview(repoId?: string) {
   };
 }
 
-/** 
- * Belirtilen repo için (Webhook, e-posta test vb.) test raporunun gönderilmesini tetikler (Mutation).
+/**
+ * Belirtilen repo için test raporunun gönderilmesini tetikler (Mutation).
  */
 export function useSendTestReport() {
   return useMutation({
