@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { buttonClass } from "@/shared/ui/button-styles";
+import { Logo } from "@/shared/ui/Logo";
 
 interface ErrorFallbackProps {
   title: string;
@@ -17,25 +19,23 @@ export function ErrorFallback({ title, description, digest, actions, fullScreen 
   return (
     <div
       role="alert"
-      className={`flex flex-col items-center justify-center gap-4 p-6 text-center bg-hm-bg ${
+      className={`flex flex-col items-center justify-center gap-5 bg-hm-bg p-6 text-center ${
         fullScreen ? "min-h-screen" : "min-h-[60vh]"
       }`}
     >
-      <div aria-hidden="true" className="font-mono text-[36px] font-medium text-hm-text-primary leading-none">#</div>
-      <div className="flex flex-col gap-1 max-w-[420px]">
-        <h1 className="text-[16px] font-medium text-hm-text-primary">{title}</h1>
-        <p className="text-[13px] text-hm-text-secondary">{description}</p>
-        {digest ? <p className="text-[11px] font-mono text-hm-text-secondary mt-2">{digest}</p> : null}
+      <Logo scale={1.4} className="mb-2" />
+      <div className="flex max-w-[460px] flex-col gap-2">
+        <h1 className="m-0 font-serif text-[44px] font-normal leading-none text-hm-text-primary">{title}</h1>
+        <p className="m-0 text-base leading-normal text-hm-text-secondary">{description}</p>
+        {digest ? <p className="m-0 mt-2 font-mono text-xs text-hm-text-secondary">{digest}</p> : null}
       </div>
-      <div className="flex items-center gap-3">{actions}</div>
+      <div className="flex flex-wrap items-center justify-center gap-3">{actions}</div>
     </div>
   );
 }
 
-export const fallbackButtonClass =
-  "inline-flex items-center justify-center h-10 px-5 rounded-full text-[13px] font-medium " +
-  "bg-hm-text-primary text-hm-surface hover:opacity-90 transition-opacity";
+/** Birincil eylem düğmesi (ör. "Tekrar dene"). */
+export const fallbackButtonClass = buttonClass("primary");
 
-export const fallbackLinkClass =
-  "inline-flex items-center justify-center h-10 px-5 rounded-full text-[13px] font-medium " +
-  "border-[0.5px] border-hm-border text-hm-text-primary hover:bg-hm-border-light transition-colors";
+/** İkincil eylem bağlantısı (ör. "Ana sayfa"). */
+export const fallbackLinkClass = buttonClass("outline");

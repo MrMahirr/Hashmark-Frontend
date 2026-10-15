@@ -1,7 +1,7 @@
 export const THEMES = ["light", "dark", "system"] as const;
 export type Theme = (typeof THEMES)[number];
 
-export const DEFAULT_THEME: Theme = "system";
+export const DEFAULT_THEME: Theme = "dark";
 export const THEME_COOKIE = "hm_theme";
 
 const ONE_YEAR_SECONDS = 365 * 24 * 60 * 60;
@@ -18,6 +18,15 @@ export function themeAttribute(theme: Theme): "light" | "dark" | undefined {
 export function nextTheme(theme: Theme): Theme {
   const index = THEMES.indexOf(theme);
   return THEMES[(index + 1) % THEMES.length];
+}
+
+/**
+ * Tasarımdaki iki durumlu tema düğmesi için hedef: koyu ↔ açık.
+ * "Sistem" seçiliyken işletim sisteminin o anki tercihinin tersine geçer.
+ */
+export function toggleTheme(theme: Theme, systemPrefersDark: boolean): "light" | "dark" {
+  const resolved = theme === "system" ? (systemPrefersDark ? "dark" : "light") : theme;
+  return resolved === "dark" ? "light" : "dark";
 }
 
 export function writeThemeCookie(theme: Theme): void {

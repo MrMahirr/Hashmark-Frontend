@@ -4,7 +4,7 @@
  * Backend'den gelen DTO (Data Transfer Object) nesneleri birebir bu şekilde temsil edilir.
  */
 
-import type { TriageStatus } from "@/shared/types/debt.types";
+import type { TriageRequestStatus, TriageStatus } from "@/shared/types/debt.types";
 
 // ── Response Types ──
 
@@ -33,6 +33,7 @@ export interface DebtResponse {
   content: string;
   detectedAt: string;
   resolvedAt: string | null;
+  manuallyResolved?: boolean;
 
   commitSha?: string | null;
   permalink?: string | null;
@@ -91,7 +92,7 @@ export interface DebtFilters {
 
 /** PATCH /debts/{id}: gönderilmeyen alan değişmez, assignee "" ise atama kaldırılır. */
 export interface DebtTriageRequest {
-  status?: TriageStatus;
+  status?: TriageRequestStatus;
   assignee?: string;
 }
 

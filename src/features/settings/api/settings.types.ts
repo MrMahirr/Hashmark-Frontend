@@ -22,6 +22,10 @@ export type NotifyDay =
 export interface SettingsResponse {
   emailNotify: boolean;
   notifyDay: NotifyDay | string;
+  /** Özete dahil edilecek etiketler; boş = hepsi */
+  digestLabels?: string[];
+  /** Özetin gönderileceği alternatif adres; boş/null = GitHub e-postası */
+  digestEmail?: string | null;
 }
 
 // ── Request Types ──
@@ -33,4 +37,8 @@ export interface SettingsResponse {
 export interface UpdateSettingsRequest {
   emailNotify?: boolean;
   notifyDay?: NotifyDay | string;
+  /** Boş dizi = tüm etiketler */
+  digestLabels?: string[];
+  /** Boş string = GitHub e-postasını kullan */
+  digestEmail?: string;
 }

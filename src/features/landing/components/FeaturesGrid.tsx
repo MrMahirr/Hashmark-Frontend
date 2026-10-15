@@ -1,31 +1,61 @@
-import { FolderOpen, TrendingUp, Mail } from "lucide-react";
 import { getServerI18n } from "@/shared/i18n/server";
+import { Heading } from "@/shared/ui/Typography";
+import { cn } from "@/shared/ui/cn";
+import { DigestPanel, RepoMixPanel, TrendPanel } from "./FeaturePanels";
+import { Wrap } from "./Wrap";
+import type { ReactNode } from "react";
 
+interface FeatureRowProps {
+  index: 1 | 2 | 3;
+  title: string;
+  text: string;
+  /** Sağdaki görsel panel. */
+  children: ReactNode;
+  reverse?: boolean;
+  last?: boolean;
+}
+
+function FeatureRow({ index, title, text, children, reverse = false, last = false }: FeatureRowProps) {
+  return (
+    <div className={cn("flex flex-wrap items-center gap-14", reverse && "flex-row-reverse", !last && "mb-[120px]")}>
+      <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-5">
+        <span className="font-mono text-sm font-bold text-hm-acc">{index} / 3</span>
+        <Heading as="h3" className="text-[44px] leading-[1.05]">
+          {title}
+        </Heading>
+        <p className="m-0 text-pretty text-lg leading-[1.6] text-hm-text-secondary">{text}</p>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+/** "Özellikler" bölümü: üç zigzag satır (tarama, trend, haftalık özet). */
 export async function FeaturesGrid() {
   const { t } = await getServerI18n();
 
-  const features = [
-    { icon: FolderOpen, title: t("landing.feature.scan.title"), text: t("landing.feature.scan.text") },
-    { icon: TrendingUp, title: t("landing.feature.trend.title"), text: t("landing.feature.trend.text") },
-    { icon: Mail, title: t("landing.feature.report.title"), text: t("landing.feature.report.text") },
-  ];
-
   return (
-    <section className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
-      {features.map(({ icon: Icon, title, text }) => (
-        <div
-          key={title}
-          className="bg-hm-surface border-[0.5px] border-hm-border rounded-card p-5 flex flex-col gap-4"
-        >
-          <div className="bg-hm-border-light w-10 h-10 rounded-control flex items-center justify-center">
-            <Icon aria-hidden="true" className="w-5 h-5 text-hm-text-primary" />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <h3 className="text-[14px] font-medium text-hm-text-primary">{title}</h3>
-            <p className="font-mono text-[12px] text-hm-text-secondary leading-relaxed">{text}</p>
-          </div>
+    <Wrap>
+      <section id="ozellikler" className="pb-10 pt-[120px]">
+        <div className="mb-[88px] flex max-w-[760px] flex-col gap-5">
+          <span className="font-mono text-[13px] uppercase tracking-[0.08em] text-hm-text-secondary">
+            {t("landing.nav.features")}
+          </span>
+          <Heading as="h2" className="text-[40px] leading-[1.02] tracking-[-0.015em] sm:text-[60px]">
+            {t("landing.features.title")}
+          </Heading>
         </div>
-      ))}
-    </section>
+
+        <FeatureRow index={1} title={t("landing.feature.1.title")} text={t("landing.feature.1.text")}>
+          <RepoMixPanel />
+        </FeatureRow>
+        <FeatureRow index={2} reverse title={t("landing.feature.2.title")} text={t("landing.feature.2.text")}>
+          <TrendPanel />
+        </FeatureRow>
+        <FeatureRow index={3} last title={t("landing.feature.3.title")} text={t("landing.feature.3.text")}>
+          <DigestPanel />
+        </FeatureRow>
+      </section>
+    </Wrap>
   );
 }

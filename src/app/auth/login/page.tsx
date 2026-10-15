@@ -1,9 +1,11 @@
 import { LoginForm } from "@/features/auth/components/LoginForm";
+import { LoginHero } from "@/features/auth/components/LoginHero";
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-hm-bg">
+    <main id="main-content" className="flex min-h-screen flex-wrap bg-hm-bg">
+      <LoginHero />
       <LoginForm />
-    </div>
+    </main>
   );
 }

@@ -1,12 +1,10 @@
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mocks = vi.hoisted(() => ({ repos: vi.fn(), syncMutate: vi.fn() }));
+const mocks = vi.hoisted(() => ({ repos: vi.fn() }));
 
 vi.mock("@/features/repos/hooks/useRepos", () => ({
   useMappedRepos: mocks.repos,
-  useSyncRepos: () => ({ mutate: mocks.syncMutate, isPending: false }),
 }));
 vi.mock("next/link", () => ({
   default: ({ href, children, ...rest }: { href: string; children: React.ReactNode }) => (
@@ -21,7 +19,6 @@ import { OnboardingChecklist } from "./OnboardingChecklist";
 describe("OnboardingChecklist", () => {
   beforeEach(() => {
     mocks.repos.mockReset();
-    mocks.syncMutate.mockReset();
   });
 
   it("yüklenirken ve depolar gelmeden görünmez", () => {
@@ -31,13 +28,12 @@ describe("OnboardingChecklist", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("depo yokken senkronizasyon adımını önerir", async () => {
+  it("depo yokken depo ekleme adımını önerir", () => {
     mocks.repos.mockReturnValue({ data: [], isLoading: false });
     render(<OnboardingChecklist />);
 
     expect(screen.getByRole("heading", { name: "Hashmark'a hoş geldiniz" })).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("button", { name: "Depoları senkronize et" }));
-    expect(mocks.syncMutate).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("link", { name: "Depo ekle" })).toHaveAttribute("href", "/dashboard/repos");
   });
 
   it("depo var ama taranmadıysa taramaya yönlendirir", () => {
@@ -45,7 +41,7 @@ describe("OnboardingChecklist", () => {
     render(<OnboardingChecklist />);
 
     expect(screen.getByRole("link", { name: "Depolara git" })).toHaveAttribute("href", "/dashboard/repos");
-    expect(screen.queryByRole("button", { name: "Depoları senkronize et" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Depo ekle" })).not.toBeInTheDocument();
   });
 
   it("ilk tarama yapıldıysa kendiliğinden kaybolur", () => {

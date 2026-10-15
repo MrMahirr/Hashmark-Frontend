@@ -38,7 +38,7 @@ export function SessionExpiredPopup() {
           <AlertTriangle size={24} aria-hidden="true" />
         </div>
         <p className="text-sm text-hm-text-secondary mb-6">{t("auth.session.description")}</p>
-        <div className="flex items-center justify-center gap-2 text-hm-blue text-sm font-medium" role="status">
+        <div className="flex items-center justify-center gap-2 text-hm-acc text-sm font-semibold" role="status">
           <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
           {t("auth.session.redirecting")}
         </div>

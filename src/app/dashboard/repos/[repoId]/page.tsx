@@ -8,9 +8,8 @@ export default async function RepoDetailPage() {
   return (
     <>
       <Navbar title={t("nav.repos")} />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 w-full">
+      <div className="w-full px-4 py-5 sm:p-8">
         <RepoDetailContent />
-        <div className="h-12"></div>
       </div>
     </>
   );

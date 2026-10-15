@@ -23,6 +23,10 @@ export interface RepoResponse {
   /** Taranan dal; null = varsayılan dal */
   trackedBranch?: string | null;
   lastScannedSha?: string | null;
+  /** false = yalnızca GitHub'dan gelen aday (henüz taranmıyor) */
+  tracked?: boolean;
+  /** Açık borçların etiket kırılımı */
+  debtBreakdown?: Record<string, number>;
 }
 
 // ── Request Types ──

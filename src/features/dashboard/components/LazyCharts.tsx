@@ -8,7 +8,7 @@ function ChartSkeleton() {
   return (
     <div
       role="status"
-      className="bg-hm-surface border-[0.5px] border-hm-border rounded-card p-4 flex items-center justify-center min-h-[300px] text-xs text-hm-text-secondary animate-pulse"
+      className="flex min-h-[300px] animate-pulse items-center justify-center rounded-card border border-hm-border bg-hm-surface p-6 text-sm text-hm-text-secondary"
     >
       {t("dashboard.trend.loading")}
     </div>

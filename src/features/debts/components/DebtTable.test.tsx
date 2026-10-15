@@ -51,6 +51,25 @@ function setup(debts: Debt[], overrides: Partial<React.ComponentProps<typeof Deb
 }
 
 describe("DebtTable", () => {
+  it("depoya göre gruplama: her depo için başlık satırı ve açık borç sayısı gösterir", () => {
+    const { table } = setup(
+      [
+        makeDebt(0, { repoName: "octo/a" }),
+        makeDebt(1, { repoName: "octo/b" }),
+        makeDebt(2, { repoName: "octo/a" }),
+      ],
+      { groupByRepo: true },
+    );
+
+    const groupHeaders = Array.from(table.querySelectorAll('th[scope="colgroup"]')).map((el) => el.textContent);
+    expect(groupHeaders).toEqual(["octo/a2 açık borç", "octo/b1 açık borç"]);
+  });
+
+  it("gruplama kapalıyken başlık satırı yoktur", () => {
+    const { table } = setup([makeDebt(0)]);
+    expect(table.querySelector('th[scope="colgroup"]')).toBeNull();
+  });
+
   it("satırları, sorumluyu ve GitHub bağlantılarını gösterir", () => {
     const { within: w } = setup([makeDebt(0), makeDebt(1, { assignee: "ayse" })]);
 
