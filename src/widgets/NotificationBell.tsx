@@ -1,157 +1,133 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
-import { Bell, Check, Info, AlertTriangle, XCircle, Loader2 } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { AlertTriangle, Bell, Check, Info, Loader2, XCircle } from "lucide-react";
+import { Dialog } from "@/shared/components/Dialog";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { useNotifications, useMarkAsRead, useMarkAllAsRead } from "@/features/notifications/hooks/useNotifications";
+import { Button, IconButton } from "@/shared/ui/Button";
+import { Chip, ChipGroup } from "@/shared/ui/Chip";
+import { cn } from "@/shared/ui/cn";
 
+type NotificationFilter = "all" | "unread";
+
+const TYPE_ICON: Record<string, ReactNode> = {
+  SUCCESS: <Check size={16} className="text-hm-success" />,
+  WARNING: <AlertTriangle size={16} className="text-hm-warning" />,
+  INFO: <Info size={16} className="text-hm-info" />,
+  ERROR: <XCircle size={16} className="text-hm-danger" />,
+};
+
+/** Zil düğmesi (okunmamış sayısı rozetiyle) + sağdan açılan bildirim çekmecesi. */
 export const NotificationBell = () => {
   const { t, formatDateTime } = useI18n();
-  const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const panelId = useId();
-
-  // Dışarı tıklanınca ve Esc ile kapat; Esc'de odak zile döner
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsOpen(false);
-        buttonRef.current?.focus();
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOpen]);
+  const [open, setOpen] = useState(false);
+  const [filter, setFilter] = useState<NotificationFilter>("all");
 
   const { data: notifications = [], isLoading } = useNotifications();
-  const markAsReadMutation = useMarkAsRead();
-  const markAllAsReadMutation = useMarkAllAsRead();
-
-  const handleMarkAsRead = (id: number, read: boolean) => {
-    if (!read && !markAsReadMutation.isPending) {
-      markAsReadMutation.mutate(id);
-    }
-  };
-
-  const handleMarkAllAsRead = () => {
-    if (!markAllAsReadMutation.isPending && notifications.some((n) => !n.read)) {
-      markAllAsReadMutation.mutate();
-    }
-  };
+  const markAsRead = useMarkAsRead();
+  const markAll = useMarkAllAsRead();
 
   const unreadCount = notifications.filter((n) => !n.read).length;
+  const visible = filter === "unread" ? notifications.filter((n) => !n.read) : notifications;
+
+  const handleMarkAsRead = (id: number, read: boolean) => {
+    if (!read && !markAsRead.isPending) markAsRead.mutate(id);
+  };
+
+  const handleMarkAll = () => {
+    if (!markAll.isPending && unreadCount > 0) markAll.mutate();
+  };
 
   return (
-    <div className="relative" ref={containerRef}>
-      <button
-        ref={buttonRef}
-        type="button"
-        onClick={() => setIsOpen((prev) => !prev)}
-        aria-haspopup="true"
-        aria-expanded={isOpen}
-        aria-controls={isOpen ? panelId : undefined}
-        aria-label={
-          unreadCount > 0 ? t("notifications.unread", { count: unreadCount }) : t("notifications.open")
-        }
-        className={`p-2 rounded-full transition-colors relative ${
-          isOpen ? "bg-hm-bg text-hm-text-primary" : "text-hm-text-secondary hover:text-hm-text-primary hover:bg-hm-bg"
-        }`}
-      >
-        <Bell size={18} aria-hidden="true" />
+    <>
+      <div className="relative">
+        <IconButton
+          onClick={() => setOpen(true)}
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          aria-label={unreadCount > 0 ? t("notifications.unread", { count: unreadCount }) : t("notifications.open")}
+        >
+          <Bell size={18} aria-hidden="true" />
+        </IconButton>
         {unreadCount > 0 && (
           <span
             aria-hidden="true"
-            className="absolute top-1.5 right-1.5 w-2 h-2 bg-hm-danger rounded-full ring-2 ring-hm-surface"
-          />
+            className="pointer-events-none absolute -right-[3px] -top-[3px] flex h-5 min-w-5 items-center justify-center rounded-[10px] bg-hm-text-primary px-[5px] font-mono text-[11px] font-bold text-hm-bg"
+          >
+            {unreadCount}
+          </span>
         )}
-      </button>
+      </div>
 
-      {isOpen && (
-        <div
-          id={panelId}
-          role="region"
-          aria-label={t("notifications.title")}
-          className="hm-anim-fade-in absolute right-0 mt-3 w-80 max-w-[calc(100vw-2rem)] bg-hm-surface border-[0.5px] border-hm-border rounded-xl shadow-lg z-50 overflow-hidden"
-        >
-          <div className="flex items-center justify-between px-4 py-3 border-b-[0.5px] border-hm-border bg-hm-bg/50">
-            <h3 className="text-sm font-medium text-hm-text-primary">{t("notifications.title")}</h3>
-            <button
-              type="button"
-              onClick={handleMarkAllAsRead}
-              disabled={markAllAsReadMutation.isPending || unreadCount === 0}
-              className="text-[11px] font-medium text-hm-blue hover:text-hm-blue/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {markAllAsReadMutation.isPending ? t("notifications.processing") : t("notifications.markAll")}
-            </button>
-          </div>
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        title={t("notifications.title")}
+        placement="right"
+        maxWidth={420}
+      >
+        <div className="flex h-full flex-col">
+          <ChipGroup aria-label={t("notifications.title")} className="px-5 pb-4 pt-4">
+            <Chip pressed={filter === "all"} onClick={() => setFilter("all")}>
+              {t("notifications.tabAll")}
+            </Chip>
+            <Chip pressed={filter === "unread"} onClick={() => setFilter("unread")}>
+              {t("notifications.tabUnread")} ({unreadCount})
+            </Chip>
+          </ChipGroup>
 
-          <div className="max-h-[320px] overflow-y-auto">
+          <div className="flex-1 overflow-y-auto">
             {isLoading ? (
-              <div className="flex justify-center items-center py-8" role="status">
-                <Loader2 className="w-5 h-5 animate-spin text-hm-blue" aria-hidden="true" />
+              <div className="flex items-center justify-center py-8" role="status">
+                <Loader2 className="h-5 w-5 animate-spin text-hm-acc" aria-hidden="true" />
                 <span className="sr-only">{t("common.loading")}</span>
               </div>
-            ) : notifications.length > 0 ? (
+            ) : visible.length > 0 ? (
               <ul>
-                {notifications.map((notif) => (
-                  <li key={notif.id} className="border-b-[0.5px] border-hm-border last:border-b-0">
+                {visible.map((notif) => (
+                  <li key={notif.id}>
                     <button
                       type="button"
                       onClick={() => handleMarkAsRead(notif.id, notif.read)}
                       aria-label={notif.read ? undefined : `${t("notifications.markRead")}: ${notif.title}`}
-                      className={`w-full text-left px-4 py-3 hover:bg-hm-bg transition-colors flex gap-3 ${
-                        !notif.read ? "bg-hm-blue/5" : ""
-                      }`}
+                      className="flex w-full cursor-pointer items-start gap-3.5 border-0 border-t border-solid border-hm-border bg-transparent px-5 py-4 text-left text-hm-text-primary hover:bg-[color-mix(in_srgb,var(--hm-text-primary)_6%,transparent)] focus-visible:-outline-offset-[3px]"
                     >
-                      <span className="flex-shrink-0 mt-0.5" aria-hidden="true">
-                        {notif.type === "SUCCESS" && <Check size={16} className="text-hm-success" />}
-                        {notif.type === "WARNING" && <AlertTriangle size={16} className="text-hm-warning" />}
-                        {notif.type === "INFO" && <Info size={16} className="text-hm-blue" />}
-                        {notif.type === "ERROR" && <XCircle size={16} className="text-hm-danger" />}
-                      </span>
-                      <span className="flex-1 min-w-0">
-                        <span
-                          className={`block text-sm ${
-                            !notif.read ? "font-medium text-hm-text-primary" : "text-hm-text-secondary"
-                          }`}
-                        >
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          "mt-[7px] h-2.5 w-2.5 flex-none rounded-full",
+                          notif.read ? "border border-hm-border bg-transparent" : "bg-hm-acc",
+                        )}
+                      />
+                      <span className="flex min-w-0 flex-col gap-1">
+                        <span className={cn("flex items-center gap-2 text-base", notif.read ? "font-medium" : "font-bold")}>
+                          <span aria-hidden="true">{TYPE_ICON[notif.type]}</span>
                           {notif.title}
                         </span>
-                        <span className="block text-xs text-hm-text-secondary mt-0.5 line-clamp-2">
-                          {notif.description}
-                        </span>
-                        <span className="block text-[10px] text-hm-text-secondary mt-1.5 font-medium">
+                        <span className="text-sm leading-[1.45] text-hm-text-secondary">{notif.description}</span>
+                        <span className="font-mono text-xs text-hm-text-secondary">
                           {formatDateTime(notif.createdAt)}
                         </span>
                       </span>
-                      {!notif.read && (
-                        <span className="flex-shrink-0 flex items-center" aria-hidden="true">
-                          <span className="w-1.5 h-1.5 bg-hm-blue rounded-full"></span>
-                        </span>
-                      )}
                     </button>
                   </li>
                 ))}
               </ul>
             ) : (
-              <div className="px-4 py-8 text-center text-sm text-hm-text-secondary">{t("notifications.empty")}</div>
+              <div className="border-t border-hm-border px-5 py-12 text-center text-hm-text-secondary">
+                {filter === "unread" ? t("notifications.emptyUnread") : t("notifications.empty")}
+              </div>
             )}
           </div>
+
+          <div className="flex items-center justify-end gap-3 border-t border-hm-border px-5 py-4">
+            <Button variant="outline" onClick={handleMarkAll} disabled={markAll.isPending || unreadCount === 0}>
+              {markAll.isPending ? t("notifications.processing") : t("notifications.markAll")}
+            </Button>
+          </div>
         </div>
-      )}
-    </div>
+      </Dialog>
+    </>
   );
 };

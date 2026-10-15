@@ -4,6 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUserProfile } from "@/features/auth/hooks/useUserProfile";
 import { useI18n } from "@/shared/i18n/I18nProvider";
+import { Avatar } from "@/shared/ui/Avatar";
+import { Logo } from "@/shared/ui/Logo";
+import { SideLink } from "@/shared/ui/SideLink";
 import { NAV_ITEMS, isNavActive } from "./navItems";
 
 interface SidebarNavProps {
@@ -16,69 +19,57 @@ export function SidebarContent({ onNavigate }: SidebarNavProps) {
   const pathname = usePathname();
   const { data: profile } = useUserProfile();
   const { t } = useI18n();
+  const displayName = profile?.name ?? profile?.githubLogin ?? t("nav.profile");
 
   return (
     <>
-      <div className="flex flex-col mb-8 px-2">
-        <span className="font-mono text-xl font-medium text-hm-text-primary"># Hashmark</span>
-        <span className="font-sans text-sm text-hm-text-secondary mt-1">{t("nav.tagline")}</span>
-      </div>
-
-      <nav aria-label={t("nav.main")} className="flex-1 space-y-1">
-        {NAV_ITEMS.map((item) => {
-          const active = isNavActive(pathname, item.href);
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onNavigate}
-              aria-current={active ? "page" : undefined}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors font-sans text-sm ${
-                active ? "text-hm-blue font-medium bg-hm-bg" : "text-hm-text-secondary hover:bg-hm-bg"
-              }`}
-            >
-              <Icon size={18} aria-hidden="true" className={active ? "text-hm-blue" : ""} />
-              <span>{t(item.labelKey)}</span>
-            </Link>
-          );
-        })}
-      </nav>
-
-      <div className="mt-auto pt-4 border-t-[0.5px] border-hm-border">
+      <div className="flex flex-col gap-7">
         <Link
-          href="/dashboard/profile"
+          href="/"
           onClick={onNavigate}
-          aria-current={pathname === "/dashboard/profile" ? "page" : undefined}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg text-hm-text-secondary font-sans text-sm hover:bg-hm-bg transition-colors"
+          className="flex items-center gap-3.5 pl-2 no-underline"
         >
-          {profile?.avatarUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              alt=""
-              className="w-6 h-6 rounded-full object-cover border-[0.5px] border-hm-border"
-              src={profile.avatarUrl}
-            />
-          ) : (
-            <div
-              aria-hidden="true"
-              className="w-6 h-6 rounded-full bg-hm-bg border-[0.5px] border-hm-border flex items-center justify-center text-[10px] font-medium text-hm-text-primary"
-            >
-              {profile?.name?.charAt(0) ?? profile?.githubLogin?.charAt(0) ?? "U"}
-            </div>
-          )}
-          <span className="truncate max-w-[120px]">
-            {profile?.name ?? profile?.githubLogin ?? t("nav.profile")}
+          <Logo />
+          <span className="flex flex-col gap-0.5">
+            <span className="font-serif text-[28px] leading-none text-hm-text-primary">hashmark</span>
+            <span className="font-mono text-[11px] text-hm-text-secondary">{t("nav.tagline")}</span>
           </span>
         </Link>
+
+        <nav aria-label={t("nav.main")} className="flex flex-col gap-1">
+          {NAV_ITEMS.map((item) => {
+            const Icon = item.icon;
+            return (
+              <SideLink
+                key={item.href}
+                href={item.href}
+                active={isNavActive(pathname, item.href)}
+                onClick={onNavigate}
+                icon={<Icon size={18} aria-hidden="true" />}
+              >
+                {t(item.labelKey)}
+              </SideLink>
+            );
+          })}
+        </nav>
       </div>
+
+      <Link
+        href="/dashboard/profile"
+        onClick={onNavigate}
+        aria-current={pathname === "/dashboard/profile" ? "page" : undefined}
+        className="mt-auto flex items-center gap-3 border-t border-hm-border px-2 pt-4 text-sm text-hm-text-secondary no-underline hover:text-hm-text-primary"
+      >
+        <Avatar src={profile?.avatarUrl} name={displayName} size={32} />
+        <span className="truncate">{displayName}</span>
+      </Link>
     </>
   );
 }
 
 export const Sidebar = () => {
   return (
-    <aside className="h-full w-[220px] fixed left-0 top-0 bg-hm-surface border-r-[0.5px] border-hm-border flex-col py-6 px-4 z-10 hidden md:flex">
+    <aside className="fixed left-0 top-0 z-10 hidden h-full w-[240px] flex-col gap-8 border-r border-hm-border bg-hm-surface px-4 py-6 md:flex">
       <SidebarContent />
     </aside>
   );

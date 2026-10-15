@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
+import { Navbar } from "@/widgets/Navbar";
 import { ProfileSection } from "@/features/settings/components/ProfileSection";
 import { NotificationSettings } from "@/features/settings/components/NotificationSettings";
 import { AppearanceSettings } from "@/features/settings/components/AppearanceSettings";
-import { ConnectedRepos } from "@/features/settings/components/ConnectedRepos";
 import { getServerI18n } from "@/shared/i18n/server";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -14,16 +14,13 @@ export default async function SettingsPage() {
   const { t } = await getServerI18n();
 
   return (
-    <div className="max-w-[560px] mx-auto py-10 px-4 sm:px-6 w-full space-y-4">
-      <div className="mb-8">
-        <h2 className="font-medium text-2xl text-hm-text-primary">{t("settings.title")}</h2>
-        <p className="text-sm text-hm-text-secondary mt-1">{t("settings.subtitle")}</p>
+    <>
+      <Navbar title={t("settings.title")} />
+      <div className="flex w-full max-w-[960px] flex-col gap-5 px-4 py-5 sm:p-8">
+        <AppearanceSettings />
+        <NotificationSettings />
+        <ProfileSection />
       </div>
-
-      <ProfileSection />
-      <AppearanceSettings />
-      <NotificationSettings />
-      <ConnectedRepos />
-    </div>
+    </>
   );
 }

@@ -1,29 +1,18 @@
-import {
-  DebtType,
-  DEBT_TYPE_CONFIG,
-} from "@/shared/types/debt.types";
+import { DebtType } from "@/shared/types/debt.types";
+import { TagBadge } from "@/shared/ui/TagBadge";
+import { cn } from "@/shared/ui/cn";
 
 interface BadgeProps {
   type: DebtType;
   className?: string;
 }
 
-/**
- * Debt tipi için renkli pill badge.
- * Renk konfigürasyonu DEBT_TYPE_CONFIG'den alınır,
- * CSS class'ları Tailwind utility class'larına dönüştürülmüştür.
- */
-export function Badge({ type, className = "" }: BadgeProps) {
-  const config = DEBT_TYPE_CONFIG[type];
-
-  return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium leading-5 whitespace-nowrap ${config.bgClass} ${config.colorClass} ${className}`}>
-      {config.label}
-    </span>
-  );
+/** Borç tipi rozeti — yeni tasarımın `TagBadge` ilkeline devreder. */
+export function Badge({ type, className }: BadgeProps) {
+  return <TagBadge tag={type} className={className} />;
 }
 
-/* --- Generic Status Badge --- */
+/* --- Genel durum rozeti --- */
 
 interface StatusBadgeProps {
   label: string;
@@ -32,19 +21,21 @@ interface StatusBadgeProps {
 }
 
 const statusVariantClass: Record<StatusBadgeProps["variant"], string> = {
-  success: "text-hm-success bg-hm-success-bg",
-  danger: "text-hm-danger bg-hm-danger-bg",
-  warning: "text-hm-todo bg-hm-todo-bg",
-  info: "bg-hm-blue-light text-hm-blue",
+  success: "border-hm-success text-hm-success bg-hm-success-bg",
+  danger: "border-hm-danger text-hm-danger bg-hm-danger-bg",
+  warning: "border-hm-warning text-hm-warning bg-hm-warning-bg",
+  info: "border-hm-info text-hm-info bg-hm-info-bg",
 };
 
-export function StatusBadge({
-  label,
-  variant,
-  className = "",
-}: StatusBadgeProps) {
+export function StatusBadge({ label, variant, className }: StatusBadgeProps) {
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium leading-5 whitespace-nowrap ${statusVariantClass[variant]} ${className}`}>
+    <span
+      className={cn(
+        "inline-flex items-center whitespace-nowrap rounded-[6px] border px-[9px] py-px font-mono text-xs font-bold",
+        statusVariantClass[variant],
+        className,
+      )}
+    >
       {label}
     </span>
   );

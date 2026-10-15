@@ -8,7 +8,7 @@ export default async function ReposPage() {
   return (
     <>
       <Navbar title={t("nav.repos")} />
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 w-full">
+      <div className="w-full px-4 py-5 sm:p-8">
         <ReposPageContent />
       </div>
     </>

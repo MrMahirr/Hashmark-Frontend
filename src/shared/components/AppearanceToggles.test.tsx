@@ -10,7 +10,7 @@ vi.mock("next/navigation", () => ({
 import { I18nProvider } from "@/shared/i18n/I18nProvider";
 import { ThemeProvider } from "@/shared/theme/ThemeProvider";
 import { LanguageToggle, ThemeToggle } from "./AppearanceToggles";
-import { nextTheme, themeAttribute } from "@/shared/theme/theme";
+import { nextTheme, themeAttribute, toggleTheme } from "@/shared/theme/theme";
 
 const cookies = () => document.cookie;
 
@@ -21,6 +21,13 @@ describe("tema yardımcıları", () => {
     expect(nextTheme("system")).toBe("light");
     expect(themeAttribute("system")).toBeUndefined();
     expect(themeAttribute("dark")).toBe("dark");
+  });
+
+  it("iki durumlu düğme: koyu <-> açık; sistemde OS tercihinin tersine geçer", () => {
+    expect(toggleTheme("dark", false)).toBe("light");
+    expect(toggleTheme("light", true)).toBe("dark");
+    expect(toggleTheme("system", true)).toBe("light");
+    expect(toggleTheme("system", false)).toBe("dark");
   });
 });
 
@@ -41,8 +48,8 @@ describe("ThemeToggle", () => {
     expect(cookies()).toContain("hm_theme=dark");
 
     await userEvent.click(screen.getByRole("button", { name: "Tema: Koyu" }));
-    expect(document.documentElement.hasAttribute("data-theme")).toBe(false); // sistem
-    expect(cookies()).toContain("hm_theme=system");
+    expect(document.documentElement.getAttribute("data-theme")).toBe("light");
+    expect(cookies()).toContain("hm_theme=light");
   });
 });
 
@@ -59,11 +66,12 @@ describe("LanguageToggle", () => {
       </I18nProvider>
     );
 
-    await userEvent.click(screen.getByRole("button", { name: "Dil: EN" }));
+    await userEvent.click(screen.getByRole("button", { name: "EN" }));
 
     expect(cookies()).toContain("hm_lang=en");
     expect(refresh).toHaveBeenCalledTimes(1);
     expect(document.documentElement.lang).toBe("en");
-    expect(screen.getByRole("button", { name: "Language: TR" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "EN" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("group", { name: "Language" })).toBeInTheDocument();
   });
 });

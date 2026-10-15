@@ -7,8 +7,7 @@ import {
   getRepo,
   syncRepos,
   deleteRepo,
-  setTrackedBranch,
-} from "../api/repos.api";
+  setTrackedBranch, getRepoCandidates, trackRepo } from "../api/repos.api";
 
 import { Repo, ScanStatus } from "@/shared/types/repo.types";
 import type { RepoResponse } from "../api/repos.types";
@@ -39,6 +38,7 @@ export function mapRepoResponseToRepo(dto: RepoResponse): Repo {
     resolvedCount: 0,
     connectedAt: dto.createdAt ?? "",
     trackedBranch: dto.trackedBranch ?? null,
+    debtBreakdown: dto.debtBreakdown ?? undefined,
   };
 }
 
@@ -108,6 +108,37 @@ export function useSyncRepos() {
         description: err.message || t("repos.sync.failedDescription"),
         type: "error",
       });
+    },
+  });
+}
+
+/** Henüz izlenmeyen (aday) depolar; yalnızca `enabled` iken çekilir. */
+export function useRepoCandidates(enabled: boolean) {
+  return useQuery({
+    queryKey: queryKeys.repos.candidates,
+    queryFn: getRepoCandidates,
+    enabled,
+  });
+}
+
+/** Adayı izlemeye alır; depo listesi ve aday listesi yenilenir. */
+export function useTrackRepo() {
+  const queryClient = useQueryClient();
+  const addToast = useToastStore((state) => state.addToast);
+  const { t } = useI18n();
+
+  return useMutation({
+    mutationFn: (repoId: string) => trackRepo(repoId),
+    onSuccess: (repo) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.repos.all });
+      addToast({
+        title: t("repos.add.done"),
+        description: t("repos.add.doneDescription", { name: repo.fullName }),
+        type: "success",
+      });
+    },
+    onError: (err: Error) => {
+      addToast({ title: t("repos.add.failed"), description: err.message, type: "error" });
     },
   });
 }

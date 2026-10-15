@@ -8,6 +8,7 @@ export const queryKeys = {
   repos: {
     all: ["repos"] as const,
     detail: (id: string) => ["repos", id] as const,
+    candidates: ["repos", "candidates"] as const,
   },
   debts: {
     all: ["debts"] as const,
