@@ -53,3 +53,16 @@ export async function deleteRepo(repoId: string): Promise<void> {
     `${ApiMethod.REPOS}/${repoId}`
   );
 }
+
+/**
+ * Taramanın izleyeceği dalı ayarlar. Boş/null → deponun varsayılan dalı.
+ * @param {string} repoId - Repo id'si
+ * @param {string | null} branch - Dal adı
+ */
+export async function setTrackedBranch(repoId: string, branch: string | null): Promise<RepoResponse> {
+  const response = await apiClient.put<RepoResponse>(
+    `${ApiMethod.REPOS}/${repoId}/branch`,
+    { branch }
+  );
+  return response.data;
+}

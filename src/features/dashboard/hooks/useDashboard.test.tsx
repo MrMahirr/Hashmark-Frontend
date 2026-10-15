@@ -10,6 +10,9 @@ vi.mock("../api/dashboard.api", () => ({
 vi.mock("@/features/debts/hooks/useDebts", () => ({
   useDebtStats: vi.fn(),
 }));
+vi.mock("@/features/repos/hooks/useRepos", () => ({
+  useMappedRepos: () => ({ data: [{ id: "1" }, { id: "2" }, { id: "3" }] }),
+}));
 
 import { getReportSummary } from "../api/dashboard.api";
 import { useDebtStats } from "@/features/debts/hooks/useDebts";
@@ -85,5 +88,6 @@ describe("useDashboardOverview", () => {
     expect(result.current.trendData[0]).toEqual({ date: "2026-10-05", total: 12, added: 4, resolved: 2 });
     expect(result.current.moduleDistribution).toEqual([{ module: "src", count: 7 }]);
     expect(result.current.stats.activeDebts).toBe(15);
+    expect(result.current.stats.activeRepos).toBe(3);
   });
 });

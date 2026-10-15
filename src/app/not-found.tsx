@@ -1,24 +1,28 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ErrorFallback, fallbackLinkClass } from "@/shared/components/ErrorFallback";
+import { getServerI18n } from "@/shared/i18n/server";
 
-export const metadata: Metadata = {
-  title: "Sayfa bulunamadı | Hashmark",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerI18n();
+  return { title: t("error.notFound.metaTitle") };
+}
 
-export default function NotFound() {
+export default async function NotFound() {
+  const { t } = await getServerI18n();
+
   return (
     <ErrorFallback
       fullScreen
-      title="Sayfa bulunamadı"
-      description="Aradığınız sayfa taşınmış, silinmiş veya hiç var olmamış olabilir."
+      title={t("error.notFound.title")}
+      description={t("error.notFound.description")}
       actions={
         <>
           <Link href="/dashboard" className={fallbackLinkClass}>
-            Panele git
+            {t("error.notFound.dashboard")}
           </Link>
           <Link href="/" className={fallbackLinkClass}>
-            Ana sayfa
+            {t("common.homepage")}
           </Link>
         </>
       }

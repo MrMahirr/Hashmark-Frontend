@@ -13,6 +13,12 @@ export enum DebtStatus {
   RESOLVED = "RESOLVED",
 }
 
+/** Kullanıcının borç üzerindeki kararı (taramalar bunu değiştirmez). */
+export type TriageStatus = "OPEN" | "IGNORED" | "WONT_FIX";
+export const TRIAGE_STATUSES: readonly TriageStatus[] = ["OPEN", "IGNORED", "WONT_FIX"];
+
+export type DebtPriority = "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
+
 export interface Debt {
   id: string;
   type: DebtType;
@@ -21,10 +27,24 @@ export interface Debt {
   lineNumber: number;
   repoId: string;
   repoName: string;
-  author: string;
   status: DebtStatus;
+  /** ISO tarih; ekranda kullanıcının diline göre biçimlendirilir. */
   createdAt: string;
   resolvedAt: string | null;
+
+  triageStatus: TriageStatus;
+  /** GitHub'daki satırın kalıcı bağlantısı (son görüldüğü commit). */
+  permalink: string | null;
+  commitSha: string | null;
+  /** Etkin atanan: elle atama veya koddaki TODO(kisi). */
+  assignee: string | null;
+  priority: DebtPriority | null;
+  dueDate: string | null;
+  issueRef: string | null;
+  /** git blame (en iyi çaba) */
+  authorLogin: string | null;
+  authorName: string | null;
+  introducedAt: string | null;
 }
 
 /**

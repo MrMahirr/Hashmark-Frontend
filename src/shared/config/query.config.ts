@@ -17,6 +17,10 @@ export const queryConfig = {
   staleTime: readMillis(process.env.NEXT_PUBLIC_QUERY_STALE_MS, ONE_MINUTE),
   /** Kullanılmayan sorgunun bellekte tutulduğu süre. */
   gcTime: readMillis(process.env.NEXT_PUBLIC_QUERY_GC_MS, 5 * ONE_MINUTE),
+  /** Tarama sürerken durum sorgulama aralığı (`NEXT_PUBLIC_SCAN_POLL_MS`). */
+  scanPollInterval: Math.max(1000, readMillis(process.env.NEXT_PUBLIC_SCAN_POLL_MS, 3000)),
+  /** Bildirim yoklama aralığı (`NEXT_PUBLIC_NOTIFICATION_POLL_MS`); sekme arka plandayken durur. */
+  notificationPollInterval: Math.max(5000, readMillis(process.env.NEXT_PUBLIC_NOTIFICATION_POLL_MS, 30_000)),
   /** Rapor özeti ağır bir sorgu olduğu için daha uzun taze kalır. */
   reportStaleTime: Math.max(
     readMillis(process.env.NEXT_PUBLIC_QUERY_STALE_MS, ONE_MINUTE),

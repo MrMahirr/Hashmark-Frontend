@@ -18,6 +18,8 @@ export interface Repo {
   debtCount: number;
   resolvedCount: number;
   connectedAt: string;
+  /** Taranan dal; null = varsayılan dal */
+  trackedBranch: string | null;
   debtBreakdown?: Record<string, number>;
 }
 

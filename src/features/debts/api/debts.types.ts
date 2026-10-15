@@ -4,6 +4,8 @@
  * Backend'den gelen DTO (Data Transfer Object) nesneleri birebir bu şekilde temsil edilir.
  */
 
+import type { TriageStatus } from "@/shared/types/debt.types";
+
 // ── Response Types ──
 
 /**
@@ -17,8 +19,8 @@ export interface PageResponse<T> {
   totalPages: number;
 }
 
-/** 
- * GET /debts
+/**
+ * GET /debts, PATCH /debts/{id}
  * Backend DTO karşılığı: dev.hashmark.debt.dto.DebtDto
  */
 export interface DebtResponse {
@@ -27,13 +29,25 @@ export interface DebtResponse {
   repoFullName?: string;
   filePath: string;
   lineNo: number;
-  label: "TODO" | "FIXME" | "HACK" | "XXX" | string;
+  label: "TODO" | "FIXME" | "HACK" | "XXX" | "NOTE" | "DOC" | "INFO" | string;
   content: string;
   detectedAt: string;
   resolvedAt: string | null;
+
+  commitSha?: string | null;
+  permalink?: string | null;
+  fingerprint?: string | null;
+  triageStatus?: TriageStatus | string | null;
+  assignee?: string | null;
+  priority?: string | null;
+  dueDate?: string | null;
+  issueRef?: string | null;
+  authorLogin?: string | null;
+  authorName?: string | null;
+  introducedAt?: string | null;
 }
 
-/** 
+/**
  * GET /debts/stats
  * Backend DTO karşılığı: dev.hashmark.debt.dto.DebtStatsDto
  */
@@ -43,6 +57,42 @@ export interface DebtStatsResponse {
   resolvedThisWeek: number;
 }
 
+/**
+ * GET /debts/{id}/context
+ * Backend DTO karşılığı: dev.hashmark.debt.dto.DebtContextDto
+ */
+export interface DebtContextResponse {
+  filePath: string;
+  commitSha: string | null;
+  /** `lines[0]` dosyanın bu satırıdır (1 tabanlı). */
+  startLine: number;
+  highlightLine: number;
+  totalLines: number;
+  lines: string[];
+  tooLarge: boolean;
+}
+
 // ── Request Types ──
-// GET endpointleri için URL Parametreleri (Query Params) kullanıldığından 
-// JSON Request Body tanımlamasına şimdilik gerek yoktur.
+
+/** GET /debts ve GET /debts/export için ortak filtreler. */
+export interface DebtFilters {
+  repoId?: string;
+  label?: string;
+  /** "open" | "resolved" | "ignored"; boş = hepsi */
+  status?: string;
+  q?: string;
+  assignee?: string;
+  priority?: string;
+  sort?: string;
+  dir?: "asc" | "desc";
+  page?: number;
+  size?: number;
+}
+
+/** PATCH /debts/{id}: gönderilmeyen alan değişmez, assignee "" ise atama kaldırılır. */
+export interface DebtTriageRequest {
+  status?: TriageStatus;
+  assignee?: string;
+}
+
+export type ExportFormat = "csv" | "json" | "sarif";

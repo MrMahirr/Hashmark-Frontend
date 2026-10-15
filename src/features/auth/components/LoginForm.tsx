@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { useGitHubLogin } from "../hooks/useAuth";
 import { useAuthStore } from "../store/auth.store";
+import { useI18n } from "@/shared/i18n/I18nProvider";
+import { LanguageToggle, ThemeToggle } from "@/shared/components/AppearanceToggles";
 
 const GithubIcon = () => (
   <svg aria-hidden="true" className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -18,6 +20,7 @@ const GithubIcon = () => (
 );
 
 export function LoginForm() {
+  const { t } = useI18n();
   // İş mantığı (API katmanı) ile arayüz katmanı Adapter (hook) yardımıyla haberleşir (SRP)
   const { mutate: loginWithGitHub, isPending } = useGitHubLogin();
 
@@ -31,67 +34,56 @@ export function LoginForm() {
   }, [isAuthenticated, router]);
 
   return (
-    <div className="bg-hm-surface w-full max-w-[400px] rounded-card border-[0.5px] border-hm-border p-12 relative">
-      {/* Back Button */}
-      <Link 
-        href="/" 
-        aria-label="Ana Sayfaya Dön"
+    <main id="main-content" className="bg-hm-surface w-full max-w-[400px] rounded-card border-[0.5px] border-hm-border p-12 relative">
+      <Link
+        href="/"
+        aria-label={t("auth.login.back")}
         className="absolute top-6 left-6 flex items-center justify-center p-1.5 rounded-control text-hm-text-secondary hover:text-hm-text-primary hover:bg-hm-border-light transition-colors"
       >
-        <ArrowLeft className="w-4 h-4" />
+        <ArrowLeft className="w-4 h-4" aria-hidden="true" />
       </Link>
 
-      {/* Brand / Header */}
-      <div className="flex flex-col items-center mb-4 gap-1">
-        <div className="flex items-center gap-2 mb-4">
-          <span className="font-mono text-[32px] font-medium leading-none text-hm-text-primary">
-            #
-          </span>
-          <span className="text-[15px] font-medium text-hm-text-primary">
-            Hashmark
-          </span>
-        </div>
-        <h1 className="text-[20px] font-medium text-hm-text-primary">
-          Giriş yap
-        </h1>
-        <p className="text-[13px] text-hm-text-secondary text-center mt-1">
-          Borç takibine başlamak için GitHub hesabınızı bağlayın.
-        </p>
+      <div className="absolute top-5 right-5 flex items-center gap-1">
+        <LanguageToggle />
+        <ThemeToggle />
       </div>
 
-      {/* Action Area */}
+      <div className="flex flex-col items-center mb-4 gap-1">
+        <div className="flex items-center gap-2 mb-4">
+          <span aria-hidden="true" className="font-mono text-[32px] font-medium leading-none text-hm-text-primary">
+            #
+          </span>
+          <span className="text-[15px] font-medium text-hm-text-primary">Hashmark</span>
+        </div>
+        <h1 className="text-[20px] font-medium text-hm-text-primary">{t("auth.login.title")}</h1>
+        <p className="text-[13px] text-hm-text-secondary text-center mt-1">{t("auth.login.subtitle")}</p>
+      </div>
+
       <div className="mt-8 flex flex-col gap-4">
-        {/* GitHub Login Button */}
-        <button 
+        <button
+          type="button"
           onClick={() => loginWithGitHub()}
           disabled={isPending}
           className="w-full h-[44px] bg-[#24292F] hover:bg-[#24292F]/90 text-white font-medium text-[14px] rounded-control flex items-center justify-center gap-3 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
         >
           <GithubIcon />
-          {isPending ? "Yönlendiriliyor..." : "GitHub ile Devam Et"}
+          {isPending ? t("auth.login.redirecting") : t("auth.login.continue")}
         </button>
       </div>
 
-      {/* Fine Print */}
       <div className="mt-8 text-center">
-        <p className="text-[11px] font-medium text-hm-text-secondary/70">
-          Giriş yaparak{" "}
-          <Link
-            href="#"
-            className="hover:text-hm-text-primary transition-colors underline underline-offset-2"
-          >
-            Hizmet Şartlarımızı
+        <p className="text-[11px] font-medium text-hm-text-secondary">
+          {t("auth.login.termsPrefix")}{" "}
+          <Link href="#" className="hover:text-hm-text-primary transition-colors underline underline-offset-2">
+            {t("auth.login.terms")}
           </Link>{" "}
-          ve{" "}
-          <Link
-            href="#"
-            className="hover:text-hm-text-primary transition-colors underline underline-offset-2"
-          >
-            Gizlilik Politikamızı
-          </Link>{" "}
-          kabul etmiş olursunuz.
+          {t("auth.login.and")}{" "}
+          <Link href="#" className="hover:text-hm-text-primary transition-colors underline underline-offset-2">
+            {t("auth.login.privacy")}
+          </Link>
+          {t("auth.login.termsSuffix") === "." ? "." : ` ${t("auth.login.termsSuffix")}`}
         </p>
       </div>
-    </div>
+    </main>
   );
 }

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/shared/api/query-keys";
+import { queryConfig } from "@/shared/config/query.config";
 import { getNotifications, markAsRead, markAllAsRead } from "../api/notification.api";
 import type { NotificationResponse } from "../api/notification.types";
 
@@ -7,7 +8,9 @@ export function useNotifications() {
   return useQuery<NotificationResponse[], Error>({
     queryKey: queryKeys.notifications.all,
     queryFn: getNotifications,
-    refetchInterval: 30000, // 30 saniyede bir poll
+    // Yoklama aralığı yapılandırılabilir; sekme görünür değilken (varsayılan) yoklanmaz
+    refetchInterval: queryConfig.notificationPollInterval,
+    refetchOnWindowFocus: true,
   });
 }
 

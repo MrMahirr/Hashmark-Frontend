@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { ErrorFallback, fallbackButtonClass, fallbackLinkClass } from "@/shared/components/ErrorFallback";
+import { useI18n } from "@/shared/i18n/I18nProvider";
 
 export default function RootError({
   error,
@@ -11,6 +12,8 @@ export default function RootError({
   error: Error & { digest?: string };
   unstable_retry: () => void;
 }) {
+  const { t } = useI18n();
+
   useEffect(() => {
     console.error(error);
   }, [error]);
@@ -18,16 +21,16 @@ export default function RootError({
   return (
     <ErrorFallback
       fullScreen
-      title="Bir şeyler ters gitti"
-      description="Beklenmeyen bir hata oluştu. Tekrar deneyebilir veya ana sayfaya dönebilirsiniz."
-      digest={error.digest}
+      title={t("error.title")}
+      description={t("error.description")}
+      digest={error.digest ? t("error.code", { code: error.digest }) : undefined}
       actions={
         <>
           <button type="button" className={fallbackButtonClass} onClick={() => unstable_retry()}>
-            Tekrar dene
+            {t("common.tryAgain")}
           </button>
           <Link href="/" className={fallbackLinkClass}>
-            Ana sayfa
+            {t("common.homepage")}
           </Link>
         </>
       }

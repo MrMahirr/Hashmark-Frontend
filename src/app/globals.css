@@ -2,7 +2,8 @@
 
 /* ===================================================
    HASHMARK — Design System Tokens (Tailwind CSS v4)
-   Light / Minimal — No dark mode
+   Light (varsayılan) + Dark tema. Tema `<html data-theme>` ile seçilir;
+   öznitelik yoksa sistem tercihi (prefers-color-scheme) kullanılır.
    =================================================== */
 
 /* Fonts: Inter & JetBrains Mono loaded via next/font/google in layout.tsx */
@@ -25,6 +26,8 @@
   --hm-blue: #2563EB;
   --hm-blue-light: #EFF6FF;
   --hm-blue-hover: #1D4ED8;
+  /* Mavi zemin üzerindeki metin rengi */
+  --hm-on-blue: #FFFFFF;
 
   /* Accent — Debt Types */
   --hm-todo: #D97706;
@@ -60,6 +63,93 @@
   --hm-font-mono: var(--font-jetbrains-mono), ui-monospace, "Cascadia Code", "Fira Code", monospace;
 }
 
+/* --- Dark tema --- */
+:root {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --hm-bg: #0D1117;
+  --hm-surface: #161B22;
+  --hm-border: #30363D;
+  --hm-border-light: #21262D;
+
+  --hm-text-primary: #E6EDF3;
+  --hm-text-secondary: #9DA7B3;
+  --hm-text-muted: #8B949E;
+  --hm-text-inverse: #0D1117;
+
+  --hm-blue: #4C8DF6;
+  --hm-blue-light: #11243F;
+  --hm-blue-hover: #7AA9FA;
+  --hm-on-blue: #0D1117;
+
+  --hm-todo: #FBBF24;
+  --hm-todo-bg: #2B2108;
+  --hm-fixme: #F87171;
+  --hm-fixme-bg: #331416;
+  --hm-hack: #FB923C;
+  --hm-hack-bg: #33200F;
+  --hm-xxx: #A78BFA;
+  --hm-xxx-bg: #231B3D;
+  --hm-note: #2DD4BF;
+  --hm-note-bg: #0F2B28;
+  --hm-doc: #818CF8;
+  --hm-doc-bg: #1C2140;
+  --hm-info: #38BDF8;
+  --hm-info-bg: #0E2A3A;
+
+  --hm-success: #34D399;
+  --hm-success-bg: #0E2B22;
+  --hm-danger: #F87171;
+  --hm-danger-bg: #331416;
+  --hm-warning: #FBBF24;
+  --hm-warning-bg: #2B2108;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --hm-bg: #0D1117;
+    --hm-surface: #161B22;
+    --hm-border: #30363D;
+    --hm-border-light: #21262D;
+
+    --hm-text-primary: #E6EDF3;
+    --hm-text-secondary: #9DA7B3;
+    --hm-text-muted: #8B949E;
+    --hm-text-inverse: #0D1117;
+
+    --hm-blue: #4C8DF6;
+    --hm-blue-light: #11243F;
+    --hm-blue-hover: #7AA9FA;
+    --hm-on-blue: #0D1117;
+
+    --hm-todo: #FBBF24;
+    --hm-todo-bg: #2B2108;
+    --hm-fixme: #F87171;
+    --hm-fixme-bg: #331416;
+    --hm-hack: #FB923C;
+    --hm-hack-bg: #33200F;
+    --hm-xxx: #A78BFA;
+    --hm-xxx-bg: #231B3D;
+    --hm-note: #2DD4BF;
+    --hm-note-bg: #0F2B28;
+    --hm-doc: #818CF8;
+    --hm-doc-bg: #1C2140;
+    --hm-info: #38BDF8;
+    --hm-info-bg: #0E2A3A;
+
+    --hm-success: #34D399;
+    --hm-success-bg: #0E2B22;
+    --hm-danger: #F87171;
+    --hm-danger-bg: #331416;
+    --hm-warning: #FBBF24;
+    --hm-warning-bg: #2B2108;
+  }
+}
+
 /* --- Tailwind v4 Theme Integration --- */
 @theme inline {
   /* Colors */
@@ -76,6 +166,7 @@
   --color-hm-blue: var(--hm-blue);
   --color-hm-blue-light: var(--hm-blue-light);
   --color-hm-blue-hover: var(--hm-blue-hover);
+  --color-hm-on-blue: var(--hm-on-blue);
 
   --color-hm-todo: var(--hm-todo);
   --color-hm-todo-bg: var(--hm-todo-bg);
@@ -124,3 +215,80 @@ body {
   min-height: 100vh;
 }
 
+/* --- İnce (0.5px) kenarlık yardımcıları (landing bileşenleri kullanır) --- */
+@utility border-b-thin {
+  border-bottom-width: 0.5px;
+}
+@utility border-t-thin {
+  border-top-width: 0.5px;
+}
+@utility border-y-thin {
+  border-top-width: 0.5px;
+  border-bottom-width: 0.5px;
+}
+
+/* --- Erişilebilirlik --- */
+
+/* Klavye odağı her etkileşimli öğede görünür olsun */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--hm-blue);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Yalnızca ekran okuyucuya görünen, odak alınca ortaya çıkan "içeriğe geç" bağlantısı */
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: -4rem;
+  z-index: 200;
+  padding: 0.5rem 0.875rem;
+  border-radius: var(--hm-radius-control);
+  background: var(--hm-text-primary);
+  color: var(--hm-surface);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  transition: top 0.15s ease;
+}
+.skip-link:focus {
+  top: 0.75rem;
+}
+
+/* --- Basit giriş animasyonları (framer-motion yerine) --- */
+@keyframes hm-fade-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes hm-slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+@keyframes hm-slide-in-left {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+.hm-anim-fade-in {
+  animation: hm-fade-in 0.18s ease-out;
+}
+.hm-anim-slide-right {
+  animation: hm-slide-in-right 0.2s ease-out;
+}
+.hm-anim-slide-left {
+  animation: hm-slide-in-left 0.2s ease-out;
+}
+
+dialog.hm-dialog::backdrop {
+  background: rgb(0 0 0 / 0.45);
+  backdrop-filter: blur(2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

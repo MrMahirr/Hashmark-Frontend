@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 interface ErrorFallbackProps {
   title: string;
   description: string;
-  /** Next.js'in hata için ürettiği kısa tanımlayıcı (sunucu loglarıyla eşleştirmek için). */
+  /** Hata kodu satırı (örn. "Hata kodu: 123"); sunucu loglarıyla eşleştirmek için. */
   digest?: string;
   actions: ReactNode;
   fullScreen?: boolean;
@@ -21,13 +21,11 @@ export function ErrorFallback({ title, description, digest, actions, fullScreen 
         fullScreen ? "min-h-screen" : "min-h-[60vh]"
       }`}
     >
-      <div className="font-mono text-[36px] font-medium text-hm-text-primary leading-none">#</div>
+      <div aria-hidden="true" className="font-mono text-[36px] font-medium text-hm-text-primary leading-none">#</div>
       <div className="flex flex-col gap-1 max-w-[420px]">
         <h1 className="text-[16px] font-medium text-hm-text-primary">{title}</h1>
         <p className="text-[13px] text-hm-text-secondary">{description}</p>
-        {digest ? (
-          <p className="text-[11px] font-mono text-hm-text-secondary mt-2">Hata kodu: {digest}</p>
-        ) : null}
+        {digest ? <p className="text-[11px] font-mono text-hm-text-secondary mt-2">{digest}</p> : null}
       </div>
       <div className="flex items-center gap-3">{actions}</div>
     </div>

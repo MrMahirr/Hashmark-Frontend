@@ -5,6 +5,7 @@ import { distributePercentages } from "@/shared/utils/percentages";
 import { getReportSummary, sendTestReport } from "../api/dashboard.api";
 import { calculateHealth } from "../utils/health";
 import { useDebtStats } from "@/features/debts/hooks/useDebts";
+import { useMappedRepos } from "@/features/repos/hooks/useRepos";
 import { DebtType, type LabelDistribution, type ModuleDistribution, type TrendDataPoint } from "@/shared/types";
 
 /**
@@ -38,6 +39,7 @@ export function useReportSummary(repoId?: string) {
 export function useDashboardOverview(repoId?: string) {
   const summaryQuery = useReportSummary(repoId);
   const statsQuery = useDebtStats(repoId);
+  const reposQuery = useMappedRepos();
 
   const isLoading = summaryQuery.isLoading || statsQuery.isLoading;
   const isError = summaryQuery.isError || statsQuery.isError;
@@ -103,7 +105,8 @@ export function useDashboardOverview(repoId?: string) {
       totalDebts,
       activeDebts,
       resolvedDebts,
-      activeRepos: 1,
+      // Tek depo görünümünde 1, genel bakışta bağlı depo sayısı
+      activeRepos: repoId ? 1 : (reposQuery.data?.length ?? 0),
       resolutionRate,
     },
     trendData,

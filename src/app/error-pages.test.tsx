@@ -6,6 +6,14 @@ import DashboardError from "./dashboard/error";
 import GlobalError from "./global-error";
 import NotFound from "./not-found";
 
+// not-found sunucu bileşeni: dil çerezi yerine varsayılan (tr) sözlüğü kullan
+vi.mock("@/shared/i18n/server", async () => {
+  const { createTranslator } = await import("@/shared/i18n");
+  return {
+    getServerI18n: async () => ({ locale: "tr", t: createTranslator("tr") }),
+  };
+});
+
 vi.mock("next/link", () => ({
   default: ({ href, children, ...rest }: { href: string; children: React.ReactNode }) => (
     <a href={href} {...rest}>
@@ -56,8 +64,8 @@ describe("hata sayfaları", () => {
     expect(retry).toHaveBeenCalledTimes(1);
   });
 
-  it("404 sayfası yönlendirme bağlantılarını gösterir", () => {
-    render(<NotFound />);
+  it("404 sayfası yönlendirme bağlantılarını gösterir", async () => {
+    render(await NotFound());
 
     expect(screen.getByText("Sayfa bulunamadı")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Panele git" })).toHaveAttribute("href", "/dashboard");

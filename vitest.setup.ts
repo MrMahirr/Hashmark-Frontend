@@ -36,6 +36,31 @@ if (typeof window !== "undefined") {
   Object.defineProperty(window, "localStorage", { value: memoryStorage, configurable: true, writable: true });
 }
 
+// jsdom'da bulunmayan tarayıcı API'leri
+class ResizeObserverStub {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+if (typeof globalThis.ResizeObserver === "undefined") {
+  globalThis.ResizeObserver = ResizeObserverStub as unknown as typeof ResizeObserver;
+}
+
+if (typeof HTMLDialogElement !== "undefined") {
+  const proto = HTMLDialogElement.prototype;
+  if (typeof proto.showModal !== "function") {
+    proto.showModal = function showModal(this: HTMLDialogElement) {
+      this.setAttribute("open", "");
+    };
+  }
+  if (typeof proto.close !== "function") {
+    proto.close = function close(this: HTMLDialogElement) {
+      this.removeAttribute("open");
+      this.dispatchEvent(new Event("close"));
+    };
+  }
+}
+
 afterEach(() => {
   cleanup();
   memoryStorage.clear();
