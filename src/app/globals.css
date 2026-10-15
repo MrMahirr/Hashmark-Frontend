@@ -1,173 +1,159 @@
 @import "tailwindcss";
 
 /* ===================================================
-   HASHMARK — Design System Tokens (Tailwind CSS v4)
-   Light (varsayılan) + Dark tema. Tema `<html data-theme>` ile seçilir;
+   HASHMARK — Design System v2 "Teknik borcun cetveli"
+   Kaynak: Hashmark-Vault/Planlar/Yeni Tasarıma Geçiş Planı.md §1.3
+   Varsayılan tema KOYU. Açık tema `<html data-theme="light">`;
    öznitelik yoksa sistem tercihi (prefers-color-scheme) kullanılır.
    =================================================== */
 
-/* Fonts: Inter & JetBrains Mono loaded via next/font/google in layout.tsx */
+/* Fonts: Hanken Grotesk, Instrument Serif, JetBrains Mono → next/font (layout.tsx) */
 
-/* --- CSS Custom Properties (Design Tokens) --- */
 :root {
-  /* Background */
-  --hm-bg: #F9FAFB;
-  --hm-surface: #FFFFFF;
-  --hm-border: #E5E7EB;
-  --hm-border-light: #F3F4F6;
+  color-scheme: dark;
 
-  /* Text */
-  --hm-text-primary: #111827;
-  --hm-text-secondary: #6B7280;
-  --hm-text-muted: #9CA3AF;
-  --hm-text-inverse: #FFFFFF;
+  /* Yüzeyler */
+  --hm-bg: #0D1110;
+  --hm-surface: #141A18;
+  --hm-border: #26312D;
+  --hm-border-light: #1B2420;
 
-  /* Accent — Functional */
-  --hm-blue: #2563EB;
-  --hm-blue-light: #EFF6FF;
-  --hm-blue-hover: #1D4ED8;
-  /* Mavi zemin üzerindeki metin rengi */
-  --hm-on-blue: #FFFFFF;
+  /* Metin */
+  --hm-text-primary: #E9EEE8;
+  --hm-text-secondary: #9AA9A2;
+  --hm-text-muted: #9AA9A2;
+  --hm-text-inverse: #0D1110;
 
-  /* Accent — Debt Types */
-  --hm-todo: #D97706;
-  --hm-todo-bg: #FFFBEB;
-  --hm-fixme: #DC2626;
-  --hm-fixme-bg: #FEF2F2;
-  --hm-hack: #EA580C;
-  --hm-hack-bg: #FFF7ED;
-  --hm-xxx: #7C3AED;
-  --hm-xxx-bg: #F5F3FF;
-  --hm-note: #0D9488;
-  --hm-note-bg: #F0FDFA;
-  --hm-doc: #4F46E5;
-  --hm-doc-bg: #EEF2FF;
-  --hm-info: #0284C7;
-  --hm-info-bg: #F0F9FF;
+  /* Vurgu + birincil düğme + ofset gölge + vurgu bandı */
+  --hm-acc: #CDF24A;
+  --hm-btn: #CDF24A;
+  --hm-btn-fg: #0D1110;
+  --hm-shadow: #33423C;
+  --hm-hl: #CDF24A;
+  --hm-hl-fg: #0D1110;
 
-  /* Status */
-  --hm-success: #059669;
-  --hm-success-bg: #ECFDF5;
-  --hm-danger: #DC2626;
-  --hm-danger-bg: #FEF2F2;
-  --hm-warning: #D97706;
-  --hm-warning-bg: #FFFBEB;
+  /* Etiket renkleri */
+  --hm-todo: #7DB7FF;
+  --hm-fixme: #FF8F70;
+  --hm-hack: #FFC857;
+  --hm-xxx: #C9A2FF;
+  --hm-note: #5FD6C2;
+  --hm-doc: #A3A8FF;
+  --hm-info: #6FD0F0;
 
-  /* Spacing */
-  --hm-radius-control: 8px;
-  --hm-radius-card: 12px;
+  /* Durum */
+  --hm-success: #8FD14F;
+  --hm-danger: #FF8F70;
+  --hm-warning: #FFC857;
+
+  /* Etiket/durum zeminleri çalışma anında %12 tondan üretilir (tema başına belirteç yok) */
+  --hm-todo-bg: color-mix(in srgb, var(--hm-todo) 12%, transparent);
+  --hm-fixme-bg: color-mix(in srgb, var(--hm-fixme) 12%, transparent);
+  --hm-hack-bg: color-mix(in srgb, var(--hm-hack) 12%, transparent);
+  --hm-xxx-bg: color-mix(in srgb, var(--hm-xxx) 12%, transparent);
+  --hm-note-bg: color-mix(in srgb, var(--hm-note) 12%, transparent);
+  --hm-doc-bg: color-mix(in srgb, var(--hm-doc) 12%, transparent);
+  --hm-info-bg: color-mix(in srgb, var(--hm-info) 12%, transparent);
+  --hm-success-bg: color-mix(in srgb, var(--hm-success) 12%, transparent);
+  --hm-danger-bg: color-mix(in srgb, var(--hm-danger) 12%, transparent);
+  --hm-warning-bg: color-mix(in srgb, var(--hm-warning) 12%, transparent);
+
+  /* Köşe yarıçapı */
+  --hm-radius-control: 12px;
+  --hm-radius-card: 18px;
+  --hm-radius-panel: 22px;
+  --hm-radius-cta: 28px;
   --hm-radius-pill: 9999px;
 
-  /* Typography — next/font injects --font-inter and --font-jetbrains-mono */
-  --hm-font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  /* Tipografi — next/font --font-hanken, --font-instrument-serif, --font-jetbrains-mono enjekte eder */
+  --hm-font-sans: var(--font-hanken), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --hm-font-serif: var(--font-instrument-serif), Georgia, serif;
   --hm-font-mono: var(--font-jetbrains-mono), ui-monospace, "Cascadia Code", "Fira Code", monospace;
 }
 
-/* --- Dark tema --- */
-:root {
+/* --- Açık tema --- */
+:root[data-theme="light"] {
   color-scheme: light;
+  --hm-bg: #EEF0EA;
+  --hm-surface: #F9FAF7;
+  --hm-border: #D2D8CF;
+  --hm-border-light: #E3E7DF;
+
+  --hm-text-primary: #111514;
+  --hm-text-secondary: #525C55;
+  --hm-text-muted: #525C55;
+  --hm-text-inverse: #EEF0EA;
+
+  --hm-acc: #326500;
+  --hm-btn: #111514;
+  --hm-btn-fg: #EEF0EA;
+  --hm-shadow: #CDF24A;
+  --hm-hl: #CDF24A;
+  --hm-hl-fg: #111514;
+
+  --hm-todo: #1C56AE;
+  --hm-fixme: #A22E0D;
+  --hm-hack: #7C5000;
+  --hm-xxx: #7136BB;
+  --hm-note: #0D645D;
+  --hm-doc: #4338CA;
+  --hm-info: #00607E;
+
+  --hm-success: #2D6600;
+  --hm-danger: #A22E0D;
+  --hm-warning: #7C5000;
 }
 
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --hm-bg: #0D1117;
-  --hm-surface: #161B22;
-  --hm-border: #30363D;
-  --hm-border-light: #21262D;
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    color-scheme: light;
+    --hm-bg: #EEF0EA;
+    --hm-surface: #F9FAF7;
+    --hm-border: #D2D8CF;
+    --hm-border-light: #E3E7DF;
 
-  --hm-text-primary: #E6EDF3;
-  --hm-text-secondary: #9DA7B3;
-  --hm-text-muted: #8B949E;
-  --hm-text-inverse: #0D1117;
+    --hm-text-primary: #111514;
+    --hm-text-secondary: #525C55;
+    --hm-text-muted: #525C55;
+    --hm-text-inverse: #EEF0EA;
 
-  --hm-blue: #4C8DF6;
-  --hm-blue-light: #11243F;
-  --hm-blue-hover: #7AA9FA;
-  --hm-on-blue: #0D1117;
+    --hm-acc: #326500;
+    --hm-btn: #111514;
+    --hm-btn-fg: #EEF0EA;
+    --hm-shadow: #CDF24A;
+    --hm-hl: #CDF24A;
+    --hm-hl-fg: #111514;
 
-  --hm-todo: #FBBF24;
-  --hm-todo-bg: #2B2108;
-  --hm-fixme: #F87171;
-  --hm-fixme-bg: #331416;
-  --hm-hack: #FB923C;
-  --hm-hack-bg: #33200F;
-  --hm-xxx: #A78BFA;
-  --hm-xxx-bg: #231B3D;
-  --hm-note: #2DD4BF;
-  --hm-note-bg: #0F2B28;
-  --hm-doc: #818CF8;
-  --hm-doc-bg: #1C2140;
-  --hm-info: #38BDF8;
-  --hm-info-bg: #0E2A3A;
+    --hm-todo: #1C56AE;
+    --hm-fixme: #A22E0D;
+    --hm-hack: #7C5000;
+    --hm-xxx: #7136BB;
+    --hm-note: #0D645D;
+    --hm-doc: #4338CA;
+    --hm-info: #00607E;
 
-  --hm-success: #34D399;
-  --hm-success-bg: #0E2B22;
-  --hm-danger: #F87171;
-  --hm-danger-bg: #331416;
-  --hm-warning: #FBBF24;
-  --hm-warning-bg: #2B2108;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --hm-bg: #0D1117;
-    --hm-surface: #161B22;
-    --hm-border: #30363D;
-    --hm-border-light: #21262D;
-
-    --hm-text-primary: #E6EDF3;
-    --hm-text-secondary: #9DA7B3;
-    --hm-text-muted: #8B949E;
-    --hm-text-inverse: #0D1117;
-
-    --hm-blue: #4C8DF6;
-    --hm-blue-light: #11243F;
-    --hm-blue-hover: #7AA9FA;
-    --hm-on-blue: #0D1117;
-
-    --hm-todo: #FBBF24;
-    --hm-todo-bg: #2B2108;
-    --hm-fixme: #F87171;
-    --hm-fixme-bg: #331416;
-    --hm-hack: #FB923C;
-    --hm-hack-bg: #33200F;
-    --hm-xxx: #A78BFA;
-    --hm-xxx-bg: #231B3D;
-    --hm-note: #2DD4BF;
-    --hm-note-bg: #0F2B28;
-    --hm-doc: #818CF8;
-    --hm-doc-bg: #1C2140;
-    --hm-info: #38BDF8;
-    --hm-info-bg: #0E2A3A;
-
-    --hm-success: #34D399;
-    --hm-success-bg: #0E2B22;
-    --hm-danger: #F87171;
-    --hm-danger-bg: #331416;
-    --hm-warning: #FBBF24;
-    --hm-warning-bg: #2B2108;
+    --hm-success: #2D6600;
+    --hm-danger: #A22E0D;
+    --hm-warning: #7C5000;
   }
 }
 
 /* --- Tailwind v4 Theme Integration --- */
 @theme inline {
-  /* Colors */
   --color-hm-bg: var(--hm-bg);
   --color-hm-surface: var(--hm-surface);
   --color-hm-border: var(--hm-border);
   --color-hm-border-light: var(--hm-border-light);
-
   --color-hm-text-primary: var(--hm-text-primary);
   --color-hm-text-secondary: var(--hm-text-secondary);
   --color-hm-text-muted: var(--hm-text-muted);
   --color-hm-text-inverse: var(--hm-text-inverse);
-
-  --color-hm-blue: var(--hm-blue);
-  --color-hm-blue-light: var(--hm-blue-light);
-  --color-hm-blue-hover: var(--hm-blue-hover);
-  --color-hm-on-blue: var(--hm-on-blue);
-
+  --color-hm-acc: var(--hm-acc);
+  --color-hm-btn: var(--hm-btn);
+  --color-hm-btn-fg: var(--hm-btn-fg);
+  --color-hm-shadow: var(--hm-shadow);
+  --color-hm-hl: var(--hm-hl);
+  --color-hm-hl-fg: var(--hm-hl-fg);
   --color-hm-todo: var(--hm-todo);
   --color-hm-todo-bg: var(--hm-todo-bg);
   --color-hm-fixme: var(--hm-fixme);
@@ -182,7 +168,6 @@
   --color-hm-doc-bg: var(--hm-doc-bg);
   --color-hm-info: var(--hm-info);
   --color-hm-info-bg: var(--hm-info-bg);
-
   --color-hm-success: var(--hm-success);
   --color-hm-success-bg: var(--hm-success-bg);
   --color-hm-danger: var(--hm-danger);
@@ -190,13 +175,14 @@
   --color-hm-warning: var(--hm-warning);
   --color-hm-warning-bg: var(--hm-warning-bg);
 
-  /* Font Families */
   --font-sans: var(--hm-font-sans);
+  --font-serif: var(--hm-font-serif);
   --font-mono: var(--hm-font-mono);
 
-  /* Border Radius */
   --radius-control: var(--hm-radius-control);
   --radius-card: var(--hm-radius-card);
+  --radius-panel: var(--hm-radius-panel);
+  --radius-cta: var(--hm-radius-cta);
   --radius-pill: var(--hm-radius-pill);
 }
 
@@ -215,25 +201,12 @@ body {
   min-height: 100vh;
 }
 
-/* --- İnce (0.5px) kenarlık yardımcıları (landing bileşenleri kullanır) --- */
-@utility border-b-thin {
-  border-bottom-width: 0.5px;
-}
-@utility border-t-thin {
-  border-top-width: 0.5px;
-}
-@utility border-y-thin {
-  border-top-width: 0.5px;
-  border-bottom-width: 0.5px;
-}
-
 /* --- Erişilebilirlik --- */
 
 /* Klavye odağı her etkileşimli öğede görünür olsun */
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
-  outline: 2px solid var(--hm-blue);
+  outline: 3px solid var(--hm-acc);
   outline-offset: 2px;
-  border-radius: 4px;
 }
 
 /* Yalnızca ekran okuyucuya görünen, odak alınca ortaya çıkan "içeriğe geç" bağlantısı */
@@ -245,7 +218,7 @@ body {
   padding: 0.5rem 0.875rem;
   border-radius: var(--hm-radius-control);
   background: var(--hm-text-primary);
-  color: var(--hm-surface);
+  color: var(--hm-bg);
   font-size: 0.8125rem;
   font-weight: 500;
   transition: top 0.15s ease;
@@ -266,6 +239,13 @@ body {
 @keyframes hm-slide-in-left {
   from { transform: translateX(-100%); }
   to { transform: translateX(0); }
+}
+@keyframes hm-indeterminate {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+.hm-anim-indeterminate {
+  animation: hm-indeterminate 1.4s ease-in-out infinite;
 }
 .hm-anim-fade-in {
   animation: hm-fade-in 0.18s ease-out;

@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -40,7 +40,7 @@ describe("NotificationBell", () => {
     render(<NotificationBell />);
 
     await userEvent.click(screen.getByRole("button", { name: "1 okunmamış bildirim" }));
-    expect(screen.getByRole("region", { name: "Bildirimler" })).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Bildirimler" })).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole("button", { name: "Okundu işaretle: Tarama bitti" }));
     expect(mocks.markRead).toHaveBeenCalledWith(1);
@@ -54,10 +54,24 @@ describe("NotificationBell", () => {
     const bell = screen.getByRole("button", { name: "1 okunmamış bildirim" });
     await userEvent.click(bell);
 
-    await userEvent.keyboard("{Escape}");
+    // jsdom Esc'yi işlemez; tarayıcının yerel "close" olayını taklit ediyoruz (bkz. Dialog.test)
+    act(() => {
+      screen.getByRole("dialog", { name: "Bildirimler" }).dispatchEvent(new Event("close"));
+    });
 
-    expect(screen.queryByRole("region", { name: "Bildirimler" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("dialog", { name: "Bildirimler" })).not.toBeInTheDocument();
     expect(bell).toHaveFocus();
+  });
+
+  it("Okunmamış sekmesi yalnızca okunmamışları listeler", async () => {
+    render(<NotificationBell />);
+    await userEvent.click(screen.getByRole("button", { name: "1 okunmamış bildirim" }));
+
+    await userEvent.click(screen.getByRole("button", { name: "Okunmamış (1)" }));
+
+    expect(screen.getByText("Tarama bitti")).toBeInTheDocument();
+    expect(screen.queryByText("Eski")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Okunmamış (1)" })).toHaveAttribute("aria-pressed", "true");
   });
 
   it("boş listede açıklama gösterir", async () => {

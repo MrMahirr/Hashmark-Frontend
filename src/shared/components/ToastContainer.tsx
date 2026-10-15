@@ -8,14 +8,14 @@ import { CheckCircle2, AlertCircle, Info, Loader2, X } from "lucide-react";
 const icons: Record<ToastType, React.ReactNode> = {
   success: <CheckCircle2 aria-hidden="true" className="w-4 h-4 text-hm-success shrink-0" />,
   error: <AlertCircle aria-hidden="true" className="w-4 h-4 text-hm-danger shrink-0" />,
-  info: <Info aria-hidden="true" className="w-4 h-4 text-hm-blue shrink-0" />,
+  info: <Info aria-hidden="true" className="w-4 h-4 text-hm-acc shrink-0" />,
   loading: <Loader2 aria-hidden="true" className="w-4 h-4 text-hm-text-primary animate-spin shrink-0" />,
 };
 
 const borderColors: Record<ToastType, string> = {
-  success: "border-hm-success/30 bg-hm-success-bg",
-  error: "border-hm-danger/30 bg-hm-danger-bg",
-  info: "border-hm-blue/30 bg-hm-blue-light",
+  success: "border-hm-success/40 bg-hm-surface",
+  error: "border-hm-danger/40 bg-hm-surface",
+  info: "border-hm-acc/40 bg-hm-surface",
   loading: "border-hm-border bg-hm-surface",
 };
 
@@ -38,17 +38,17 @@ export function ToastContainer() {
         <div
           key={toast.id}
           role={toast.type === "error" ? "alert" : "status"}
-          className={`pointer-events-auto hm-anim-fade-in flex items-start gap-3 p-3.5 rounded-card border-[0.5px] shadow-lg ${
+          className={`pointer-events-auto hm-anim-fade-in flex items-start gap-3 p-3.5 rounded-card border shadow-[4px_4px_0_var(--hm-shadow)] ${
             borderColors[toast.type]
           }`}
         >
           <div className="mt-0.5">{icons[toast.type]}</div>
           <div className="flex-1 min-w-0">
-            <h4 className="font-sans text-[13px] font-medium text-hm-text-primary leading-tight">
+            <h4 className="font-sans text-sm font-bold text-hm-text-primary leading-tight">
               {toast.title}
             </h4>
             {toast.description && (
-              <p className="font-sans text-[12px] text-hm-text-secondary mt-1 leading-normal">
+              <p className="font-sans text-[13px] text-hm-text-secondary mt-1 leading-normal">
                 {toast.description}
               </p>
             )}

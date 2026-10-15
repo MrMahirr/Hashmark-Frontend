@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
-import { CheckCircle2, Circle, Loader2 } from "lucide-react";
+import { CheckCircle2, Circle } from "lucide-react";
 import { useI18n } from "@/shared/i18n/I18nProvider";
-import { useMappedRepos, useSyncRepos } from "@/features/repos/hooks/useRepos";
+import { useMappedRepos } from "@/features/repos/hooks/useRepos";
+import { ButtonLink } from "@/shared/ui/Button";
+import { Panel } from "@/shared/ui/Panel";
 
 /**
  * Yeni kullanıcıyı ilk raporuna götüren 3 adımlı rehber. Depo bağlanıp ilk tarama
@@ -12,7 +13,6 @@ import { useMappedRepos, useSyncRepos } from "@/features/repos/hooks/useRepos";
 export function OnboardingChecklist() {
   const { t } = useI18n();
   const { data: repos, isLoading } = useMappedRepos();
-  const syncMutation = useSyncRepos();
 
   if (isLoading || !repos) return null;
 
@@ -28,14 +28,11 @@ export function OnboardingChecklist() {
   const currentKey = steps.find((step) => !step.done)?.key;
 
   return (
-    <section
-      aria-labelledby="onboarding-title"
-      className="bg-hm-surface border-[0.5px] border-hm-border rounded-card p-5"
-    >
-      <h2 id="onboarding-title" className="text-sm font-medium text-hm-text-primary">
+    <Panel aria-labelledby="onboarding-title" className="p-6">
+      <h2 id="onboarding-title" className="m-0 font-serif text-[28px] font-normal leading-none text-hm-text-primary">
         {t("onboarding.title")}
       </h2>
-      <p className="mt-1 text-xs text-hm-text-secondary">{t("onboarding.subtitle")}</p>
+      <p className="mb-0 mt-2 text-sm text-hm-text-secondary">{t("onboarding.subtitle")}</p>
 
       <ol className="mt-4 flex flex-col gap-3">
         {steps.map((step, index) => (
@@ -44,40 +41,31 @@ export function OnboardingChecklist() {
               {step.done ? (
                 <CheckCircle2 size={18} className="text-hm-success" />
               ) : (
-                <Circle size={18} className={step.key === currentKey ? "text-hm-blue" : "text-hm-border"} />
+                <Circle size={18} className={step.key === currentKey ? "text-hm-acc" : "text-hm-border"} />
               )}
             </span>
             <div className="min-w-0 flex-1">
-              <p className={`text-[13px] ${step.done ? "text-hm-text-secondary line-through" : "text-hm-text-primary font-medium"}`}>
+              <p className={`m-0 text-[15px] ${step.done ? "text-hm-text-secondary line-through" : "text-hm-text-primary font-medium"}`}>
                 <span className="sr-only">{`${index + 1}. `}</span>
                 {step.title}
                 {step.done && <span className="sr-only"> — {t("onboarding.done")}</span>}
               </p>
-              {!step.done && step.hint && <p className="mt-0.5 text-xs text-hm-text-secondary">{step.hint}</p>}
+              {!step.done && step.hint && <p className="mt-0.5 text-sm text-hm-text-secondary">{step.hint}</p>}
 
               {step.key === "sync" && currentKey === "sync" && (
-                <button
-                  type="button"
-                  onClick={() => syncMutation.mutate()}
-                  disabled={syncMutation.isPending}
-                  className="mt-2 inline-flex items-center gap-2 rounded-md bg-hm-text-primary px-3 py-1.5 text-xs font-medium text-hm-surface disabled:opacity-50"
-                >
-                  {syncMutation.isPending && <Loader2 size={12} className="animate-spin" aria-hidden="true" />}
+                <ButtonLink href="/dashboard/repos" className="mt-3">
                   {t("onboarding.action.sync")}
-                </button>
+                </ButtonLink>
               )}
               {step.key === "scan" && currentKey === "scan" && (
-                <Link
-                  href="/dashboard/repos"
-                  className="mt-2 inline-flex items-center rounded-md bg-hm-text-primary px-3 py-1.5 text-xs font-medium text-hm-surface"
-                >
+                <ButtonLink href="/dashboard/repos" className="mt-3">
                   {t("onboarding.action.goRepos")}
-                </Link>
+                </ButtonLink>
               )}
             </div>
           </li>
         ))}
       </ol>
-    </section>
+    </Panel>
   );
 }

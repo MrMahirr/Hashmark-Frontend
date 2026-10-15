@@ -1,5 +1,7 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { queryKeys } from "@/shared/api/query-keys";
+import { disconnectGithub } from "./../api/user.api";
 import {
   getGitHubLoginUrl,
   handleAuthCallback,
@@ -61,6 +63,23 @@ export function useLogout() {
       // API'da hata olsa dahi güvenlik gereği token'ları temizleyip çıkış yapıyoruz
       clearTokens();
       router.push("/auth/login");
+    },
+  });
+}
+
+/**
+ * GitHub bağlantısını keser. `deleteData` true ise depo ve borç kayıtları da silinir.
+ * Başarılı olunca profil ve depo önbelleği yenilenir.
+ */
+export function useDisconnectGithub() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (deleteData: boolean) => disconnectGithub(deleteData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.user.me });
+      queryClient.invalidateQueries({ queryKey: queryKeys.repos.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.debts.all });
     },
   });
 }

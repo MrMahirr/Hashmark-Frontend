@@ -26,25 +26,25 @@ export default function GlobalError({
   return (
     <html lang={locale}>
       <body className="min-h-screen bg-hm-bg font-sans text-hm-text-primary antialiased">
-        <div role="alert" className="min-h-screen flex flex-col items-center justify-center gap-4 p-6 text-center">
+        <div role="alert" className="flex min-h-screen flex-col items-center justify-center gap-5 p-6 text-center">
           <div aria-hidden="true" className="font-mono text-[36px] font-medium leading-none">#</div>
-          <h1 className="text-[16px] font-medium">{t("error.global.title")}</h1>
-          <p className="text-[13px] text-hm-text-secondary max-w-[420px]">{t("error.global.description")}</p>
+          <h1 className="m-0 font-serif text-[44px] font-normal leading-none">{t("error.global.title")}</h1>
+          <p className="m-0 max-w-[460px] text-base text-hm-text-secondary">{t("error.global.description")}</p>
           {error.digest ? (
-            <p className="text-[11px] font-mono text-hm-text-secondary">{t("error.code", { code: error.digest })}</p>
+            <p className="m-0 font-mono text-xs text-hm-text-secondary">{t("error.code", { code: error.digest })}</p>
           ) : null}
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-3">
             <button
               type="button"
               onClick={() => unstable_retry()}
-              className="h-10 px-5 rounded-full text-[13px] font-medium bg-hm-text-primary text-hm-surface"
+              className="inline-flex min-h-11 cursor-pointer items-center rounded-control bg-hm-btn px-5 text-[15px] font-bold text-hm-btn-fg shadow-[4px_4px_0_var(--hm-shadow)]"
             >
               {t("common.tryAgain")}
             </button>
             {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a
               href="/"
-              className="inline-flex items-center h-10 px-5 rounded-full text-[13px] font-medium border-[0.5px] border-hm-border"
+              className="inline-flex min-h-11 items-center rounded-control border border-hm-border px-5 text-[15px] font-semibold text-hm-text-primary no-underline"
             >
               {t("common.homepage")}
             </a>

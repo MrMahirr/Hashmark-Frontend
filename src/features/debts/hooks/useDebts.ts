@@ -52,6 +52,7 @@ export function mapDebtResponseToDebt(dto: DebtResponse, defaultRepoName = ""): 
     status: dto.resolvedAt ? DebtStatus.RESOLVED : DebtStatus.ACTIVE,
     createdAt: dto.detectedAt ?? "",
     resolvedAt: dto.resolvedAt ?? null,
+    manuallyResolved: dto.manuallyResolved ?? false,
     triageStatus: triage,
     permalink: dto.permalink ?? null,
     commitSha: dto.commitSha ?? null,

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { RefreshCw } from "lucide-react";
 import { Navbar } from "@/widgets/Navbar";
 import { DebtExplorer } from "./DebtExplorer";
 import { useDebtStats } from "../hooks/useDebts";
@@ -8,7 +9,7 @@ import { useMappedRepos, useSyncRepos } from "@/features/repos/hooks/useRepos";
 import { useStartScan } from "@/features/scanner/hooks/useScanner";
 import { ScanProgress } from "@/features/scanner/components/ScanProgress";
 import { useI18n } from "@/shared/i18n/I18nProvider";
-import { RefreshCw, Loader2 } from "lucide-react";
+import { Button } from "@/shared/ui/Button";
 
 /**
  * SRP & Client Boundary:
@@ -36,38 +37,33 @@ export function DebtsPageContent() {
 
   const title = (
     <span className="flex items-center gap-3">
-      <span className="text-[16px] font-medium text-hm-text-primary leading-tight">{t("debts.title")}</span>
-      <span className="font-sans text-hm-text-secondary bg-hm-bg border-[0.5px] border-hm-border px-2 py-0.5 rounded-full text-xs">
+      <span>{t("debts.title")}</span>
+      <span className="rounded-pill border border-hm-border bg-hm-surface px-3 py-0.5 font-mono text-xs font-bold text-hm-text-secondary">
         {t("debts.totalBadge", { count: stats?.total ?? 0 })}
       </span>
     </span>
   );
 
   const action = (
-    <button
-      type="button"
+    <Button
       onClick={handleScan}
-      disabled={isScanning}
-      className="h-8 px-3 rounded-md bg-hm-text-primary text-hm-surface font-sans text-xs font-medium hover:bg-hm-text-primary/90 transition-colors flex items-center gap-2 cursor-pointer disabled:opacity-50"
+      isLoading={isScanning}
+      leftIcon={<RefreshCw size={14} aria-hidden="true" />}
+      className="max-sm:hidden"
     >
-      {isScanning ? (
-        <Loader2 size={14} className="animate-spin" aria-hidden="true" />
-      ) : (
-        <RefreshCw size={14} aria-hidden="true" />
-      )}
       {isScanning ? t("debts.scanning") : t("debts.scanNow")}
-    </button>
+    </Button>
   );
 
   return (
-    <div className="flex-1 flex flex-col h-full relative w-full overflow-hidden">
+    <div className="relative flex h-full w-full flex-1 flex-col overflow-hidden">
       <Navbar title={title} action={action} />
 
-      <div className="flex-1 overflow-auto px-4 sm:px-6 pb-6 pt-4 w-full">
-        <div className="max-w-[1400px] mx-auto w-full flex flex-col gap-4">
+      <div className="w-full flex-1 overflow-auto px-4 py-5 sm:p-8">
+        <div className="flex w-full flex-col gap-5">
           {selectedRepo && <ScanProgress repoId={selectedRepo} />}
           <DebtExplorer
-            repos={repos?.map((repo) => ({ id: repo.id, name: repo.fullName })) ?? []}
+            repos={repos?.map((repo) => ({ id: repo.id, name: repo.fullName, debtCount: repo.debtCount })) ?? []}
             selectedRepo={selectedRepo}
             onRepoChange={setSelectedRepo}
           />

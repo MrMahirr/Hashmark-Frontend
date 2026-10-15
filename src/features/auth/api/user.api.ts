@@ -9,3 +9,11 @@ export async function getUserProfile(): Promise<UserProfileResponse> {
   );
   return response.data;
 }
+
+/**
+ * GitHub bağlantısını keser (erişim jetonu silinir).
+ * @param deleteData true ise depo ve borç kayıtları da silinir.
+ */
+export async function disconnectGithub(deleteData: boolean): Promise<void> {
+  await apiClient.delete(`${ApiMethod.USER}/github-connection`, { params: { deleteData } });
+}

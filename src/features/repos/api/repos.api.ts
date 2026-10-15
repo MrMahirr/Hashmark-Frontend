@@ -43,6 +43,18 @@ export async function syncRepos(): Promise<void> {
   );
 }
 
+/** GitHub'dan senkronlanmış ama henüz izlenmeyen (aday) depolar. */
+export async function getRepoCandidates(): Promise<RepoResponse[]> {
+  const response = await apiClient.get<RepoResponse[]>(`${ApiMethod.REPOS}/candidates`);
+  return response.data;
+}
+
+/** Adayı izlemeye alır (taramalara dahil olur). */
+export async function trackRepo(repoId: string): Promise<RepoResponse> {
+  const response = await apiClient.post<RepoResponse>(`${ApiMethod.REPOS}/${repoId}/track`);
+  return response.data;
+}
+
 /** 
  * Verilen id değerine ait repoyu sistemden (ve veritabanından) siler.
  * @param {string} repoId - Silinecek repo'nun id'si

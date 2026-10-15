@@ -13,7 +13,7 @@ import { ScanProgress } from "@/features/scanner/components/ScanProgress";
 import { useRepo, mapRepoResponseToRepo } from "../hooks/useRepos";
 import { useDashboardOverview } from "@/features/dashboard/hooks/useDashboard";
 import { useI18n } from "@/shared/i18n/I18nProvider";
-import { Loader2, AlertCircle, RefreshCw } from "lucide-react";
+import { ErrorState, LoadingState } from "@/shared/ui/StateViews";
 
 interface RepoDetailContentProps {
   repoId?: string;
@@ -49,38 +49,20 @@ export function RepoDetailContent({ repoId: propRepoId }: RepoDetailContentProps
   const isError = isRepoError || isOverviewError;
 
   if (isLoading) {
-    return (
-      <div role="status" className="flex flex-col items-center justify-center min-h-[500px] w-full gap-3">
-        <Loader2 className="w-8 h-8 text-hm-blue animate-spin" aria-hidden="true" />
-        <p className="font-sans text-xs text-hm-text-secondary animate-pulse">{t("repos.detail.loading")}</p>
-      </div>
-    );
+    return <LoadingState label={t("repos.detail.loading")} />;
   }
 
   if (isError || !repoDto) {
     return (
-      <div className="bg-hm-surface border-[0.5px] border-hm-border rounded-card p-8 flex flex-col items-center justify-center text-center gap-4 my-8">
-        <div className="w-12 h-12 rounded-full bg-hm-danger-bg flex items-center justify-center text-hm-danger">
-          <AlertCircle className="w-6 h-6" aria-hidden="true" />
-        </div>
-        <div role="alert">
-          <h3 className="font-sans text-base font-medium text-hm-text-primary">{t("repos.detail.errorTitle")}</h3>
-          <p className="font-sans text-xs text-hm-text-secondary mt-1 max-w-md">
-            {t("repos.detail.errorDescription")}
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => {
-            refetchRepo();
-            refetchOverview();
-          }}
-          className="px-4 py-2 bg-hm-text-primary text-hm-surface rounded text-xs font-medium flex items-center gap-2 hover:opacity-90 transition-opacity cursor-pointer"
-        >
-          <RefreshCw className="w-3.5 h-3.5" aria-hidden="true" />
-          {t("common.retry")}
-        </button>
-      </div>
+      <ErrorState
+        title={t("repos.detail.errorTitle")}
+        description={t("repos.detail.errorDescription")}
+        retryLabel={t("common.retry")}
+        onRetry={() => {
+          refetchRepo();
+          refetchOverview();
+        }}
+      />
     );
   }
 
@@ -98,12 +80,10 @@ export function RepoDetailContent({ repoId: propRepoId }: RepoDetailContentProps
   const addedThisWeek = trendData.length > 0 ? trendData[trendData.length - 1].added : 0;
 
   return (
-    <>
+    <div className="flex flex-col gap-5">
       <RepoHeader repo={repo} />
 
-      <div className="mb-4">
-        <ScanProgress repoId={repoId} />
-      </div>
+      <ScanProgress repoId={repoId} />
 
       <RepoStatsRow
         totalCount={stats.totalDebts}
@@ -113,27 +93,22 @@ export function RepoDetailContent({ repoId: propRepoId }: RepoDetailContentProps
 
       <BranchSetting repoId={repoId} currentBranch={repo.trackedBranch} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-        <div className="lg:col-span-2 flex">
-          <div className="w-full h-full min-w-0">
-            <LazyTrendChart data={trendData} />
-          </div>
+      <div className="flex flex-wrap items-start gap-4">
+        <div className="min-w-0 flex-[2_1_460px]">
+          <LazyTrendChart data={trendData} />
         </div>
-        <div className="flex">
-          <div className="w-full h-full min-w-0">
-            <LabelDistribution data={labelDistribution} />
-          </div>
+        <div className="min-w-0 flex-[1_1_320px]">
+          <LabelDistribution data={labelDistribution} />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-        <div className="lg:col-span-1">
+      <div className="flex flex-wrap items-start gap-4">
+        <div className="min-w-0 flex-[1_1_320px]">
           <RepoModuleDistribution data={formattedModules} />
         </div>
-        <div className="lg:col-span-2" />
       </div>
 
       <DebtExplorer fixedRepoId={repoId} fixedRepoName={repoDto.fullName} />
-    </>
+    </div>
   );
 }

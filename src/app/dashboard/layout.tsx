@@ -23,7 +23,7 @@ export default function DashboardLayout({
       <main
         id="main-content"
         tabIndex={-1}
-        className="flex-1 flex flex-col h-full overflow-y-auto md:ml-[220px] bg-hm-bg focus:outline-none"
+        className="flex-1 flex flex-col h-full overflow-y-auto md:ml-[240px] bg-hm-bg focus:outline-none"
       >
         {children}
       </main>

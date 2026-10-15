@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { Clock, ChevronRight, Radar, Loader2 } from "lucide-react";
+import { ChevronRight, Radar } from "lucide-react";
 import { Repo } from "@/shared/types/repo.types";
 import { useStartScan } from "@/features/scanner/hooks/useScanner";
 import { useI18n } from "@/shared/i18n/I18nProvider";
+import { Button } from "@/shared/ui/Button";
 
 interface RepoHeaderProps {
   repo: Repo;
@@ -15,15 +16,13 @@ export const RepoHeader = ({ repo }: RepoHeaderProps) => {
   const scanMutation = useStartScan();
 
   const handleScan = () => {
-    if (!scanMutation.isPending && repo.id) {
-      scanMutation.mutate(repo.id);
-    }
+    if (!scanMutation.isPending && repo.id) scanMutation.mutate(repo.id);
   };
 
   return (
-    <div className="mb-8">
-      <nav aria-label="breadcrumb" className="flex items-center gap-2 font-sans text-[11px] font-medium text-hm-text-secondary mb-6">
-        <Link href="/dashboard/repos" className="hover:text-hm-blue transition-colors">
+    <div className="flex flex-col gap-5">
+      <nav aria-label="breadcrumb" className="flex items-center gap-2 font-mono text-xs text-hm-text-secondary">
+        <Link href="/dashboard/repos" className="inline-flex min-h-11 items-center hover:text-hm-acc">
           {t("repos.breadcrumb")}
         </Link>
         <ChevronRight size={14} aria-hidden="true" />
@@ -32,29 +31,16 @@ export const RepoHeader = ({ repo }: RepoHeaderProps) => {
         </span>
       </nav>
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
-          <h2 className="font-mono text-base font-medium text-hm-text-primary flex items-center gap-2 break-all">
-            <span aria-hidden="true" className="text-hm-text-secondary">#</span> {repo.fullName}
-          </h2>
-          <p className="font-sans text-[11px] font-medium text-hm-text-secondary mt-1 flex items-center gap-1">
-            <Clock size={14} aria-hidden="true" />
+          <h2 className="m-0 break-all font-mono text-[22px] font-bold text-hm-text-primary">{repo.fullName}</h2>
+          <p className="m-0 mt-2 font-mono text-[13px] text-hm-text-secondary">
             {t("repos.lastScanHeader", { date: formatDate(repo.lastScanAt, t("common.never")) })}
           </p>
         </div>
-        <button
-          type="button"
-          onClick={handleScan}
-          disabled={scanMutation.isPending}
-          className="bg-hm-text-primary text-hm-surface px-4 py-2 rounded-lg font-sans text-sm font-medium hover:bg-hm-text-primary/90 transition-colors flex items-center gap-2 cursor-pointer disabled:opacity-50 self-start sm:self-auto"
-        >
-          {scanMutation.isPending ? (
-            <Loader2 size={16} className="animate-spin" aria-hidden="true" />
-          ) : (
-            <Radar size={16} aria-hidden="true" />
-          )}
+        <Button onClick={handleScan} isLoading={scanMutation.isPending} leftIcon={<Radar size={16} aria-hidden="true" />}>
           {scanMutation.isPending ? t("debts.scanning") : t("debts.scanNow")}
-        </button>
+        </Button>
       </div>
     </div>
   );

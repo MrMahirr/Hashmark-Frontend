@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Navbar } from "@/widgets/Navbar";
 import { ProfileContent } from "@/features/auth/components/ProfileContent";
 import { getServerI18n } from "@/shared/i18n/server";
 
@@ -11,13 +12,11 @@ export default async function ProfilePage() {
   const { t } = await getServerI18n();
 
   return (
-    <div className="max-w-[720px] mx-auto py-10 px-4 sm:px-6 w-full space-y-4">
-      <div className="mb-8">
-        <h2 className="font-medium text-2xl text-hm-text-primary">{t("profile.title")}</h2>
-        <p className="text-sm text-hm-text-secondary mt-1">{t("profile.subtitle")}</p>
+    <>
+      <Navbar title={t("profile.title")} />
+      <div className="flex w-full max-w-[960px] flex-col gap-5 px-4 py-5 sm:p-8">
+        <ProfileContent />
       </div>
-
-      <ProfileContent />
-    </div>
+    </>
   );
 }

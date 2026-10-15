@@ -1,21 +1,31 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Hanken_Grotesk, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { getServerI18n } from "@/shared/i18n/server";
 import { getServerTheme } from "@/shared/theme/server";
 import { themeAttribute } from "@/shared/theme/theme";
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
+// latin-ext: Türkçe karakterler (ı, ş, ğ, İ) için gerekli.
+const hanken = Hanken_Grotesk({
+  variable: "--font-hanken",
+  subsets: ["latin", "latin-ext"],
   weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument-serif",
+  subsets: ["latin", "latin-ext"],
+  weight: "400",
+  display: "swap",
 });
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-  weight: ["400", "500"],
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "700"],
+  display: "swap",
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -48,7 +58,7 @@ export default async function RootLayout({
     <html
       lang={locale}
       data-theme={themeAttribute(theme)}
-      className={`${inter.variable} ${jetbrainsMono.variable}`}
+      className={`${hanken.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable}`}
     >
       <body className="min-h-screen bg-hm-bg font-sans text-hm-text-primary antialiased">
         <a href="#main-content" className="skip-link">

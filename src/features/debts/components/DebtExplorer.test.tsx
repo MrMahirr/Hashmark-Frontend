@@ -87,6 +87,36 @@ describe("DebtExplorer", () => {
     expect(lastFilters()).toMatchObject({ label: "FIXME" });
   });
 
+  it("depo çipleri seçimi üst bileşene iletir ve açık borç sayısını gösterir", async () => {
+    const onRepoChange = vi.fn();
+    render(
+      <DebtExplorer
+        repos={[
+          { id: "7", name: "octo/hello", debtCount: 12 },
+          { id: "8", name: "octo/world", debtCount: 3 },
+        ]}
+        selectedRepo=""
+        onRepoChange={onRepoChange}
+      />,
+    );
+
+    const group = screen.getByRole("group", { name: "Depo" });
+    expect(within(group).getByRole("button", { name: "Tüm Depolar" })).toHaveAttribute("aria-pressed", "true");
+
+    await userEvent.click(within(group).getByRole("button", { name: /octo\/world/ }));
+    expect(onRepoChange).toHaveBeenCalledWith("8");
+    expect(within(group).getByRole("button", { name: "octo/hello (12)" })).toBeInTheDocument();
+  });
+
+  it("depoya göre grupla anahtarı aria-pressed ile değişir", async () => {
+    render(<DebtExplorer repos={[{ id: "7", name: "octo/hello" }]} selectedRepo="" onRepoChange={vi.fn()} />);
+
+    const toggle = screen.getByRole("button", { name: "Depoya göre grupla" });
+    expect(toggle).toHaveAttribute("aria-pressed", "false");
+    await userEvent.click(toggle);
+    expect(toggle).toHaveAttribute("aria-pressed", "true");
+  });
+
   it("aramayı bekletir (debounce) ve q olarak gönderir", async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     try {

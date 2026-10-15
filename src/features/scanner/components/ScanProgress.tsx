@@ -76,15 +76,15 @@ export function ScanProgress({ repoId, hideDoneAfterMs = 15_000 }: ScanProgressP
   if (job.filesFailed > 0) details.push(t("scan.filesFailed", { count: job.filesFailed }));
 
   let tone = "border-hm-border bg-hm-surface text-hm-text-primary";
-  let icon = <Loader2 size={16} className="animate-spin text-hm-blue" aria-hidden="true" />;
+  let icon = <Loader2 size={16} className="animate-spin text-hm-acc" aria-hidden="true" />;
   let text = job.status === "PENDING" ? t("scan.pending") : t("scan.running", { count: job.filesScanned });
 
   if (job.status === "FAILED") {
-    tone = "border-hm-danger/30 bg-hm-danger-bg text-hm-text-primary";
+    tone = "border-hm-danger bg-hm-danger-bg text-hm-text-primary";
     icon = <AlertCircle size={16} className="text-hm-danger" aria-hidden="true" />;
     text = t("scan.failed");
   } else if (job.status === "DONE") {
-    tone = "border-hm-success/30 bg-hm-success-bg text-hm-text-primary";
+    tone = "border-hm-acc bg-hm-surface text-hm-text-primary";
     icon = <CheckCircle2 size={16} className="text-hm-success" aria-hidden="true" />;
     text = t("scan.done", { debts: job.debtFound, files: job.filesScanned });
   }
@@ -94,12 +94,12 @@ export function ScanProgress({ repoId, hideDoneAfterMs = 15_000 }: ScanProgressP
       role="status"
       aria-live="polite"
       aria-label={t("scan.region")}
-      className={`flex items-start gap-3 rounded-card border-[0.5px] px-4 py-3 text-[13px] ${tone}`}
+      className={`flex items-start gap-3 rounded-card border px-4 py-3 text-sm ${tone}`}
     >
       <span className="mt-0.5">{icon}</span>
       <div className="min-w-0">
-        <p className="font-medium">{text}</p>
-        {details.length > 0 && <p className="mt-0.5 text-[12px] text-hm-text-secondary">{details.join(" · ")}</p>}
+        <p className="font-semibold">{text}</p>
+        {details.length > 0 && <p className="mt-0.5 font-mono text-xs text-hm-text-secondary">{details.join(" · ")}</p>}
       </div>
     </div>
   );
