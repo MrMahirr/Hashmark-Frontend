@@ -18,13 +18,15 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Hashmark — Track Your Technical Debt",
   description:
-    "Hashmark scans your GitHub repositories to detect TODO, FIXME, HACK, and XXX annotations, visualizes technical debt over time, and sends weekly summary reports.",
+    "Hashmark scans your GitHub repositories to detect TODO, FIXME, HACK, and XXX debt markers (plus NOTE, DOC and INFO comments), tracks them over time, and sends weekly summary reports.",
   keywords: [
     "technical debt",
     "code quality",
     "GitHub",
     "TODO",
     "FIXME",
+    "HACK",
+    "XXX",
     "developer tools",
   ],
 };

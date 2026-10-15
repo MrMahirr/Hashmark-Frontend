@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { MOCK_NOTIFICATION_SETTINGS } from "../mock/settings.mock";
+import { useSettings, useUpdateSettings } from "../hooks/useSettings";
 
 export function NotificationSettings() {
-  const [emailEnabled, setEmailEnabled] = useState(
-    MOCK_NOTIFICATION_SETTINGS.weeklyReport
-  );
+  const { data: settings, isLoading, isError } = useSettings();
+  const updateSettings = useUpdateSettings();
+
+  const emailEnabled = settings?.emailNotify ?? false;
+  const disabled = isLoading || isError || updateSettings.isPending;
 
   return (
     <section className="bg-hm-surface rounded-card border-[0.5px] border-solid border-hm-border p-5 space-y-6">
@@ -26,16 +27,18 @@ export function NotificationSettings() {
         >
           E-posta bildirimleri
         </label>
-        
+
         <button
           id="email-toggle"
           type="button"
           role="switch"
           aria-checked={emailEnabled}
-          onClick={() => setEmailEnabled(!emailEnabled)}
+          disabled={disabled}
+          onClick={() => updateSettings.mutate({ emailNotify: !emailEnabled })}
           className={`
             relative inline-flex h-5 w-10 items-center rounded-full
-            transition-colors duration-200 ease-in-out focus:outline-none 
+            transition-colors duration-200 ease-in-out focus:outline-none
+            disabled:opacity-60 disabled:cursor-not-allowed
             ${emailEnabled ? "bg-hm-blue" : "bg-hm-border"}
           `}
         >
@@ -48,6 +51,17 @@ export function NotificationSettings() {
           />
         </button>
       </div>
+
+      {isError ? (
+        <p role="alert" className="text-xs text-hm-danger">
+          Ayarlar yüklenemedi. Lütfen sayfayı yenileyin.
+        </p>
+      ) : null}
+      {updateSettings.isError ? (
+        <p role="alert" className="text-xs text-hm-danger">
+          Ayar kaydedilemedi, tekrar deneyin.
+        </p>
+      ) : null}
     </section>
   );
 }

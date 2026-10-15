@@ -1,32 +1,36 @@
 /**
  * Interface Segregation Principle (ISP) & Single Responsibility Principle (SRP):
  * Ayarlar (Settings) modülüne ait API Request ve Response modelleri bu dosyada tutulur.
- * Sadece Settings işlemlerinde kullanılacağından diğer sayfaları/tipleri kirletmez.
  */
+
+/** Haftalık raporun gönderileceği gün (backend `notify_day`). */
+export type NotifyDay =
+  | "MONDAY"
+  | "TUESDAY"
+  | "WEDNESDAY"
+  | "THURSDAY"
+  | "FRIDAY"
+  | "SATURDAY"
+  | "SUNDAY";
 
 // ── Response Types ──
 
-/** 
- * GET /settings
- * Kullanıcının mevcut ayarlarını döner.
- * Backend DTO karşılığı: dev.hashmark.settings.dto.SettingsDto
+/**
+ * GET /settings, PUT /settings
+ * Backend DTO karşılığı: dev.hashmark.settings.dto.UserSettingsDto
  */
 export interface SettingsResponse {
-  webhookUrl: string | null;
-  notifyOnCritical: boolean;
-  notifyOnHigh: boolean;
+  emailNotify: boolean;
+  notifyDay: NotifyDay | string;
 }
 
 // ── Request Types ──
 
-/** 
- * PATCH /settings
- * Ayarların bir kısmını (veya tamamını) güncellemek için gönderilen payload.
- * PATCH metodu doğası gereği alanlar opsiyoneldir (Partial update).
- * Backend DTO karşılığı: dev.hashmark.settings.dto.UpdateSettingsRequest
+/**
+ * PUT /settings
+ * Backend DTO karşılığı: dev.hashmark.settings.dto.UserSettingsDto
  */
 export interface UpdateSettingsRequest {
-  webhookUrl?: string;
-  notifyOnCritical?: boolean;
-  notifyOnHigh?: boolean;
+  emailNotify?: boolean;
+  notifyDay?: NotifyDay | string;
 }

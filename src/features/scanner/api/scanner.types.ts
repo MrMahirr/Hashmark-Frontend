@@ -6,19 +6,31 @@
 
 // ── Response Types ──
 
-/** 
+/** Backend `scan_jobs.status` değerleri (kalıcı kuyruk: PENDING → RUNNING → DONE | FAILED). */
+export type ScanJobStatus = "PENDING" | "RUNNING" | "DONE" | "FAILED";
+
+/**
  * GET /scan/{repoId}/status
- * Backend DTO karşılığı: dev.hashmark.scanner.dto.ScanStatusDto
+ * Backend model karşılığı: dev.hashmark.scanner.model.ScanJob
  */
 export interface ScanStatusResponse {
+  id: number;
   repoId: number;
-  // Durum makinesi tipleri (Union types)
-  status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "FAILED";
-  message: string | null;
+  status: ScanJobStatus;
+  /** Taranan dal; null = varsayılan dal */
+  branch: string | null;
+  commitSha: string | null;
+  attempts: number;
   startedAt: string | null;
-  completedAt: string | null;
+  finishedAt: string | null;
+  debtFound: number;
+  filesScanned: number;
+  filesSkipped: number;
+  filesFailed: number;
+  /** Hata veya uyarı açıklaması ("Partial scan: ..." gibi) */
+  message: string | null;
+  createdAt: string;
 }
 
 // ── Request Types ──
-// POST /scan endpoint'i path variable ile çalıştığından (POST /scan/{repoId}) 
-// ekstra bir JSON body tipine şu an için ihtiyaç yoktur.
+// POST /scan/{repoId} path variable ile çalıştığından ekstra bir JSON body tipine ihtiyaç yoktur.

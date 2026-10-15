@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/shared/api/query-keys";
 import { useToastStore } from "@/shared/store/toast.store";
 import { getScanStatus, startScan } from "../api/scanner.api";
+import { scanPollInterval } from "../utils/scan-status";
 
 /**
  * SRP ve Adapter Pattern:
@@ -12,7 +13,7 @@ import { getScanStatus, startScan } from "../api/scanner.api";
 
 /** 
  * Belirtilen repoId'ye ait kod tarama (scan) durumunu getirir.
- * Tarama devam ediyorsa (PENDING veya IN_PROGRESS), periyodik (Polling) olarak
+ * Tarama devam ediyorsa (PENDING veya RUNNING), periyodik (Polling) olarak
  * backend'den yeni durumu sorar.
  * 
  * @param {string} repoId - Sorgulanacak reponun id'si
@@ -22,15 +23,8 @@ export function useScanStatus(repoId: string) {
     queryKey: queryKeys.scanner.status(repoId),
     queryFn: () => getScanStatus(repoId),
     enabled: !!repoId, // repoId gelmeden API isteği başlatma
-    refetchInterval: (query) => {
-      const status = query.state.data?.status;
-      // Durum bekliyor veya devam ediyorsa 5 saniyede bir kontrol et (Polling)
-      if (status === "PENDING" || status === "IN_PROGRESS") {
-        return 5000;
-      }
-      // COMPLETED, FAILED veya undefined ise dur. (Polling iptal)
-      return false;
-    },
+    // PENDING/RUNNING iken 5 sn'de bir sorgula; DONE, FAILED veya veri yokken dur
+    refetchInterval: (query) => scanPollInterval(query.state.data?.status),
   });
 }
 

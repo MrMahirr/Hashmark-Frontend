@@ -1,8 +1,11 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { useGitHubLogin } from "../hooks/useAuth";
+import { useAuthStore } from "../store/auth.store";
 
 const GithubIcon = () => (
   <svg aria-hidden="true" className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -17,6 +20,15 @@ const GithubIcon = () => (
 export function LoginForm() {
   // İş mantığı (API katmanı) ile arayüz katmanı Adapter (hook) yardımıyla haberleşir (SRP)
   const { mutate: loginWithGitHub, isPending } = useGitHubLogin();
+
+  // Zaten oturumu olan kullanıcı (ör. proxy çerezi eksik kaldıysa) tekrar giriş yapmadan panele geçer
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const router = useRouter();
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace("/dashboard");
+    }
+  }, [isAuthenticated, router]);
 
   return (
     <div className="bg-hm-surface w-full max-w-[400px] rounded-card border-[0.5px] border-hm-border p-12 relative">

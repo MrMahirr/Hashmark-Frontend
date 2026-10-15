@@ -21,8 +21,8 @@ export function HeroSection() {
           Kod tabanınızda düşündüğünüzden daha fazla borç var.
         </h1>
         <p className="text-[15px] text-hm-text-secondary max-w-[540px] leading-relaxed">
-          Hashmark, repolarınızı teknik borç işaretleri (TODO, FIXME ve özel anotasyonlar)
-          için otomatik olarak tarayarak, neye dikkat etmeniz gerektiğine dair net ve
+          Hashmark, repolarınızı teknik borç işaretleri (TODO, FIXME, HACK ve XXX) ile
+          NOTE, DOC, INFO yorumları için otomatik olarak tarayarak, neye dikkat etmeniz gerektiğine dair net ve
           ölçülebilir bir tablo sunar.
         </p>
       </div>
