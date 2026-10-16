@@ -75,6 +75,21 @@ describe("setupInterceptors", () => {
     expect(provider.onUnauthorized).not.toHaveBeenCalled();
   });
 
+  it("refresh token rotation: dönen yeni refresh token saklanmak üzere iletilir", async () => {
+    const { client } = fakeClient((config) =>
+      config.headers.Authorization === "Bearer new-access" ? { status: 200, data: "ok" } : { status: 401 }
+    );
+    const refresh = fakeClient(() => ({
+      status: 200,
+      data: { accessToken: "new-access", refreshToken: "refresh-2" },
+    }));
+    setupInterceptors(client, provider, { refreshClient: refresh.client });
+
+    await client.get("/debts");
+
+    expect(provider.onTokenRefreshed).toHaveBeenCalledWith("new-access", "refresh-2");
+  });
+
   it("eşzamanlı 401'ler tek bir refresh isteğini paylaşır", async () => {
     const { client } = fakeClient((config) =>
       config.headers.Authorization === "Bearer new-access" ? { status: 200, data: "ok" } : { status: 401 }

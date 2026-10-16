@@ -410,6 +410,10 @@ export const tr = {
   "settings.account.reconnect": "GitHub ile yeniden bağlan",
   "settings.account.disconnected": "GitHub bağlantısı kesildi.",
   "settings.account.disconnectFailed": "Bağlantı kesilemedi, tekrar deneyin.",
+  "settings.account.delete": "Hesabı sil",
+  "settings.account.deleteTitle": "Hesabınız silinsin mi?",
+  "settings.account.deleteText": "Hesabınız, depolarınız, borç kayıtlarınız, ayarlarınız ve oturumlarınız kalıcı olarak silinir. Bu işlem geri alınamaz.",
+  "settings.account.deleteFailed": "Hesap silinemedi, tekrar deneyin.",
 } as const;
 
 export type MessageKey = keyof typeof tr;

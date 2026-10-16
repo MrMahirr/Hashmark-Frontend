@@ -27,10 +27,11 @@ export interface LoginResponse {
 
 /** 
  * POST /auth/refresh
- * Backend DTO karşılığı: Map<String, String> (accessToken içerir)
+ * Refresh token rotation: her yenilemede yeni bir refresh token da döner; eskisi artık geçersizdir.
  */
 export interface RefreshResponse {
   accessToken: string;
+  refreshToken?: string;
 }
 
 // ── Request Types ──

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useUserProfile } from "@/features/auth/hooks/useUserProfile";
-import { useDisconnectGithub, useGitHubLogin, useLogout } from "@/features/auth/hooks/useAuth";
+import { useDeleteAccount, useDisconnectGithub, useGitHubLogin, useLogout } from "@/features/auth/hooks/useAuth";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { useToastStore } from "@/shared/store/toast.store";
@@ -26,9 +26,11 @@ export function ProfileSection() {
   const logoutMutation = useLogout();
   const disconnect = useDisconnectGithub();
   const reconnect = useGitHubLogin();
+  const deleteAccount = useDeleteAccount();
 
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleteData, setDeleteData] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -85,7 +87,25 @@ export function ProfileSection() {
         >
           {logoutMutation.isPending ? t("common.loggingOut") : t("common.logout")}
         </Button>
+        <Button variant="outline" onClick={() => setDeleteOpen(true)}>
+          {t("settings.account.delete")}
+        </Button>
       </div>
+
+      <ConfirmDialog
+        open={deleteOpen}
+        title={t("settings.account.deleteTitle")}
+        confirmLabel={t("settings.account.delete")}
+        pending={deleteAccount.isPending}
+        onCancel={() => setDeleteOpen(false)}
+        onConfirm={() =>
+          deleteAccount.mutate(undefined, {
+            onError: () => addToast({ title: t("settings.account.deleteFailed"), type: "error" }),
+          })
+        }
+      >
+        <p className="m-0">{t("settings.account.deleteText")}</p>
+      </ConfirmDialog>
 
       <ConfirmDialog
         open={confirmOpen}

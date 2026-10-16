@@ -29,12 +29,13 @@ export async function getGitHubLoginUrl(): Promise<GitHubLoginUrlResponse> {
 /** 
  * GitHub OAuth callback "code" bilgisini işleyip backend üzerinden JWT (accessToken, refreshToken) tokenlarını alır.
  * @param {string} code - GitHub auth code
+ * @param {string} state - /auth/github'tan dönen tek kullanımlık OAuth state (login CSRF koruması)
  * @returns {Promise<LoginResponse>}
  */
-export async function handleAuthCallback(code: string): Promise<LoginResponse> {
+export async function handleAuthCallback(code: string, state: string): Promise<LoginResponse> {
   const response = await apiClient.get<LoginResponse>(
     `${ApiMethod.AUTH}/${ApiEndpoint.CALLBACK}`,
-    { params: { code } }
+    { params: { code, state } }
   );
   return response.data;
 }

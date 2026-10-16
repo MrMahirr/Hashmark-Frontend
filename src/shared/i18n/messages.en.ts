@@ -408,4 +408,8 @@ export const en: Record<MessageKey, string> = {
   "settings.account.reconnect": "Reconnect with GitHub",
   "settings.account.disconnected": "GitHub disconnected.",
   "settings.account.disconnectFailed": "Could not disconnect, try again.",
+  "settings.account.delete": "Delete account",
+  "settings.account.deleteTitle": "Delete your account?",
+  "settings.account.deleteText": "Your account, repositories, debt records, settings and sessions are permanently deleted. This cannot be undone.",
+  "settings.account.deleteFailed": "Could not delete the account, try again.",
 };

@@ -10,6 +10,11 @@ export async function getUserProfile(): Promise<UserProfileResponse> {
   return response.data;
 }
 
+/** Hesabı ve tüm verileri kalıcı olarak siler (KVKK/GDPR). */
+export async function deleteAccount(): Promise<void> {
+  await apiClient.delete(`${ApiMethod.USER}/account`);
+}
+
 /**
  * GitHub bağlantısını keser (erişim jetonu silinir).
  * @param deleteData true ise depo ve borç kayıtları da silinir.

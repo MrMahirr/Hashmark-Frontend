@@ -27,7 +27,7 @@ export interface AuthProvider {
   getToken: () => string | null;
   getRefreshToken: () => string | null;
   /** Access token sessizce yenilendiğinde çağrılır. */
-  onTokenRefreshed: (accessToken: string) => void;
+  onTokenRefreshed: (accessToken: string, refreshToken?: string) => void;
   /** Oturum kurtarılamadığında (refresh yok/başarısız) çağrılır. */
   onUnauthorized: () => void;
 }
@@ -38,9 +38,16 @@ export interface AuthProvider {
  */
 export const zustandAuthProvider: AuthProvider = {
   getToken: () => useAuthStore.getState().accessToken,
-  getRefreshToken: () => useAuthStore.getState().refreshToken,
-  onTokenRefreshed: (accessToken) => {
-    useAuthStore.getState().setAccessToken(accessToken);
+  getRefreshToken: () => {
+    // Çoklu sekme: başka bir sekme token'ı döndürdüyse (rotation) güncel değer localStorage'dadır.
+    try {
+      return localStorage.getItem("refreshToken") ?? useAuthStore.getState().refreshToken;
+    } catch {
+      return useAuthStore.getState().refreshToken;
+    }
+  },
+  onTokenRefreshed: (accessToken, refreshToken) => {
+    useAuthStore.getState().setAccessToken(accessToken, refreshToken);
   },
   onUnauthorized: () => {
     if (typeof window !== "undefined") {
@@ -97,13 +104,18 @@ export const setupInterceptors = (
         return Promise.reject(new SessionLostError("No refresh token"));
       }
       refreshInFlight = refreshClient
-        .post<{ accessToken: string }>("/auth/refresh", { refreshToken })
+        .post<{ accessToken: string; refreshToken?: string }>("/auth/refresh", { refreshToken })
         .then((response) => {
           const accessToken = response.data?.accessToken;
           if (!accessToken) {
             throw new SessionLostError("Refresh response had no access token");
           }
-          authProvider.onTokenRefreshed(accessToken);
+          const rotated = response.data.refreshToken;
+          if (rotated) {
+            authProvider.onTokenRefreshed(accessToken, rotated);
+          } else {
+            authProvider.onTokenRefreshed(accessToken);
+          }
           return accessToken;
         })
         .finally(() => {
