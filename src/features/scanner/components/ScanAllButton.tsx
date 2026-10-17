@@ -9,6 +9,7 @@ import { useToastStore } from "@/shared/store/toast.store";
 import { Button } from "@/shared/ui/Button";
 import { useMappedRepos } from "@/features/repos/hooks/useRepos";
 import { startScan } from "../api/scanner.api";
+import { PRIVATE_REPO_ACK_REQUIRED, errorCode } from "@/features/consent/api/consent.api";
 import { ScanDialog } from "./ScanDialog";
 
 /**
@@ -25,9 +26,19 @@ export function ScanAllButton() {
   const scanAll = useMutation({
     mutationFn: async () => {
       const results = await Promise.allSettled(repos.map((repo) => startScan(repo.id)));
-      return repos.filter((_, index) => results[index].status === "fulfilled").map((repo) => repo.id);
+      const needsAck = results.filter(
+        (r) => r.status === "rejected" && errorCode(r.reason) === PRIVATE_REPO_ACK_REQUIRED,
+      ).length;
+      return {
+        startedIds: repos.filter((_, index) => results[index].status === "fulfilled").map((repo) => repo.id),
+        needsAck,
+      };
     },
-    onSuccess: (startedIds) => {
+    onSuccess: ({ startedIds, needsAck }) => {
+      // Özel depolar toplu taramada atlanır; ek onay depo tek tek taranırken istenir
+      if (needsAck > 0) {
+        addToast({ title: t("privateRepo.skipped", { count: needsAck }), type: "info" });
+      }
       repos.forEach((repo) =>
         queryClient.invalidateQueries({ queryKey: queryKeys.scanner.status(repo.id) })
       );

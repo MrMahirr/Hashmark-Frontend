@@ -3,6 +3,8 @@
 import { Sidebar } from "@/widgets/Sidebar";
 import { useAuthGuard } from "@/features/auth/hooks/useAuthGuard";
 import { SessionExpiredPopup } from "@/features/auth/components/SessionExpiredPopup";
+import { useConsentRedirect } from "@/features/consent/hooks/useConsentRedirect";
+import { PrivateRepoAckDialog } from "@/features/consent/components/PrivateRepoAckDialog";
 
 export default function DashboardLayout({
   children,
@@ -10,10 +12,11 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const { isReady } = useAuthGuard();
+  const { blocked } = useConsentRedirect(isReady);
 
   // Auth durumu çözülene kadar veya yetkisiz kullanıcılar için boş ekran göster
   // (useAuthGuard zaten login sayfasına yönlendiriyor)
-  if (!isReady) {
+  if (!isReady || blocked) {
     return null;
   }
 
@@ -28,6 +31,7 @@ export default function DashboardLayout({
         {children}
       </main>
       <SessionExpiredPopup />
+      <PrivateRepoAckDialog />
     </div>
   );
 }

@@ -26,7 +26,7 @@ describe("proxy (dashboard guard)", () => {
     expect(response.headers.get("x-middleware-next")).toBe("1");
   });
 
-  it("yalnızca /dashboard altında çalışır", () => {
-    expect(config.matcher).toEqual(["/dashboard/:path*"]);
+  it("yalnızca /dashboard altında ve /consent'te çalışır", () => {
+    expect(config.matcher).toEqual(["/dashboard/:path*", "/consent"]);
   });
 });

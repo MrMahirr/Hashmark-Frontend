@@ -5,6 +5,8 @@ import { useToastStore } from "@/shared/store/toast.store";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { getScanStatus, startScan } from "../api/scanner.api";
 import { scanPollInterval } from "../utils/scan-status";
+import { PRIVATE_REPO_ACK_REQUIRED, errorCode } from "@/features/consent/api/consent.api";
+import { usePrivateAckStore } from "@/features/consent/store/private-ack.store";
 
 /**
  * SRP ve Adapter Pattern:
@@ -38,6 +40,7 @@ export function useStartScan() {
   const queryClient = useQueryClient();
   const addToast = useToastStore((state) => state.addToast);
   const { t } = useI18n();
+  const requestPrivateAck = usePrivateAckStore((state) => state.request);
 
   return useMutation({
     mutationFn: (repoId: string) => startScan(repoId),
@@ -51,7 +54,12 @@ export function useStartScan() {
         type: "success",
       });
     },
-    onError: (err: Error) => {
+    onError: (err: Error, repoId) => {
+      // Özel depo ek onay bekliyor: hata değil, onay diyaloğu açılır (PrivateRepoAckDialog)
+      if (errorCode(err) === PRIVATE_REPO_ACK_REQUIRED) {
+        requestPrivateAck(repoId);
+        return;
+      }
       // 409: bu depo için tarama zaten sırada/çalışıyor
       const serverMessage = isAxiosError(err)
         ? (err.response?.data as { message?: string } | undefined)?.message
