@@ -15,7 +15,7 @@ function OAuthCallbackContent() {
     const code = searchParams.get("code");
     if (code && !isCalledRef.current) {
       isCalledRef.current = true;
-      handleCallback(code);
+      handleCallback({ code, state: searchParams.get("state") ?? "" });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);

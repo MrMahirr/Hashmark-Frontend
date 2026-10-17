@@ -30,4 +30,9 @@ export const queryKeys = {
   notifications: {
     all: ["notifications"] as const,
   },
+  consent: {
+    policy: (lang: string) => ["consent", "policy", lang] as const,
+    privateRepoNotice: (lang: string) => ["consent", "private-repo", lang] as const,
+    status: ["consent", "status"] as const,
+  },
 } as const;

@@ -71,7 +71,7 @@ export function LoginForm() {
               {t("auth.login.terms")}
             </Link>{" "}
             {t("auth.login.and")}{" "}
-            <Link href="#" className="underline underline-offset-2 hover:text-hm-text-primary">
+            <Link href="/privacy" className="underline underline-offset-2 hover:text-hm-text-primary">
               {t("auth.login.privacy")}
             </Link>
             {t("auth.login.termsSuffix") === "." ? "." : ` ${t("auth.login.termsSuffix")}`}

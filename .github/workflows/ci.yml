@@ -1,0 +1,34 @@
+name: ci
+
+on:
+  push:
+    branches: [main, master, dev]
+  pull_request:
+  schedule:
+    - cron: "0 5 * * 1"   # npm audit için haftalık
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Lint, tip denetimi, birim test, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "22", cache: npm }
+      - run: npm ci --ignore-scripts
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:8080/api/v1
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+      - name: npm audit (yüksek ve kritik açıklar build'i düşürür)
+        run: npm audit --audit-level=high --omit=dev

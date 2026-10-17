@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { queryKeys } from "@/shared/api/query-keys";
-import { disconnectGithub } from "./../api/user.api";
+import { deleteAccount, disconnectGithub } from "./../api/user.api";
+import { consumeOAuthState, rememberOAuthState } from "@/shared/auth/oauth-state";
 import {
   getGitHubLoginUrl,
   handleAuthCallback,
@@ -22,6 +23,7 @@ export function useGitHubLogin() {
   return useMutation({
     mutationFn: getGitHubLoginUrl,
     onSuccess: (data) => {
+      rememberOAuthState(data.authUrl);
       window.location.href = data.authUrl;
     },
   });
@@ -35,7 +37,13 @@ export function useAuthCallback() {
   const router = useRouter();
 
   return useMutation({
-    mutationFn: (code: string) => handleAuthCallback(code),
+    mutationFn: ({ code, state }: { code: string; state: string }) => {
+      // State bu tarayıcıda başlatılan girişle eşleşmiyorsa kod backend'e hiç gönderilmez (login CSRF).
+      if (!consumeOAuthState(state)) {
+        return Promise.reject(new Error("OAuth state mismatch"));
+      }
+      return handleAuthCallback(code, state);
+    },
     onSuccess: (data) => {
       // Tokenları Global State (Zustand) ve LocalStorage'a kaydet
       setTokens(data.accessToken, data.refreshToken);
@@ -80,6 +88,22 @@ export function useDisconnectGithub() {
       queryClient.invalidateQueries({ queryKey: queryKeys.user.me });
       queryClient.invalidateQueries({ queryKey: queryKeys.repos.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.debts.all });
+    },
+  });
+}
+
+/** Hesabı ve tüm verileri kalıcı olarak siler; başarılı olunca yerel oturum temizlenir. */
+export function useDeleteAccount() {
+  const { clearTokens } = useAuthStore();
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  return useMutation({
+    mutationFn: deleteAccount,
+    onSuccess: () => {
+      clearTokens();
+      queryClient.clear();
+      router.push("/auth/login");
     },
   });
 }

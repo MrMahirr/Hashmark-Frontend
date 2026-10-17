@@ -16,7 +16,7 @@ interface AuthState {
 interface AuthActions {
   setTokens: (accessToken: string, refreshToken: string) => void;
   /** Yalnızca access token yenilenirken kullanılır; refresh token ve oturum aynı kalır. */
-  setAccessToken: (accessToken: string) => void;
+  setAccessToken: (accessToken: string, refreshToken?: string) => void;
   clearTokens: () => void;
   setSessionExpired: (expired: boolean) => void;
 }
@@ -54,8 +54,14 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
     set({ accessToken, refreshToken, isAuthenticated: true, sessionExpired: false });
   },
 
-  setAccessToken: (accessToken) => {
+  setAccessToken: (accessToken, refreshToken) => {
     localStorage.setItem("accessToken", accessToken);
+    if (refreshToken) {
+      // Rotation: eski refresh token artık geçersiz, yenisi saklanmalı.
+      localStorage.setItem("refreshToken", refreshToken);
+      set({ accessToken, refreshToken, isAuthenticated: true });
+      return;
+    }
     set({ accessToken, isAuthenticated: true });
   },
 

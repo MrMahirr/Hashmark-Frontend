@@ -1,3 +1,10 @@
+# Docker log rotasyonu (veri saklama politikası): konteyner başına en fazla 5 × 10 MB.
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
 services:
   # === Frontend (Next.js) ===
   frontend:
@@ -8,6 +15,7 @@ services:
         - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
         - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
     container_name: hashmark_frontend
+    logging: *default-logging
     restart: unless-stopped
     networks:
       - hashmark-network
@@ -22,13 +30,14 @@ services:
   nginx:
     image: nginx:alpine
     container_name: hashmark_nginx
+    logging: *default-logging
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - ../nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - /letsencript:/etc/letsencript:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
       - ../nginx/certbot/www:/var/www/certbot:ro
     depends_on:
       frontend:
@@ -36,7 +45,7 @@ services:
     networks:
       - hashmark-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      test: ["CMD-SHELL", "wget -S --spider --tries=1 --header=\"Host: hashmark.yunusemremahir.com.tr\" http://127.0.0.1:80/ 2>&1 | grep -qE \"HTTP/1.1 (200|301|302)\""]
       interval: 30s
       timeout: 5s
       retries: 3

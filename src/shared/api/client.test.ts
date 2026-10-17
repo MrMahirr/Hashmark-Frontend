@@ -75,6 +75,21 @@ describe("setupInterceptors", () => {
     expect(provider.onUnauthorized).not.toHaveBeenCalled();
   });
 
+  it("refresh token rotation: dönen yeni refresh token saklanmak üzere iletilir", async () => {
+    const { client } = fakeClient((config) =>
+      config.headers.Authorization === "Bearer new-access" ? { status: 200, data: "ok" } : { status: 401 }
+    );
+    const refresh = fakeClient(() => ({
+      status: 200,
+      data: { accessToken: "new-access", refreshToken: "refresh-2" },
+    }));
+    setupInterceptors(client, provider, { refreshClient: refresh.client });
+
+    await client.get("/debts");
+
+    expect(provider.onTokenRefreshed).toHaveBeenCalledWith("new-access", "refresh-2");
+  });
+
   it("eşzamanlı 401'ler tek bir refresh isteğini paylaşır", async () => {
     const { client } = fakeClient((config) =>
       config.headers.Authorization === "Bearer new-access" ? { status: 200, data: "ok" } : { status: 401 }
@@ -132,6 +147,27 @@ describe("setupInterceptors", () => {
 
     expect(provider.onUnauthorized).not.toHaveBeenCalled();
     expect(refresh.calls).toHaveLength(0);
+  });
+
+  it("403 CONSENT_REQUIRED onay ekranına yönlendirir, oturumu düşürmez", async () => {
+    const { client } = fakeClient(() => ({ status: 403, data: { code: "CONSENT_REQUIRED" } }));
+    const onConsentRequired = vi.fn();
+    setupInterceptors(client, { ...provider, onConsentRequired });
+
+    await expect(client.get("/debts")).rejects.toMatchObject({ response: { status: 403 } });
+
+    expect(onConsentRequired).toHaveBeenCalledTimes(1);
+    expect(provider.onUnauthorized).not.toHaveBeenCalled();
+  });
+
+  it("kodsuz 403 onay yönlendirmesi yapmaz", async () => {
+    const { client } = fakeClient(() => ({ status: 403, data: { code: "PRIVATE_REPO_ACK_REQUIRED" } }));
+    const onConsentRequired = vi.fn();
+    setupInterceptors(client, { ...provider, onConsentRequired });
+
+    await expect(client.post("/scan/1")).rejects.toMatchObject({ response: { status: 403 } });
+
+    expect(onConsentRequired).not.toHaveBeenCalled();
   });
 
   it("kimlik uçlarındaki 401 için yenileme denemez", async () => {
