@@ -60,10 +60,15 @@ export function useDashboardOverview(repoId?: string) {
   const noteCnt = labelStats?.noteCount ?? 0;
   const docCnt = labelStats?.docCount ?? 0;
   const infoCnt = labelStats?.infoCount ?? 0;
+  const customCounts = Object.entries(labelStats?.customCounts ?? {})
+    .filter(([, count]) => count > 0)
+    .sort(([a], [b]) => a.localeCompare(b));
+  const customCnt = customCounts.reduce((sum, [, count]) => sum + count, 0);
 
   // Etiket istatistiği henüz gelmediyse (ilk yükleme) toplam borç sayısı kullanılır.
-  // Sağlık hesabında yalnızca TODO, FIXME, HACK, XXX penalize edilir; NOTE, DOC, INFO edilmez.
-  const penalizableDebts = labelStats ? todoCnt + fixmeCnt + hackCnt + xxxCnt : totalDebts;
+  // Sağlık hesabında TODO, FIXME, HACK, XXX ve `.hashmark.yml` özel etiketleri penalize edilir;
+  // NOTE, DOC, INFO edilmez.
+  const penalizableDebts = labelStats ? todoCnt + fixmeCnt + hackCnt + xxxCnt + customCnt : totalDebts;
   const { score: healthScore, grade } = calculateHealth(penalizableDebts);
 
   const trendData: TrendDataPoint[] = summary?.trendData?.map((t) => ({
@@ -74,11 +79,13 @@ export function useDashboardOverview(repoId?: string) {
   })) ?? [];
 
   // Etiket dağılımı: yüzdelerin toplamı her zaman 100 (en büyük kalan yöntemi)
-  const labelCounts: Array<{ type: DebtType; count: number }> = [
+  const labelCounts: Array<{ type: DebtType | string; count: number }> = [
     { type: DebtType.TODO, count: todoCnt },
     { type: DebtType.FIXME, count: fixmeCnt },
     { type: DebtType.HACK, count: hackCnt },
     { type: DebtType.XXX, count: xxxCnt },
+    // Özel etiketler borçtur: yerleşik borç etiketlerinden sonra, bilgi etiketlerinden önce
+    ...customCounts.map(([type, count]) => ({ type, count })),
     { type: DebtType.NOTE, count: noteCnt },
     { type: DebtType.DOC, count: docCnt },
     { type: DebtType.INFO, count: infoCnt },

@@ -16,7 +16,8 @@ export interface TrendDataPoint {
 }
 
 export interface LabelDistribution {
-  type: DebtType;
+  /** Yerleşik etiket ({@link DebtType}) ya da `.hashmark.yml` özel etiketi (ör. "SECURITY"). */
+  type: DebtType | string;
   count: number;
   percentage: number;
 }

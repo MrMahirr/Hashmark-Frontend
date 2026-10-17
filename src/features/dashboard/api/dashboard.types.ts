@@ -21,6 +21,8 @@ export interface LabelStatsDto {
   noteCount?: number;
   docCount?: number;
   infoCount?: number;
+  /** `.hashmark.yml` özel etiketleri: etiket → açık borç sayısı. Hepsi borç sayılır. */
+  customCounts?: Record<string, number>;
 }
 
 export interface ModuleDebtInfoDto {

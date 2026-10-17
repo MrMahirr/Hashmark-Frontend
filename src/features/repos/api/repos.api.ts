@@ -78,3 +78,16 @@ export async function setTrackedBranch(repoId: string, branch: string | null): P
   );
   return response.data;
 }
+
+/**
+ * Push'ta otomatik taramayı açar/kapatır. Açmak depoya GitHub webhook'u kurar (depoda admin yetkisi gerekir).
+ * @param {string} repoId - Repo id'si
+ * @param {boolean} enabled - true: aç, false: kapat
+ */
+export async function setAutoScan(repoId: string, enabled: boolean): Promise<RepoResponse> {
+  const response = await apiClient.put<RepoResponse>(
+    `${ApiMethod.REPOS}/${repoId}/auto-scan`,
+    { enabled }
+  );
+  return response.data;
+}
