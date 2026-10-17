@@ -30,6 +30,8 @@ export interface AuthProvider {
   onTokenRefreshed: (accessToken: string, refreshToken?: string) => void;
   /** Oturum kurtarılamadığında (refresh yok/başarısız) çağrılır. */
   onUnauthorized: () => void;
+  /** Backend 403 CONSENT_REQUIRED döndüğünde (onay kapısı, plan 5.10) çağrılır. */
+  onConsentRequired?: () => void;
 }
 
 /**
@@ -52,6 +54,11 @@ export const zustandAuthProvider: AuthProvider = {
   onUnauthorized: () => {
     if (typeof window !== "undefined") {
       useAuthStore.getState().setSessionExpired(true);
+    }
+  },
+  onConsentRequired: () => {
+    if (typeof window !== "undefined" && window.location.pathname !== "/consent") {
+      window.location.assign("/consent");
     }
   },
 };
@@ -80,7 +87,8 @@ function isAuthEndpoint(url: string | undefined): boolean {
  *  1. Refresh token varsa, access token SESSİZCE yenilenir ve istek bir kez tekrarlanır.
  *     Aynı anda gelen birden çok 401 tek bir refresh isteğini paylaşır (single-flight).
  *  2. Yenileme mümkün değilse veya başarısızsa `onUnauthorized` çağrılır (oturum süresi doldu).
- * 403 (yetki yok) oturumu düşürmez; çağıran tarafa hata olarak iletilir.
+ * 403 (yetki yok) oturumu düşürmez; çağıran tarafa hata olarak iletilir. 403 CONSENT_REQUIRED ise
+ * ayrıca `onConsentRequired` çağrılır (onay ekranına yönlendirme).
  */
 export const setupInterceptors = (
   client: AxiosInstance,
@@ -142,6 +150,14 @@ export const setupInterceptors = (
     (response: AxiosResponse) => response,
     async (error: AxiosError) => {
       const original = error.config as RetriableConfig | undefined;
+
+      if (
+        error.response?.status === 403 &&
+        (error.response.data as { code?: string } | undefined)?.code === "CONSENT_REQUIRED"
+      ) {
+        authProvider.onConsentRequired?.();
+        return Promise.reject(error);
+      }
 
       if (error.response?.status !== 401) {
         return Promise.reject(error);

@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE } from "@/shared/auth/session";
 
 /**
- * Korunan sayfalar (/dashboard/**) için sunucu tarafı ilk savunma hattı.
+ * Korunan sayfalar (/dashboard/**, /consent) için sunucu tarafı ilk savunma hattı.
  *
  * Oturum işareti çerezi yoksa kullanıcı, korunan içerik render edilmeden login'e yönlendirilir;
  * böylece istemci tarafı guard'ın (useAuthGuard) yol açtığı "içerik flaşı" yaşanmaz.
@@ -20,5 +20,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/dashboard/:path*", "/consent"],
 };

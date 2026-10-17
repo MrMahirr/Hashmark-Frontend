@@ -149,6 +149,27 @@ describe("setupInterceptors", () => {
     expect(refresh.calls).toHaveLength(0);
   });
 
+  it("403 CONSENT_REQUIRED onay ekranına yönlendirir, oturumu düşürmez", async () => {
+    const { client } = fakeClient(() => ({ status: 403, data: { code: "CONSENT_REQUIRED" } }));
+    const onConsentRequired = vi.fn();
+    setupInterceptors(client, { ...provider, onConsentRequired });
+
+    await expect(client.get("/debts")).rejects.toMatchObject({ response: { status: 403 } });
+
+    expect(onConsentRequired).toHaveBeenCalledTimes(1);
+    expect(provider.onUnauthorized).not.toHaveBeenCalled();
+  });
+
+  it("kodsuz 403 onay yönlendirmesi yapmaz", async () => {
+    const { client } = fakeClient(() => ({ status: 403, data: { code: "PRIVATE_REPO_ACK_REQUIRED" } }));
+    const onConsentRequired = vi.fn();
+    setupInterceptors(client, { ...provider, onConsentRequired });
+
+    await expect(client.post("/scan/1")).rejects.toMatchObject({ response: { status: 403 } });
+
+    expect(onConsentRequired).not.toHaveBeenCalled();
+  });
+
   it("kimlik uçlarındaki 401 için yenileme denemez", async () => {
     const { client } = fakeClient(() => ({ status: 401 }));
     const refresh = fakeClient(() => ({ status: 200, data: { accessToken: "x" } }));
