@@ -22,7 +22,12 @@ export const LabelDistribution = ({ data }: LabelDistributionProps) => {
         <ul className="m-0 flex list-none flex-col gap-3.5 p-0">
           {data.map((item) => (
             <li key={item.type} className="grid grid-cols-[64px_1fr_48px] items-center gap-3">
-              <span className="font-mono text-xs font-bold" style={{ color: tagColor(item.type) }}>
+              {/* Özel etiketler 10 karaktere kadar olabilir: sığmazsa kırpılır, tam ad title'da */}
+              <span
+                className="truncate font-mono text-xs font-bold"
+                style={{ color: tagColor(item.type) }}
+                title={item.type}
+              >
                 {item.type}
               </span>
               <div

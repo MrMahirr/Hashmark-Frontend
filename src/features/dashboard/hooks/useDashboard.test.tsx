@@ -23,7 +23,7 @@ function wrapper({ children }: { children: ReactNode }) {
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 }
 
-function mockData(labelStats: Record<string, number> | null) {
+function mockData(labelStats: Record<string, unknown> | null) {
   vi.mocked(getReportSummary).mockResolvedValue({
     labelStats,
     trendData: [{ weekStart: "2026-10-05", totalDebts: 12, newDebts: 4, resolvedDebts: 2 }],
@@ -61,6 +61,21 @@ describe("useDashboardOverview", () => {
 
     expect(result.current.grade).toBe("A");
     expect(result.current.healthScore).toBe(85);
+  });
+
+  it(".hashmark.yml özel etiketleri borç sayılır ve dağılımda bilgi etiketlerinden önce gelir", async () => {
+    mockData({
+      todoCount: 0, fixmeCount: 0, hackCount: 0, xxxCount: 0, noteCount: 5, docCount: 0, infoCount: 0,
+      customCounts: { SECURITY: 6, OPTIMIZE: 4, UNUSED: 0 },
+    });
+
+    const { result } = renderHook(() => useDashboardOverview(), { wrapper });
+    await waitFor(() => expect(result.current.labelDistribution.length).toBeGreaterThan(0));
+
+    // 10 özel etiket borcu = 10 TODO ile aynı not
+    expect(result.current.healthScore).toBe(85);
+    expect(result.current.labelDistribution.map((l) => l.type)).toEqual(["OPTIMIZE", "SECURITY", "NOTE"]);
+    expect(result.current.labelDistribution.reduce((sum, l) => sum + l.percentage, 0)).toBe(100);
   });
 
   it("etiket istatistiği yokken toplam borçla not hesaplar", async () => {
