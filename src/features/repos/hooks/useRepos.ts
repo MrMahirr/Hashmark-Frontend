@@ -7,7 +7,7 @@ import {
   getRepo,
   syncRepos,
   deleteRepo,
-  setTrackedBranch, getRepoCandidates, trackRepo } from "../api/repos.api";
+  setTrackedBranch, setAutoScan, getRepoCandidates, trackRepo } from "../api/repos.api";
 
 import { Repo, ScanStatus } from "@/shared/types/repo.types";
 import type { RepoResponse } from "../api/repos.types";
@@ -39,6 +39,7 @@ export function mapRepoResponseToRepo(dto: RepoResponse): Repo {
     connectedAt: dto.createdAt ?? "",
     trackedBranch: dto.trackedBranch ?? null,
     debtBreakdown: dto.debtBreakdown ?? undefined,
+    autoScan: dto.autoScan ?? false,
   };
 }
 
@@ -184,6 +185,28 @@ export function useSetTrackedBranch() {
     },
     onError: () => {
       addToast({ title: t("repos.branch.failed"), type: "error" });
+    },
+  });
+}
+
+/** Push'ta otomatik taramayı açar/kapatır (backend GitHub webhook'u kurar/kaldırır). */
+export function useSetAutoScan() {
+  const queryClient = useQueryClient();
+  const addToast = useToastStore((state) => state.addToast);
+  const { t } = useI18n();
+
+  return useMutation({
+    mutationFn: ({ repoId, enabled }: { repoId: string; enabled: boolean }) => setAutoScan(repoId, enabled),
+    onSuccess: (repo) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.repos.all });
+      addToast({
+        title: t(repo.autoScan ? "repos.autoScan.enabled" : "repos.autoScan.disabled"),
+        type: "success",
+      });
+    },
+    onError: (err: Error) => {
+      // Sunucu mesajı (ör. depoda admin yetkisi gerekir) kullanıcıya aynen gösterilir
+      addToast({ title: t("repos.autoScan.failed"), description: err.message, type: "error" });
     },
   });
 }

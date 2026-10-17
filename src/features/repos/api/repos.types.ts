@@ -27,6 +27,8 @@ export interface RepoResponse {
   tracked?: boolean;
   /** Açık borçların etiket kırılımı */
   debtBreakdown?: Record<string, number>;
+  /** GitHub push webhook'u kurulu: izlenen dala her push'ta otomatik tarama */
+  autoScan?: boolean;
 }
 
 // ── Request Types ──

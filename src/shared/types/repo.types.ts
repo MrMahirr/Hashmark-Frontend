@@ -21,4 +21,6 @@ export interface Repo {
   /** Taranan dal; null = varsayılan dal */
   trackedBranch: string | null;
   debtBreakdown?: Record<string, number>;
+  /** Push'ta otomatik tarama açık mı */
+  autoScan?: boolean;
 }

@@ -27,8 +27,10 @@ export interface ScanStatusResponse {
   filesScanned: number;
   filesSkipped: number;
   filesFailed: number;
-  /** Hata veya uyarı açıklaması ("Partial scan: ..." gibi) */
+  /** Hata veya uyarı açıklaması ("Partial scan: ...", ".hashmark.yml: ..." gibi) */
   message: string | null;
+  /** MANUAL (kullanıcı) | PUSH (GitHub webhook) */
+  triggeredBy?: "MANUAL" | "PUSH";
   createdAt: string;
 }
 

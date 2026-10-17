@@ -6,6 +6,7 @@ import { RepoHeader } from "./RepoHeader";
 import { RepoStatsRow } from "./RepoStatsRow";
 import { RepoModuleDistribution } from "./RepoModuleDistribution";
 import { BranchSetting } from "./BranchSetting";
+import { AutoScanSetting } from "./AutoScanSetting";
 import { LazyTrendChart } from "@/features/dashboard/components/LazyCharts";
 import { LabelDistribution } from "@/features/dashboard/components/LabelDistribution";
 import { DebtExplorer } from "@/features/debts/components/DebtExplorer";
@@ -92,6 +93,8 @@ export function RepoDetailContent({ repoId: propRepoId }: RepoDetailContentProps
       />
 
       <BranchSetting repoId={repoId} currentBranch={repo.trackedBranch} />
+
+      <AutoScanSetting repoId={repoId} enabled={repo.autoScan ?? false} />
 
       <div className="flex flex-wrap items-start gap-4">
         <div className="min-w-0 flex-[2_1_460px]">
