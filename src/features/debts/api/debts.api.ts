@@ -8,6 +8,7 @@ import type {
   DebtStatsResponse,
   DebtTriageRequest,
   ExportFormat,
+  IssueResult,
   PageResponse,
 } from "./debts.types";
 
@@ -60,6 +61,26 @@ export async function getDebtContext(id: string, radius = 5): Promise<DebtContex
   const response = await apiClient.get<DebtContextResponse>(`${ApiMethod.DEBTS}/${id}/context`, {
     params: { radius },
   });
+  return response.data;
+}
+
+/** Borçtan GitHub issue açar; borçta zaten varsa mevcut issue döner. */
+export async function createDebtIssue(id: string): Promise<IssueResult> {
+  const response = await apiClient.post<IssueResult>(`${ApiMethod.DEBTS}/${id}/issue`);
+  return response.data;
+}
+
+/** Toplu issue (backend en fazla 20 kabul eder); sonuç borç başına. */
+export async function createDebtIssues(ids: string[]): Promise<IssueResult[]> {
+  const response = await apiClient.post<IssueResult[]>(`${ApiMethod.DEBTS}/issues`, {
+    debtIds: ids.map(Number),
+  });
+  return response.data;
+}
+
+/** Açık borçları ekleyen GitHub kullanıcıları (yazar filtresi seçenekleri). */
+export async function getDebtAuthors(repoId?: string): Promise<string[]> {
+  const response = await apiClient.get<string[]>(`${ApiMethod.DEBTS}/authors`, { params: { repoId } });
   return response.data;
 }
 

@@ -3,7 +3,10 @@ import { queryKeys } from "@/shared/api/query-keys";
 import { useToastStore } from "@/shared/store/toast.store";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import {
+  createDebtIssue,
+  createDebtIssues,
   exportDebts,
+  getDebtAuthors,
   getDebtContext,
   getDebts,
   getDebtStats,
@@ -63,6 +66,9 @@ export function mapDebtResponseToDebt(dto: DebtResponse, defaultRepoName = ""): 
     authorLogin: dto.authorLogin ?? null,
     authorName: dto.authorName ?? null,
     introducedAt: dto.introducedAt ?? null,
+    githubIssueNumber: dto.githubIssueNumber ?? null,
+    githubIssueUrl: dto.githubIssueUrl ?? null,
+    githubIssueState: dto.githubIssueState ?? null,
   };
 }
 
@@ -176,6 +182,77 @@ export function useBulkTriage() {
     },
     onError: () => {
       addToast({ title: t("debts.bulk.failed"), type: "error" });
+    },
+  });
+}
+
+/** Yazar filtresinin seçenekleri (git blame ile bilinen yazarlar). */
+export function useDebtAuthors(repoId?: string) {
+  return useQuery({
+    queryKey: ["debts", "authors", repoId ?? "all"] as const,
+    queryFn: () => getDebtAuthors(repoId),
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+/** Tek borç için GitHub issue (varsa mevcut olan döner). */
+export function useCreateDebtIssue() {
+  const queryClient = useQueryClient();
+  const addToast = useToastStore((state) => state.addToast);
+  const { t } = useI18n();
+
+  return useMutation({
+    mutationFn: (id: string) => createDebtIssue(id),
+    onSuccess: (result) => {
+      invalidateDebtViews(queryClient);
+      addToast({
+        title: t(result.created ? "debts.issue.created" : "debts.issue.exists", { number: result.issueNumber ?? "" }),
+        type: "success",
+      });
+    },
+    onError: (err: Error) => {
+      // Sunucu mesajı (ör. issue'lar kapalı, yetki yok) kullanıcıya aynen gösterilir
+      addToast({ title: t("debts.issue.failed"), description: err.message, type: "error" });
+    },
+  });
+}
+
+/** Backend toplu ucunun tek istekte kabul ettiği en fazla borç. */
+export const MAX_BULK_ISSUES = 20;
+
+/** Seçili borçlar için toplu issue; 20'lik parçalar halinde sırayla gönderilir, sonuç birleştirilir. */
+export function useCreateDebtIssues() {
+  const queryClient = useQueryClient();
+  const addToast = useToastStore((state) => state.addToast);
+  const { t } = useI18n();
+
+  return useMutation({
+    mutationFn: async (ids: string[]): Promise<BulkTriageResult> => {
+      let ok = 0;
+      let failed = 0;
+      for (let i = 0; i < ids.length; i += MAX_BULK_ISSUES) {
+        const results = await createDebtIssues(ids.slice(i, i + MAX_BULK_ISSUES));
+        for (const result of results) {
+          if (result.error) failed++;
+          else ok++;
+        }
+        // Sunucu kesinti/geçersiz token yüzünden erken durduysa yanıtta olmayanlar başarısızdır
+        failed += Math.min(MAX_BULK_ISSUES, ids.length - i) - results.length;
+      }
+      return { ok, failed };
+    },
+    onSuccess: ({ ok, failed }) => {
+      invalidateDebtViews(queryClient);
+      if (failed === 0) {
+        addToast({ title: t("debts.issue.bulkDone", { count: ok }), type: "success" });
+      } else if (ok === 0) {
+        addToast({ title: t("debts.issue.failed"), type: "error" });
+      } else {
+        addToast({ title: t("debts.issue.partial", { ok, failed }), type: "info" });
+      }
+    },
+    onError: (err: Error) => {
+      addToast({ title: t("debts.issue.failed"), description: err.message, type: "error" });
     },
   });
 }

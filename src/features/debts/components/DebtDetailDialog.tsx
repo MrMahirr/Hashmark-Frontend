@@ -8,8 +8,7 @@ import { DebtStatus, TRIAGE_STATUSES, type Debt, type TriageRequestStatus, type 
 import { useToastStore } from "@/shared/store/toast.store";
 import { Button, ButtonLink } from "@/shared/ui/Button";
 import { TagBadge, tagColor } from "@/shared/ui/TagBadge";
-import { useDebtContext, useTriageDebt } from "../hooks/useDebts";
-import { buildIssueUrl } from "../utils/issue-url";
+import { useCreateDebtIssue, useDebtContext, useTriageDebt } from "../hooks/useDebts";
 
 interface DebtDetailDialogProps {
   debt: Debt | null;
@@ -34,12 +33,12 @@ function DetailBody({ debt }: { debt: Debt }) {
   const { t, formatDate } = useI18n();
   const addToast = useToastStore((state) => state.addToast);
   const triage = useTriageDebt();
+  const createIssue = useCreateDebtIssue();
   const context = useDebtContext(debt.id);
 
   const [status, setStatus] = useState<TriageStatus>(debt.triageStatus);
   const [assignee, setAssignee] = useState(debt.assignee ?? "");
 
-  const issueUrl = buildIssueUrl(debt, t);
   const dirty = status !== debt.triageStatus || assignee.trim() !== (debt.assignee ?? "");
   const location = `${debt.filePath}:${debt.lineNumber}`;
 
@@ -97,21 +96,37 @@ function DetailBody({ debt }: { debt: Debt }) {
               {t("debts.detail.github")}
             </ButtonLink>
           )}
-          {issueUrl && (
+          {debt.githubIssueUrl && debt.githubIssueNumber ? (
             <ButtonLink
-              href={issueUrl}
+              href={debt.githubIssueUrl}
               variant="outline"
               target="_blank"
               rel="noopener noreferrer"
               leftIcon={<GitPullRequestArrow size={14} aria-hidden="true" />}
             >
-              {t("debts.detail.createIssue")}
+              {t(debt.githubIssueState === "closed" ? "debts.issue.linkClosed" : "debts.issue.link", {
+                number: debt.githubIssueNumber,
+              })}
             </ButtonLink>
+          ) : (
+            !isResolved && (
+              <Button
+                variant="outline"
+                onClick={() => createIssue.mutate(debt.id)}
+                isLoading={createIssue.isPending}
+                leftIcon={<GitPullRequestArrow size={14} aria-hidden="true" />}
+              >
+                {t("debts.detail.createIssue")}
+              </Button>
+            )
           )}
           <Button variant="outline" onClick={copyPath} leftIcon={<Copy size={14} aria-hidden="true" />}>
             {t("debts.detail.copyPath")}
           </Button>
         </div>
+        {(debt.githubIssueNumber || !isResolved) && (
+          <p className="m-0 font-mono text-xs text-hm-text-secondary">{t("debts.issue.hint")}</p>
+        )}
         {(canResolve || canReopen) && (
           <div className="flex flex-col gap-2 pt-1">
             {canResolve ? (

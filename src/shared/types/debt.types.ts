@@ -49,4 +49,8 @@ export interface Debt {
   authorLogin: string | null;
   authorName: string | null;
   introducedAt: string | null;
+  /** Hashmark'ın bu borç için açtığı GitHub issue (kapanınca borç çözülür) */
+  githubIssueNumber?: number | null;
+  githubIssueUrl?: string | null;
+  githubIssueState?: "open" | "closed" | null;
 }
