@@ -11,10 +11,13 @@ interface DebtBulkBarProps {
   pending: boolean;
   onApply: (payload: { status?: TriageRequestStatus; assignee?: string }) => void;
   onClear: () => void;
+  /** Verilirse "GitHub issue oluştur" düğmesi gösterilir. */
+  onCreateIssues?: () => void;
+  issuesPending?: boolean;
 }
 
-/** Seçili satırlar için toplu triyaj çubuğu (yok say / düzeltilmeyecek / yeniden aç / ata). */
-export function DebtBulkBar({ count, pending, onApply, onClear }: DebtBulkBarProps) {
+/** Seçili satırlar için toplu triyaj çubuğu (yok say / düzeltilmeyecek / yeniden aç / ata / issue). */
+export function DebtBulkBar({ count, pending, onApply, onClear, onCreateIssues, issuesPending = false }: DebtBulkBarProps) {
   const { t } = useI18n();
   const [assignOpen, setAssignOpen] = useState(false);
   const [assignee, setAssignee] = useState("");
@@ -70,6 +73,12 @@ export function DebtBulkBar({ count, pending, onApply, onClear }: DebtBulkBarPro
       ) : (
         <Button variant="outline" onClick={() => setAssignOpen(true)}>
           {t("debts.bulk.assign")}
+        </Button>
+      )}
+
+      {onCreateIssues && (
+        <Button variant="outline" disabled={pending} isLoading={issuesPending} onClick={onCreateIssues}>
+          {t("debts.bulk.createIssues")}
         </Button>
       )}
 

@@ -11,9 +11,13 @@ const TAG_COLOR_VAR: Record<string, string> = {
   INFO: "--hm-info",
 };
 
-/** Etiketin renk değişkeni (`var(--hm-todo)` …); bilinmeyen etiket ikincil metin rengine düşer. */
+/**
+ * Etiketin renk değişkeni (`var(--hm-todo)` …). Yerleşik olmayan etiketler `.hashmark.yml` özel etiketleridir
+ * (SECURITY, OPTIMIZE …) ve ortak `--hm-custom` rengini alır; boş etiket ikincil metin rengine düşer.
+ */
 export function tagColor(tag: string): string {
-  return `var(${TAG_COLOR_VAR[tag.toUpperCase()] ?? "--hm-text-secondary"})`;
+  const known = TAG_COLOR_VAR[tag.toUpperCase()];
+  return `var(${known ?? (tag.trim() ? "--hm-custom" : "--hm-text-secondary")})`;
 }
 
 interface TagBadgeProps {

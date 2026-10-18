@@ -61,7 +61,9 @@ describe("shared/ui ilkelleri", () => {
 
   it("TagBadge: etiket rengi değişkene eşlenir", () => {
     expect(tagColor("FIXME")).toBe("var(--hm-fixme)");
-    expect(tagColor("bilinmeyen")).toBe("var(--hm-text-secondary)");
+    // Yerleşik olmayan etiketler .hashmark.yml özel etiketleridir: ortak renk
+    expect(tagColor("SECURITY")).toBe("var(--hm-custom)");
+    expect(tagColor("")).toBe("var(--hm-text-secondary)");
     render(<TagBadge tag="TODO" />);
     expect(screen.getByText("TODO")).toBeInTheDocument();
   });

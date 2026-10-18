@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => ({
   useMappedDebts: vi.fn(),
   bulkMutate: vi.fn(),
   exportMutate: vi.fn(),
+  issuesMutate: vi.fn(),
 }));
 
 vi.mock("../hooks/useDebts", () => ({
@@ -15,6 +16,9 @@ vi.mock("../hooks/useDebts", () => ({
   useExportDebts: () => ({ mutate: mocks.exportMutate, isPending: false }),
   useDebtContext: () => ({ data: undefined, isLoading: false, isError: false }),
   useTriageDebt: () => ({ mutate: vi.fn(), isPending: false }),
+  useCreateDebtIssue: () => ({ mutate: vi.fn(), isPending: false }),
+  useCreateDebtIssues: () => ({ mutate: mocks.issuesMutate, isPending: false }),
+  useDebtAuthors: () => ({ data: ["ayse", "octocat"] }),
 }));
 
 import { DebtExplorer } from "./DebtExplorer";
@@ -62,7 +66,32 @@ describe("DebtExplorer", () => {
     mocks.useMappedDebts.mockReset();
     mocks.bulkMutate.mockReset();
     mocks.exportMutate.mockReset();
+    mocks.issuesMutate.mockReset();
     mockPage();
+  });
+
+  it("yazar ve yaş süzgeçlerini sunucuya iletir", async () => {
+    render(<DebtExplorer />);
+
+    await userEvent.selectOptions(screen.getByLabelText("Yazar"), "octocat");
+    expect(lastFilters()).toMatchObject({ author: "octocat", page: 0 });
+
+    await userEvent.selectOptions(screen.getByLabelText("Yaş"), "90");
+    expect(lastFilters()).toMatchObject({ author: "octocat", olderThanDays: 90 });
+
+    await userEvent.selectOptions(screen.getByLabelText("Yaş"), "0");
+    expect(lastFilters().olderThanDays).toBeUndefined();
+  });
+
+  it("seçili borçlar için toplu GitHub issue ister", async () => {
+    render(<DebtExplorer />);
+
+    await userEvent.click(screen.getAllByRole("checkbox", { name: "src/File0.java:1 satırını seç" })[0]);
+    await userEvent.click(screen.getAllByRole("checkbox", { name: "src/File2.java:3 satırını seç" })[0]);
+    await userEvent.click(screen.getByRole("button", { name: "GitHub issue oluştur" }));
+
+    expect(mocks.issuesMutate).toHaveBeenCalledTimes(1);
+    expect(mocks.issuesMutate.mock.calls[0][0]).toEqual(["0", "2"]);
   });
 
   it("varsayılan olarak açık borçları, tespit tarihine göre azalan çeker", () => {

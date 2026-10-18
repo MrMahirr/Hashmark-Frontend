@@ -7,11 +7,13 @@ import { useToastStore } from "@/shared/store/toast.store";
 const mocks = vi.hoisted(() => ({
   context: vi.fn(),
   triageMutate: vi.fn(),
+  issueMutate: vi.fn(),
 }));
 
 vi.mock("../hooks/useDebts", () => ({
   useDebtContext: mocks.context,
   useTriageDebt: () => ({ mutate: mocks.triageMutate, isPending: false }),
+  useCreateDebtIssue: () => ({ mutate: mocks.issueMutate, isPending: false }),
 }));
 
 import { DebtDetailDialog } from "./DebtDetailDialog";
@@ -48,6 +50,7 @@ describe("DebtDetailDialog", () => {
   beforeEach(() => {
     mocks.context.mockReset();
     mocks.triageMutate.mockReset();
+    mocks.issueMutate.mockReset();
     useToastStore.setState({ toasts: [] });
     setContext({
       data: {
@@ -82,10 +85,30 @@ describe("DebtDetailDialog", () => {
     const context = screen.getByLabelText("Kod bağlamı", { selector: "pre" });
     expect(context).toHaveTextContent("12// FIXME: handle null user");
     expect(screen.getByRole("link", { name: /GitHub'da aç/ })).toHaveAttribute("href", debt.permalink);
-    expect(screen.getByRole("link", { name: /issue oluştur/i })).toHaveAttribute(
+  });
+
+  it("issue yoksa Hashmark üzerinden oluşturur (borca bağlanır)", async () => {
+    render(<DebtDetailDialog debt={debt} onClose={() => undefined} />);
+
+    await userEvent.click(screen.getByRole("button", { name: /issue oluştur/i }));
+    expect(mocks.issueMutate).toHaveBeenCalledWith("9");
+    expect(screen.getByText(/Issue GitHub'da kapanınca/)).toBeInTheDocument();
+  });
+
+  it("bağlı issue varsa bağlantısını ve kapalı durumunu gösterir", () => {
+    const linked: Debt = {
+      ...debt,
+      githubIssueNumber: 77,
+      githubIssueUrl: "https://github.com/octo/hello/issues/77",
+      githubIssueState: "closed",
+    };
+    render(<DebtDetailDialog debt={linked} onClose={() => undefined} />);
+
+    expect(screen.getByRole("link", { name: "Issue #77 (kapalı)" })).toHaveAttribute(
       "href",
-      expect.stringContaining("octo/hello/issues/new")
+      "https://github.com/octo/hello/issues/77"
     );
+    expect(screen.queryByRole("button", { name: /issue oluştur/i })).not.toBeInTheDocument();
   });
 
   it("kod bağlamı yüklenirken ve hata durumunda uygun mesaj verir", () => {

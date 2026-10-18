@@ -7,7 +7,7 @@ import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
 import { type Debt, type TriageRequestStatus } from "@/shared/types/debt.types";
 import { Panel } from "@/shared/ui/Panel";
 import { ErrorState } from "@/shared/ui/StateViews";
-import { useBulkTriage, useExportDebts, useMappedDebts } from "../hooks/useDebts";
+import { useBulkTriage, useCreateDebtIssues, useDebtAuthors, useExportDebts, useMappedDebts } from "../hooks/useDebts";
 import type { DebtFilters } from "../api/debts.types";
 import { DebtBulkBar } from "./DebtBulkBar";
 import { DebtDetailDialog } from "./DebtDetailDialog";
@@ -49,6 +49,8 @@ export function DebtExplorer({
   const [sort, setSort] = useState("detectedAt");
   const [dir, setDir] = useState<SortDirection>("desc");
   const [groupByRepo, setGroupByRepo] = useState(false);
+  const [author, setAuthor] = useState("");
+  const [olderThanDays, setOlderThanDays] = useState(0);
   const [selectedIds, setSelectedIds] = useState<ReadonlySet<string>>(new Set());
   const [detail, setDetail] = useState<Debt | null>(null);
 
@@ -61,17 +63,21 @@ export function DebtExplorer({
       label: label || undefined,
       status: status || undefined,
       q: debouncedSearch || undefined,
+      author: author || undefined,
+      olderThanDays: olderThanDays || undefined,
       sort,
       dir,
       page,
       size,
     }),
-    [repoId, label, status, debouncedSearch, sort, dir, page, size]
+    [repoId, label, status, debouncedSearch, author, olderThanDays, sort, dir, page, size]
   );
 
   const { data, isLoading, isFetching, isError, refetch } = useMappedDebts(filters, fixedRepoName);
   const bulk = useBulkTriage();
+  const bulkIssues = useCreateDebtIssues();
   const exporter = useExportDebts();
+  const authors = useDebtAuthors(repoId || undefined);
 
   const debts = useMemo(() => data?.content ?? [], [data]);
   const totalElements = data?.totalElements ?? 0;
@@ -159,14 +165,29 @@ export function DebtExplorer({
         }}
         exportPending={exporter.isPending}
         onExport={(format) => exporter.mutate({ filters, format })}
+        authors={authors.data ?? []}
+        author={author}
+        onAuthorChange={(value) => {
+          setAuthor(value);
+          resetView();
+        }}
+        olderThanDays={olderThanDays}
+        onOlderThanDaysChange={(value) => {
+          setOlderThanDays(value);
+          resetView();
+        }}
       />
 
       {selectedIds.size > 0 && (
         <DebtBulkBar
           count={selectedIds.size}
-          pending={bulk.isPending}
+          pending={bulk.isPending || bulkIssues.isPending}
           onApply={runBulk}
           onClear={() => setSelectedIds(new Set())}
+          onCreateIssues={() =>
+            bulkIssues.mutate(Array.from(selectedIds), { onSuccess: () => setSelectedIds(new Set()) })
+          }
+          issuesPending={bulkIssues.isPending}
         />
       )}
 
