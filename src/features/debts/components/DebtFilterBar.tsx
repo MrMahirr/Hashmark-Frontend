@@ -44,7 +44,21 @@ interface DebtFilterBarProps {
 
   exportPending: boolean;
   onExport: (format: ExportFormat) => void;
+
+  /** git blame yazarları; boşsa yazar süzgeci gizlenir. */
+  authors?: ReadonlyArray<string>;
+  author?: string;
+  onAuthorChange?: (author: string) => void;
+  /** 0 = her yaş */
+  olderThanDays?: number;
+  onOlderThanDaysChange?: (days: number) => void;
 }
+
+/** Yaş süzgeci seçenekleri (gün); 0 = her yaş. 90+ gün "çürüyen" borçlardır. */
+export const AGE_OPTIONS = [0, 30, 90, 180, 365] as const;
+
+const SELECT =
+  "min-h-11 cursor-pointer rounded-pill border border-hm-border bg-hm-bg px-4 font-mono text-[13px] font-bold text-hm-text-primary";
 
 function CountSuffix({ value }: { value?: number }) {
   if (value === undefined) return null;
@@ -78,6 +92,11 @@ export function DebtFilterBar(props: DebtFilterBarProps) {
     onStatusChange,
     exportPending,
     onExport,
+    authors = [],
+    author = "",
+    onAuthorChange,
+    olderThanDays = 0,
+    onOlderThanDaysChange,
   } = props;
 
   const useRepoChips = repos.length <= MAX_REPO_CHIPS;
@@ -185,16 +204,49 @@ export function DebtFilterBar(props: DebtFilterBarProps) {
         })}
       </ChipGroup>
 
-      <ChipGroup aria-label={t("debts.filter.status")} className="gap-2.5">
-        {DEBT_STATUSES.map((value) => {
-          const key = value === "" ? "all" : value;
-          return (
-            <Chip key={key} pressed={status === value} onClick={() => onStatusChange(value)}>
-              {t(`debts.status.${key}` as const)}
-            </Chip>
-          );
-        })}
-      </ChipGroup>
+      <div className="flex flex-wrap items-center gap-2.5">
+        <ChipGroup aria-label={t("debts.filter.status")} className="gap-2.5">
+          {DEBT_STATUSES.map((value) => {
+            const key = value === "" ? "all" : value;
+            return (
+              <Chip key={key} pressed={status === value} onClick={() => onStatusChange(value)}>
+                {t(`debts.status.${key}` as const)}
+              </Chip>
+            );
+          })}
+        </ChipGroup>
+
+        {onOlderThanDaysChange && (
+          <label className="flex items-center">
+            <span className="sr-only">{t("debts.filter.age")}</span>
+            <select
+              value={olderThanDays}
+              onChange={(event) => onOlderThanDaysChange(Number(event.target.value))}
+              className={SELECT}
+            >
+              {AGE_OPTIONS.map((days) => (
+                <option key={days} value={days}>
+                  {days === 0 ? t("debts.filter.anyAge") : t("debts.filter.olderThan", { days })}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+
+        {onAuthorChange && (authors.length > 0 || author) && (
+          <label className="flex items-center">
+            <span className="sr-only">{t("debts.filter.author")}</span>
+            <select value={author} onChange={(event) => onAuthorChange(event.target.value)} className={`${SELECT} max-w-[220px]`}>
+              <option value="">{t("debts.filter.allAuthors")}</option>
+              {authors.map((login) => (
+                <option key={login} value={login}>
+                  {login}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+      </div>
     </div>
   );
 }

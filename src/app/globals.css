@@ -40,6 +40,8 @@
   --hm-note: #5FD6C2;
   --hm-doc: #A3A8FF;
   --hm-info: #6FD0F0;
+  /* .hashmark.yml özel etiketleri (SECURITY, OPTIMIZE …) */
+  --hm-custom: #F28FD0;
 
   /* Durum */
   --hm-success: #8FD14F;
@@ -98,6 +100,7 @@
   --hm-note: #0D645D;
   --hm-doc: #4338CA;
   --hm-info: #00607E;
+  --hm-custom: #9C2B73;
 
   --hm-success: #2D6600;
   --hm-danger: #A22E0D;
@@ -131,6 +134,7 @@
     --hm-note: #0D645D;
     --hm-doc: #4338CA;
     --hm-info: #00607E;
+    --hm-custom: #9C2B73;
 
     --hm-success: #2D6600;
     --hm-danger: #A22E0D;

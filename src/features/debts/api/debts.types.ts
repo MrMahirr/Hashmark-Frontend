@@ -46,6 +46,23 @@ export interface DebtResponse {
   authorLogin?: string | null;
   authorName?: string | null;
   introducedAt?: string | null;
+  githubIssueNumber?: number | null;
+  githubIssueUrl?: string | null;
+  githubIssueState?: "open" | "closed" | null;
+}
+
+/**
+ * POST /debts/{id}/issue, POST /debts/issues
+ * Backend karşılığı: dev.hashmark.issue.DebtIssueService.IssueResult
+ */
+export interface IssueResult {
+  debtId: number;
+  issueNumber: number | null;
+  issueUrl: string | null;
+  /** false: borçta zaten issue vardı (yenisi açılmadı) */
+  created: boolean;
+  /** toplu istekte bu borç için hata */
+  error: string | null;
 }
 
 /**
@@ -84,6 +101,10 @@ export interface DebtFilters {
   q?: string;
   assignee?: string;
   priority?: string;
+  /** git blame yazarı (GitHub kullanıcı adı) */
+  author?: string;
+  /** en az bu kadar gündür açık (yaş) */
+  olderThanDays?: number;
   sort?: string;
   dir?: "asc" | "desc";
   page?: number;
