@@ -65,10 +65,12 @@ export function useDashboardOverview(repoId?: string) {
     .sort(([a], [b]) => a.localeCompare(b));
   const customCnt = customCounts.reduce((sum, [, count]) => sum + count, 0);
 
-  // Etiket istatistiği henüz gelmediyse (ilk yükleme) toplam borç sayısı kullanılır.
   // Sağlık hesabında TODO, FIXME, HACK, XXX ve `.hashmark.yml` özel etiketleri penalize edilir;
-  // NOTE, DOC, INFO edilmez.
-  const penalizableDebts = labelStats ? todoCnt + fixmeCnt + hackCnt + xxxCnt + customCnt : totalDebts;
+  // NOTE, DOC, INFO edilmez. Sunucu ağırlıklı borcu (etiket × öncelik) verirse o kullanılır,
+  // yoksa borç sayısı; etiket istatistiği henüz gelmediyse (ilk yükleme) toplam borç sayısı.
+  const insights = summary?.insights ?? null;
+  const penalizableDebts =
+    insights?.weightedDebt ?? (labelStats ? todoCnt + fixmeCnt + hackCnt + xxxCnt + customCnt : totalDebts);
   const { score: healthScore, grade } = calculateHealth(penalizableDebts);
 
   const trendData: TrendDataPoint[] = summary?.trendData?.map((t) => ({
@@ -119,6 +121,7 @@ export function useDashboardOverview(repoId?: string) {
     trendData,
     labelDistribution,
     moduleDistribution,
+    insights,
     refetch: () => {
       summaryQuery.refetch();
       statsQuery.refetch();

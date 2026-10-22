@@ -61,6 +61,8 @@ export function mapDebtResponseToDebt(dto: DebtResponse, defaultRepoName = ""): 
     commitSha: dto.commitSha ?? null,
     assignee: dto.assignee ?? null,
     priority,
+    priorityAuto: priority !== null && (dto.priorityAuto ?? false),
+    secretDetected: dto.secretDetected ?? false,
     dueDate: dto.dueDate ?? null,
     issueRef: dto.issueRef ?? null,
     authorLogin: dto.authorLogin ?? null,

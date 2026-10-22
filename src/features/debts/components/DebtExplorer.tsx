@@ -9,6 +9,7 @@ import { Panel } from "@/shared/ui/Panel";
 import { ErrorState } from "@/shared/ui/StateViews";
 import { useBulkTriage, useCreateDebtIssues, useDebtAuthors, useExportDebts, useMappedDebts } from "../hooks/useDebts";
 import type { DebtFilters } from "../api/debts.types";
+import type { DebtLinkFilters } from "../utils/debt-links";
 import { DebtBulkBar } from "./DebtBulkBar";
 import { DebtDetailDialog } from "./DebtDetailDialog";
 import { DebtFilterBar, type DebtStatusFilter, type RepoOption } from "./DebtFilterBar";
@@ -24,6 +25,8 @@ interface DebtExplorerProps {
   onRepoChange?: (repoId: string) => void;
   /** Etiket çiplerinde gösterilecek sayılar (ör. istatistik ucundan). */
   labelCounts?: Partial<Record<string, number>>;
+  /** Başlangıç süzgeçleri (içgörü bağlantıları); depo seçimi `selectedRepo` ile gelir. */
+  initialFilters?: DebtLinkFilters;
 }
 
 /**
@@ -38,6 +41,7 @@ export function DebtExplorer({
   selectedRepo = "",
   onRepoChange,
   labelCounts,
+  initialFilters = {},
 }: DebtExplorerProps) {
   const { t } = useI18n();
 
@@ -50,7 +54,10 @@ export function DebtExplorer({
   const [dir, setDir] = useState<SortDirection>("desc");
   const [groupByRepo, setGroupByRepo] = useState(false);
   const [author, setAuthor] = useState("");
-  const [olderThanDays, setOlderThanDays] = useState(0);
+  const [olderThanDays, setOlderThanDays] = useState(initialFilters.olderThanDays ?? 0);
+  const [priority, setPriority] = useState<string>(initialFilters.priority ?? "");
+  const [secretOnly, setSecretOnly] = useState(initialFilters.secret ?? false);
+  const [debtOnly, setDebtOnly] = useState(initialFilters.debtOnly ?? false);
   const [selectedIds, setSelectedIds] = useState<ReadonlySet<string>>(new Set());
   const [detail, setDetail] = useState<Debt | null>(null);
 
@@ -65,12 +72,15 @@ export function DebtExplorer({
       q: debouncedSearch || undefined,
       author: author || undefined,
       olderThanDays: olderThanDays || undefined,
+      priority: priority || undefined,
+      secret: secretOnly || undefined,
+      debtOnly: debtOnly || undefined,
       sort,
       dir,
       page,
       size,
     }),
-    [repoId, label, status, debouncedSearch, author, olderThanDays, sort, dir, page, size]
+    [repoId, label, status, debouncedSearch, author, olderThanDays, priority, secretOnly, debtOnly, sort, dir, page, size]
   );
 
   const { data, isLoading, isFetching, isError, refetch } = useMappedDebts(filters, fixedRepoName);
@@ -174,6 +184,21 @@ export function DebtExplorer({
         olderThanDays={olderThanDays}
         onOlderThanDaysChange={(value) => {
           setOlderThanDays(value);
+          resetView();
+        }}
+        priority={priority}
+        onPriorityChange={(value) => {
+          setPriority(value);
+          resetView();
+        }}
+        secretOnly={secretOnly}
+        onSecretOnlyChange={(value) => {
+          setSecretOnly(value);
+          resetView();
+        }}
+        debtOnly={debtOnly}
+        onDebtOnlyChange={(value) => {
+          setDebtOnly(value);
           resetView();
         }}
       />

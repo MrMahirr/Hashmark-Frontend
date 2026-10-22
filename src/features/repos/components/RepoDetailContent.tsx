@@ -10,6 +10,7 @@ import { AutoScanSetting } from "./AutoScanSetting";
 import { LazyTrendChart } from "@/features/dashboard/components/LazyCharts";
 import { LabelDistribution } from "@/features/dashboard/components/LabelDistribution";
 import { DebtExplorer } from "@/features/debts/components/DebtExplorer";
+import { DebtInsights } from "@/features/dashboard/components/DebtInsights";
 import { ScanProgress } from "@/features/scanner/components/ScanProgress";
 import { useRepo, mapRepoResponseToRepo } from "../hooks/useRepos";
 import { useDashboardOverview } from "@/features/dashboard/hooks/useDashboard";
@@ -41,6 +42,9 @@ export function RepoDetailContent({ repoId: propRepoId }: RepoDetailContentProps
     trendData,
     labelDistribution,
     moduleDistribution,
+    insights,
+    grade,
+    healthScore,
     isLoading: isOverviewLoading,
     isError: isOverviewError,
     refetch: refetchOverview,
@@ -91,6 +95,8 @@ export function RepoDetailContent({ repoId: propRepoId }: RepoDetailContentProps
         addedCount={addedThisWeek}
         resolvedCount={stats.resolvedDebts}
       />
+
+      {insights && <DebtInsights insights={insights} grade={grade} healthScore={healthScore} repoId={repoId} />}
 
       <BranchSetting repoId={repoId} currentBranch={repo.trackedBranch} />
 
