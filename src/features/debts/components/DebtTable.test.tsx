@@ -149,7 +149,8 @@ describe("DebtTable", () => {
     expect(container.querySelector("table")).toBeNull();
   });
 
-  it("eşik altında tüm satırlar, üstünde yalnızca görünür pencere render edilir", () => {
+  // Yüzlerce satır render eder; tüm paket paralel koşarken 5 sn'ye yaklaşıyor
+  it("eşik altında tüm satırlar, üstünde yalnızca görünür pencere render edilir", { timeout: 20_000 }, () => {
     const few = setup(Array.from({ length: VIRTUALIZE_THRESHOLD }, (_, i) => makeDebt(i)));
     expect(few.table.querySelectorAll("tbody tr")).toHaveLength(VIRTUALIZE_THRESHOLD);
     few.unmount();

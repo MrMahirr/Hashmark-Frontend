@@ -25,7 +25,7 @@ describe("NotificationSettings (haftalık özet)", () => {
     mocks.mutate.mockReset();
     mocks.testMutate.mockReset();
     mocks.useSettings.mockReturnValue({
-      data: { emailNotify: true, notifyDay: "MONDAY" },
+      data: { emailNotify: true, notifyDay: "MONDAY", digestTimezone: "Europe/Istanbul" },
       isLoading: false,
       isError: false,
     });
@@ -34,7 +34,7 @@ describe("NotificationSettings (haftalık özet)", () => {
   it("anahtar rol=switch ve sunucudaki durumu yansıtır; değişmeden Kaydet pasiftir", () => {
     render(<NotificationSettings />);
 
-    expect(screen.getByRole("switch", { name: "Haftalık özeti aç/kapat" })).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByRole("switch", { name: "E-posta özetini aç/kapat" })).toHaveAttribute("aria-checked", "true");
     expect(screen.getByRole("button", { name: "Kaydet" })).toBeDisabled();
   });
 
@@ -56,17 +56,38 @@ describe("NotificationSettings (haftalık özet)", () => {
       notifyDay: "FRIDAY",
       digestLabels: [],
       digestEmail: "",
+      digestFrequency: "WEEKLY",
+      digestHour: 8,
+      digestTimezone: "Europe/Istanbul",
     });
   });
 
-  it("kapalıyken gün çipleri pasif ve 'kapalı' notu görünür", async () => {
+  it("sıklık, saat ve saat dilimi kaydedilir; gün yalnızca haftalıkta sorulur", async () => {
     render(<NotificationSettings />);
 
-    await userEvent.click(screen.getByRole("switch", { name: "Haftalık özeti aç/kapat" }));
+    await userEvent.click(screen.getByRole("button", { name: "Günlük" }));
+    expect(screen.queryByRole("group", { name: "Gönderim günü" })).not.toBeInTheDocument();
+    await userEvent.selectOptions(screen.getByLabelText("Saat"), "18");
+    await userEvent.selectOptions(screen.getByLabelText("Saat dilimi"), "America/New_York");
+    expect(screen.getByText(/^Sonraki özet: /)).toBeInTheDocument();
 
-    expect(screen.getByText("Haftalık özet kapalı.")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Kaydet" }));
+    expect(mocks.mutate.mock.calls[0][0]).toMatchObject({
+      digestFrequency: "DAILY",
+      digestHour: 18,
+      digestTimezone: "America/New_York",
+    });
+  });
+
+  it("e-posta kapalıyken etiket çipleri pasif, zamanlama (kanallar için) açık kalır", async () => {
+    render(<NotificationSettings />);
+
+    await userEvent.click(screen.getByRole("switch", { name: "E-posta özetini aç/kapat" }));
+
+    const labels = screen.getByRole("group", { name: "Dahil edilecek etiketler" });
+    labels.querySelectorAll("button").forEach((button) => expect(button).toBeDisabled());
     const days = screen.getByRole("group", { name: "Gönderim günü" });
-    days.querySelectorAll("button").forEach((button) => expect(button).toBeDisabled());
+    days.querySelectorAll("button").forEach((button) => expect(button).toBeEnabled());
   });
 
   it("etiket çipleri varsayılanda hepsi seçili; alt küme sunucuya sıralı gider", async () => {
@@ -126,7 +147,8 @@ describe("NotificationSettings (haftalık özet)", () => {
     expect(test).toBeDisabled(); // değişiklik varken önce kaydedilmeli
   });
 
-  it("erişilebilirlik ihlali içermez", async () => {
+  // Saat dilimi seçicisi ~400 seçenek içerir; tüm paket paralel koşarken axe 5 sn'yi aşabiliyor
+  it("erişilebilirlik ihlali içermez", { timeout: 20_000 }, async () => {
     const { container } = render(<NotificationSettings />);
     expect(await axeViolations(container)).toEqual([]);
   });

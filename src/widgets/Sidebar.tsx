@@ -69,7 +69,7 @@ export function SidebarContent({ onNavigate }: SidebarNavProps) {
 
 export const Sidebar = () => {
   return (
-    <aside className="fixed left-0 top-0 z-10 hidden h-full w-[240px] flex-col gap-8 border-r border-hm-border bg-hm-surface px-4 py-6 md:flex">
+    <aside className="fixed left-0 top-0 z-10 hidden h-full w-[240px] flex-col gap-8 border-r border-hm-border bg-hm-surface px-4 py-6 md:flex print:hidden">
       <SidebarContent />
     </aside>
   );

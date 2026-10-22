@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { RepoHeader } from "./RepoHeader";
 import { RepoStatsRow } from "./RepoStatsRow";
 import { HotspotMap } from "./HotspotMap";
+import { BadgeSetting } from "./BadgeSetting";
 import { BranchSetting } from "./BranchSetting";
 import { AutoScanSetting } from "./AutoScanSetting";
 import { LazyTrendChart } from "@/features/dashboard/components/LazyCharts";
@@ -93,6 +94,8 @@ export function RepoDetailContent({ repoId: propRepoId }: RepoDetailContentProps
       <BranchSetting repoId={repoId} currentBranch={repo.trackedBranch} />
 
       <AutoScanSetting repoId={repoId} enabled={repo.autoScan ?? false} />
+
+      <BadgeSetting repoId={repoId} isPrivate={repoDto.isPrivate} />
 
       <div className="flex flex-wrap items-start gap-4">
         <div className="min-w-0 flex-[2_1_460px]">
