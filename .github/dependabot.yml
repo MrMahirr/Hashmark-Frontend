@@ -1,12 +1,38 @@
 version: 2
+
+# PR'lar dev'e açılır: master'a birleşen her şey otomatik olarak üretime dağıtılır (deploy.yml).
+# Küçük/yama güncellemeleri tek PR'da gruplanır; büyük sürümler ayrı PR olarak gelir ve elle incelenir.
 updates:
   - package-ecosystem: npm
     directory: /
+    target-branch: dev
     schedule: { interval: weekly }
     open-pull-requests-limit: 5
+    groups:
+      npm-minor-patch:
+        update-types: [minor, patch]
+    ignore:
+      # typescript-eslint (eslint-config-next) TS 7'yi desteklemiyor: lint hiç çalışmıyor (PR #11).
+      # Destek gelince bu satır kaldırılır: https://github.com/typescript-eslint/typescript-eslint/issues/10940
+      - dependency-name: typescript
+        versions: [">=7"]
+      # @types/node, çalışma zamanındaki Node ana sürümünü (Dockerfile, CI) izlemeli
+      - dependency-name: "@types/node"
+        update-types: [version-update:semver-major]
+
+  # Node yalnızca LTS sürümlerine elle geçirilir (çift sayılı + "Active LTS"); tek sayılı/yeni ana sürümler atlanır.
   - package-ecosystem: docker
     directory: /
+    target-branch: dev
     schedule: { interval: weekly }
+    ignore:
+      - dependency-name: node
+        update-types: [version-update:semver-major]
+
   - package-ecosystem: github-actions
     directory: /
+    target-branch: dev
     schedule: { interval: weekly }
+    groups:
+      actions:
+        patterns: ["*"]
