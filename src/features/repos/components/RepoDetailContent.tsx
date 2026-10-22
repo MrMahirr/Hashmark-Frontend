@@ -4,12 +4,14 @@ import React from "react";
 import { useParams } from "next/navigation";
 import { RepoHeader } from "./RepoHeader";
 import { RepoStatsRow } from "./RepoStatsRow";
-import { RepoModuleDistribution } from "./RepoModuleDistribution";
+import { HotspotMap } from "./HotspotMap";
+import { BadgeSetting } from "./BadgeSetting";
 import { BranchSetting } from "./BranchSetting";
 import { AutoScanSetting } from "./AutoScanSetting";
 import { LazyTrendChart } from "@/features/dashboard/components/LazyCharts";
 import { LabelDistribution } from "@/features/dashboard/components/LabelDistribution";
 import { DebtExplorer } from "@/features/debts/components/DebtExplorer";
+import { DebtInsights } from "@/features/dashboard/components/DebtInsights";
 import { ScanProgress } from "@/features/scanner/components/ScanProgress";
 import { useRepo, mapRepoResponseToRepo } from "../hooks/useRepos";
 import { useDashboardOverview } from "@/features/dashboard/hooks/useDashboard";
@@ -40,7 +42,9 @@ export function RepoDetailContent({ repoId: propRepoId }: RepoDetailContentProps
     stats,
     trendData,
     labelDistribution,
-    moduleDistribution,
+    insights,
+    grade,
+    healthScore,
     isLoading: isOverviewLoading,
     isError: isOverviewError,
     refetch: refetchOverview,
@@ -71,13 +75,6 @@ export function RepoDetailContent({ repoId: propRepoId }: RepoDetailContentProps
   repo.debtCount = stats.totalDebts;
   repo.resolvedCount = stats.resolvedDebts;
 
-  const totalModuleDebts = moduleDistribution.reduce((acc, curr) => acc + curr.count, 0);
-  const formattedModules = moduleDistribution.map((m) => ({
-    name: m.module || t("repos.modules.root"),
-    count: m.count,
-    percentage: totalModuleDebts > 0 ? Math.round((m.count / totalModuleDebts) * 100) : 0,
-  }));
-
   const addedThisWeek = trendData.length > 0 ? trendData[trendData.length - 1].added : 0;
 
   return (
@@ -92,9 +89,13 @@ export function RepoDetailContent({ repoId: propRepoId }: RepoDetailContentProps
         resolvedCount={stats.resolvedDebts}
       />
 
+      {insights && <DebtInsights insights={insights} grade={grade} healthScore={healthScore} repoId={repoId} />}
+
       <BranchSetting repoId={repoId} currentBranch={repo.trackedBranch} />
 
       <AutoScanSetting repoId={repoId} enabled={repo.autoScan ?? false} />
+
+      <BadgeSetting repoId={repoId} isPrivate={repoDto.isPrivate} />
 
       <div className="flex flex-wrap items-start gap-4">
         <div className="min-w-0 flex-[2_1_460px]">
@@ -105,11 +106,7 @@ export function RepoDetailContent({ repoId: propRepoId }: RepoDetailContentProps
         </div>
       </div>
 
-      <div className="flex flex-wrap items-start gap-4">
-        <div className="min-w-0 flex-[1_1_320px]">
-          <RepoModuleDistribution data={formattedModules} />
-        </div>
-      </div>
+      <HotspotMap repoId={repoId} repoName={repoDto.fullName} />
 
       <DebtExplorer fixedRepoId={repoId} fixedRepoName={repoDto.fullName} />
     </div>

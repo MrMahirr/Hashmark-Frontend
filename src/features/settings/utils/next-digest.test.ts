@@ -1,27 +1,42 @@
 import { describe, expect, it } from "vitest";
-import { nextDigestDate, weekdayLabel } from "./next-digest";
+import { nextDigestAt, timeZoneOptions, weekdayLabel } from "./next-digest";
 
-describe("nextDigestDate", () => {
-  it("aynı gündeyse bir sonraki haftayı verir", () => {
-    // 2026-10-19 Pazartesi
-    const next = nextDigestDate("MONDAY", new Date(2026, 9, 19));
-    expect(next.getFullYear()).toBe(2026);
-    expect(next.getMonth()).toBe(9);
-    expect(next.getDate()).toBe(26);
+describe("nextDigestAt", () => {
+  // 2026-10-19 Pazartesi 12:30 UTC (İstanbul 15:30)
+  const monday = new Date("2026-10-19T12:30:00Z");
+
+  it("haftalık: bugünün saati geçtiyse bir sonraki haftaya", () => {
+    const next = nextDigestAt({ frequency: "WEEKLY", day: "MONDAY", hour: 9, timeZone: "Europe/Istanbul" }, monday);
+    expect(next?.toISOString()).toBe("2026-10-26T06:00:00.000Z");
   });
 
-  it("hafta içinde ilerideki günü bulur", () => {
-    // 2026-10-19 Pazartesi -> Cuma 23 Ekim
-    expect(nextDigestDate("FRIDAY", new Date(2026, 9, 19)).getDate()).toBe(23);
-    // Pazar -> 25 Ekim
-    expect(nextDigestDate("SUNDAY", new Date(2026, 9, 19)).getDate()).toBe(25);
+  it("haftalık: hafta içindeki ilk gün ve saat", () => {
+    const next = nextDigestAt({ frequency: "WEEKLY", day: "FRIDAY", hour: 8, timeZone: "Europe/Istanbul" }, monday);
+    expect(next?.toISOString()).toBe("2026-10-23T05:00:00.000Z");
   });
 
-  it("ay sonunu aşar", () => {
-    // 2026-10-30 Cuma -> Salı 3 Kasım
-    const next = nextDigestDate("TUESDAY", new Date(2026, 9, 30));
-    expect(next.getMonth()).toBe(10);
-    expect(next.getDate()).toBe(3);
+  it("günlük: aynı gün saat henüz gelmediyse bugün, kullanıcının saat diliminde", () => {
+    const next = nextDigestAt({ frequency: "DAILY", day: "MONDAY", hour: 18, timeZone: "Europe/Istanbul" }, monday);
+    expect(next?.toISOString()).toBe("2026-10-19T15:00:00.000Z");
+    const ny = nextDigestAt({ frequency: "DAILY", day: "MONDAY", hour: 8, timeZone: "America/New_York" }, monday);
+    expect(ny?.toISOString()).toBe("2026-10-20T12:00:00.000Z");
+  });
+
+  it("aylık: ayın 1'i", () => {
+    const next = nextDigestAt({ frequency: "MONTHLY", day: "MONDAY", hour: 8, timeZone: "Europe/Istanbul" }, monday);
+    expect(next?.toISOString()).toBe("2026-11-01T05:00:00.000Z");
+  });
+
+  it("geçersiz saat diliminde null", () => {
+    expect(nextDigestAt({ frequency: "DAILY", day: "MONDAY", hour: 8, timeZone: "Mars/Olympus" }, monday)).toBeNull();
+  });
+});
+
+describe("timeZoneOptions", () => {
+  it("listede olmayan mevcut değeri başa ekler", () => {
+    const zones = timeZoneOptions("Etc/Unknown");
+    expect(zones[0]).toBe("Etc/Unknown");
+    expect(zones).toContain("Europe/Istanbul");
   });
 });
 

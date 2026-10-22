@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, Loader2, Search } from "lucide-react";
+import { Download, FolderOpen, Loader2, Search, ShieldAlert, X } from "lucide-react";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { DebtType } from "@/shared/types/debt.types";
 import { Chip, ChipGroup } from "@/shared/ui/Chip";
@@ -8,6 +8,8 @@ import { Field } from "@/shared/ui/Field";
 import { tagColor } from "@/shared/ui/TagBadge";
 import { cn } from "@/shared/ui/cn";
 import type { ExportFormat } from "../api/debts.types";
+
+export type ExportChoice = ExportFormat | "pdf";
 
 export const DEBT_STATUSES = ["open", "resolved", "ignored", ""] as const;
 export type DebtStatusFilter = (typeof DEBT_STATUSES)[number];
@@ -43,7 +45,8 @@ interface DebtFilterBarProps {
   onStatusChange: (status: DebtStatusFilter) => void;
 
   exportPending: boolean;
-  onExport: (format: ExportFormat) => void;
+  /** "pdf" yazdırmaya uygun rapor sayfasını açar; diğerleri dosya indirir */
+  onExport: (format: ExportChoice) => void;
 
   /** git blame yazarları; boşsa yazar süzgeci gizlenir. */
   authors?: ReadonlyArray<string>;
@@ -52,10 +55,24 @@ interface DebtFilterBarProps {
   /** 0 = her yaş */
   olderThanDays?: number;
   onOlderThanDaysChange?: (days: number) => void;
+  /** "" = her öncelik */
+  priority?: string;
+  onPriorityChange?: (priority: string) => void;
+  /** Yalnızca yorumunda sır bulunanlar */
+  secretOnly?: boolean;
+  onSecretOnlyChange?: (value: boolean) => void;
+  /** NOTE/DOC/INFO hariç */
+  debtOnly?: boolean;
+  onDebtOnlyChange?: (value: boolean) => void;
+  /** Hotspot haritasından gelen dosya/klasör süzgeci; yalnızca kaldırılabilir */
+  path?: string;
+  onClearPath?: () => void;
 }
 
 /** Yaş süzgeci seçenekleri (gün); 0 = her yaş. 90+ gün "çürüyen" borçlardır. */
-export const AGE_OPTIONS = [0, 30, 90, 180, 365] as const;
+export const AGE_OPTIONS: readonly number[] = [0, 30, 90, 180, 365];
+
+export const PRIORITY_OPTIONS = ["CRITICAL", "HIGH", "MEDIUM", "LOW"] as const;
 
 const SELECT =
   "min-h-11 cursor-pointer rounded-pill border border-hm-border bg-hm-bg px-4 font-mono text-[13px] font-bold text-hm-text-primary";
@@ -97,7 +114,18 @@ export function DebtFilterBar(props: DebtFilterBarProps) {
     onAuthorChange,
     olderThanDays = 0,
     onOlderThanDaysChange,
+    priority = "",
+    onPriorityChange,
+    secretOnly = false,
+    onSecretOnlyChange,
+    debtOnly = false,
+    onDebtOnlyChange,
+    path = "",
+    onClearPath,
   } = props;
+
+  // URL'den gelen, listede olmayan yaş da seçili görünsün
+  const ageOptions = AGE_OPTIONS.includes(olderThanDays) ? AGE_OPTIONS : [...AGE_OPTIONS, olderThanDays];
 
   const useRepoChips = repos.length <= MAX_REPO_CHIPS;
 
@@ -128,7 +156,7 @@ export function DebtFilterBar(props: DebtFilterBarProps) {
             {t("debts.export")}
           </summary>
           <div className="absolute right-0 z-20 mt-1.5 flex w-36 flex-col rounded-[14px] border border-hm-border bg-hm-surface p-2 shadow-[6px_6px_0_var(--hm-border)]">
-            {(["csv", "json", "sarif"] as ExportFormat[]).map((format) => (
+            {(["csv", "json", "sarif", "pdf"] as ExportChoice[]).map((format) => (
               <button
                 key={format}
                 type="button"
@@ -224,13 +252,48 @@ export function DebtFilterBar(props: DebtFilterBarProps) {
               onChange={(event) => onOlderThanDaysChange(Number(event.target.value))}
               className={SELECT}
             >
-              {AGE_OPTIONS.map((days) => (
+              {ageOptions.map((days) => (
                 <option key={days} value={days}>
                   {days === 0 ? t("debts.filter.anyAge") : t("debts.filter.olderThan", { days })}
                 </option>
               ))}
             </select>
           </label>
+        )}
+
+        {onPriorityChange && (
+          <label className="flex items-center">
+            <span className="sr-only">{t("debts.filter.priority")}</span>
+            <select value={priority} onChange={(event) => onPriorityChange(event.target.value)} className={SELECT}>
+              <option value="">{t("debts.filter.anyPriority")}</option>
+              {PRIORITY_OPTIONS.map((value) => (
+                <option key={value} value={value}>
+                  {t(`debts.priority.${value}` as const)}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+
+        {onDebtOnlyChange && (
+          <Chip pressed={debtOnly} onClick={() => onDebtOnlyChange(!debtOnly)}>
+            {t("debts.filter.debtOnly")}
+          </Chip>
+        )}
+
+        {onSecretOnlyChange && (
+          <Chip pressed={secretOnly} onClick={() => onSecretOnlyChange(!secretOnly)}>
+            <ShieldAlert size={14} aria-hidden="true" />
+            {t("debts.filter.secret")}
+          </Chip>
+        )}
+
+        {path && onClearPath && (
+          <Chip pressed onClick={onClearPath} aria-label={t("debts.filter.clearPath", { path })} title={path}>
+            <FolderOpen size={14} aria-hidden="true" />
+            <span className="max-w-[260px] truncate font-mono">{path}</span>
+            <X size={14} aria-hidden="true" />
+          </Chip>
         )}
 
         {onAuthorChange && (authors.length > 0 || author) && (

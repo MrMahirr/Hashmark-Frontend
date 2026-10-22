@@ -210,7 +210,20 @@ function DetailBody({ debt }: { debt: Debt }) {
           <MetaRow label={t("debts.detail.detected")}>{formatDate(debt.createdAt)}</MetaRow>
           {debt.resolvedAt && <MetaRow label={t("debts.detail.resolved")}>{formatDate(debt.resolvedAt)}</MetaRow>}
           {debt.priority && (
-            <MetaRow label={t("debts.detail.priority")}>{t(`debts.priority.${debt.priority}` as const)}</MetaRow>
+            <MetaRow label={t("debts.detail.priority")}>
+              {t(`debts.priority.${debt.priority}` as const)}
+              {debt.priorityAuto && (
+                <span className="text-hm-text-secondary" title={t("debts.priority.autoHint")}>
+                  {" "}
+                  ({t("debts.priority.auto")})
+                </span>
+              )}
+            </MetaRow>
+          )}
+          {debt.secretDetected && (
+            <MetaRow label={t("debts.secret.label")}>
+              <span className="text-hm-danger">{t("debts.secret.detail")}</span>
+            </MetaRow>
           )}
           {debt.dueDate && <MetaRow label={t("debts.detail.due")}>{formatDate(debt.dueDate)}</MetaRow>}
           {debt.issueRef && <MetaRow label={t("debts.detail.issue")}>{debt.issueRef}</MetaRow>}

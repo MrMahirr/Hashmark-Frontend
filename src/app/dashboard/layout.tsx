@@ -21,12 +21,13 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="h-full flex overflow-hidden relative">
+    // Yazdırırken (PDF rapor) sabit yükseklik ve kaydırma kalkar, yoksa yalnızca ilk sayfa basılır
+    <div className="h-full flex overflow-hidden relative print:block print:h-auto print:overflow-visible">
       <Sidebar />
       <main
         id="main-content"
         tabIndex={-1}
-        className="flex-1 flex flex-col h-full overflow-y-auto md:ml-[240px] bg-hm-bg focus:outline-none"
+        className="flex-1 flex flex-col h-full overflow-y-auto md:ml-[240px] bg-hm-bg focus:outline-none print:ml-0 print:h-auto print:overflow-visible"
       >
         {children}
       </main>

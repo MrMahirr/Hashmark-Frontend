@@ -105,4 +105,22 @@ describe("useDashboardOverview", () => {
     expect(result.current.stats.activeDebts).toBe(15);
     expect(result.current.stats.activeRepos).toBe(3);
   });
+
+  it("sunucu ağırlıklı borç verirse not ondan hesaplanır", async () => {
+    mockData({ todoCount: 10, fixmeCount: 0, hackCount: 0, xxxCount: 0, noteCount: 0, docCount: 0, infoCount: 0 });
+    vi.mocked(getReportSummary).mockResolvedValue({
+      labelStats: { todoCount: 10, fixmeCount: 0, hackCount: 0, xxxCount: 0 },
+      trendData: [],
+      topModules: [],
+      insights: { weightedDebt: 40, staleCount: 3 },
+    } as never);
+
+    const { result } = renderHook(() => useDashboardOverview(), { wrapper });
+    await waitFor(() => expect(result.current.insights).not.toBeNull());
+
+    // 10 borç sayısı yerine 40 ağırlıklı borç: 100 - 60
+    expect(result.current.healthScore).toBe(40);
+    expect(result.current.grade).toBe("C");
+    expect(result.current.insights?.staleCount).toBe(3);
+  });
 });

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Heading, Mono } from "./Typography";
 import { Panel } from "./Panel";
 import { cn } from "./cn";
@@ -7,6 +8,8 @@ interface StatCardProps {
   value: string | number;
   badgeText?: string;
   badgeType?: "good" | "high" | "neutral";
+  /** Değerin altında açıklama veya bağlantı (ör. süzülmüş borç listesine). */
+  footer?: ReactNode;
 }
 
 const NOTE_TONE = {
@@ -16,7 +19,7 @@ const NOTE_TONE = {
 } as const;
 
 /** KPI paneli: etiket, serif 56 px değer ve mono not. */
-export function StatCard({ title, value, badgeText, badgeType = "neutral" }: StatCardProps) {
+export function StatCard({ title, value, badgeText, badgeType = "neutral", footer }: StatCardProps) {
   return (
     <Panel className="flex flex-col gap-3 px-6 py-[22px]">
       <span className="text-[15px] text-hm-text-secondary">{title}</span>
@@ -26,6 +29,7 @@ export function StatCard({ title, value, badgeText, badgeType = "neutral" }: Sta
         </Heading>
         {badgeText && <Mono className={cn("text-xs", NOTE_TONE[badgeType])}>{badgeText}</Mono>}
       </span>
+      {footer && <div className="text-[13px] text-hm-text-secondary">{footer}</div>}
     </Panel>
   );
 }

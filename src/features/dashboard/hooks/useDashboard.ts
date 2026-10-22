@@ -1,8 +1,8 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { keepPreviousData, useQuery, useMutation } from "@tanstack/react-query";
 import { queryKeys } from "@/shared/api/query-keys";
 import { queryConfig } from "@/shared/config/query.config";
 import { distributePercentages } from "@/shared/utils/percentages";
-import { getReportSummary, sendTestReport } from "../api/dashboard.api";
+import { getHotspots, getRepoComparison, getReportSummary, sendTestReport } from "../api/dashboard.api";
 import { calculateHealth } from "../utils/health";
 import { useDebtStats } from "@/features/debts/hooks/useDebts";
 import { useMappedRepos } from "@/features/repos/hooks/useRepos";
@@ -65,10 +65,12 @@ export function useDashboardOverview(repoId?: string) {
     .sort(([a], [b]) => a.localeCompare(b));
   const customCnt = customCounts.reduce((sum, [, count]) => sum + count, 0);
 
-  // Etiket istatistiği henüz gelmediyse (ilk yükleme) toplam borç sayısı kullanılır.
   // Sağlık hesabında TODO, FIXME, HACK, XXX ve `.hashmark.yml` özel etiketleri penalize edilir;
-  // NOTE, DOC, INFO edilmez.
-  const penalizableDebts = labelStats ? todoCnt + fixmeCnt + hackCnt + xxxCnt + customCnt : totalDebts;
+  // NOTE, DOC, INFO edilmez. Sunucu ağırlıklı borcu (etiket × öncelik) verirse o kullanılır,
+  // yoksa borç sayısı; etiket istatistiği henüz gelmediyse (ilk yükleme) toplam borç sayısı.
+  const insights = summary?.insights ?? null;
+  const penalizableDebts =
+    insights?.weightedDebt ?? (labelStats ? todoCnt + fixmeCnt + hackCnt + xxxCnt + customCnt : totalDebts);
   const { score: healthScore, grade } = calculateHealth(penalizableDebts);
 
   const trendData: TrendDataPoint[] = summary?.trendData?.map((t) => ({
@@ -119,11 +121,32 @@ export function useDashboardOverview(repoId?: string) {
     trendData,
     labelDistribution,
     moduleDistribution,
+    insights,
     refetch: () => {
       summaryQuery.refetch();
       statsQuery.refetch();
     },
   };
+}
+
+/** Klasör ısı haritası; klasör değişirken önceki görünüm ekranda kalır. */
+export function useHotspots(repoId: string, path: string) {
+  return useQuery({
+    queryKey: queryKeys.dashboard.hotspots(repoId, path),
+    queryFn: () => getHotspots(repoId, path),
+    enabled: !!repoId,
+    staleTime: queryConfig.reportStaleTime,
+    placeholderData: keepPreviousData,
+  });
+}
+
+/** Depo karşılaştırma / liderlik tablosu verisi. */
+export function useRepoComparison() {
+  return useQuery({
+    queryKey: queryKeys.dashboard.repoComparison,
+    queryFn: getRepoComparison,
+    staleTime: queryConfig.reportStaleTime,
+  });
 }
 
 /**

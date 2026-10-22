@@ -41,6 +41,10 @@ export interface DebtResponse {
   triageStatus?: TriageStatus | string | null;
   assignee?: string | null;
   priority?: string | null;
+  /** öncelik koddan yazılmadı, anahtar kelimeden çıkarıldı */
+  priorityAuto?: boolean;
+  /** yorumda sır bulundu ve maskelendi */
+  secretDetected?: boolean;
   dueDate?: string | null;
   issueRef?: string | null;
   authorLogin?: string | null;
@@ -105,6 +109,12 @@ export interface DebtFilters {
   author?: string;
   /** en az bu kadar gündür açık (yaş) */
   olderThanDays?: number;
+  /** yalnızca yorumunda sır bulunup maskelenenler */
+  secret?: boolean;
+  /** NOTE/DOC/INFO hariç (içgörü sayılarıyla aynı kapsam) */
+  debtOnly?: boolean;
+  /** dosya ya da klasör yolu (klasörse altındakiler) */
+  path?: string;
   sort?: string;
   dir?: "asc" | "desc";
   page?: number;
