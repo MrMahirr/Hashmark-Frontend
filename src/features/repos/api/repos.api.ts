@@ -91,3 +91,22 @@ export async function setAutoScan(repoId: string, enabled: boolean): Promise<Rep
   );
   return response.data;
 }
+
+/** README rozeti durumu: açıksa tahmin edilemez anahtar. Backend: dev.hashmark.badge.BadgeController.BadgeInfo */
+export interface BadgeInfo {
+  enabled: boolean;
+  token: string | null;
+}
+
+export async function getBadge(repoId: string): Promise<BadgeInfo> {
+  return (await apiClient.get<BadgeInfo>(`${ApiMethod.REPOS}/${repoId}/badge`)).data;
+}
+
+/** Rozeti açar ya da anahtarı yeniler (eski README bağlantıları çalışmaz). */
+export async function rotateBadge(repoId: string): Promise<BadgeInfo> {
+  return (await apiClient.post<BadgeInfo>(`${ApiMethod.REPOS}/${repoId}/badge`)).data;
+}
+
+export async function disableBadge(repoId: string): Promise<void> {
+  await apiClient.delete(`${ApiMethod.REPOS}/${repoId}/badge`);
+}

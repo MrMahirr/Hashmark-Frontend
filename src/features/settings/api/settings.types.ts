@@ -13,6 +13,9 @@ export type NotifyDay =
   | "SATURDAY"
   | "SUNDAY";
 
+/** Özet sıklığı: haftalık `notifyDay` günü, aylık ayın 1'i. */
+export type DigestFrequency = "DAILY" | "WEEKLY" | "MONTHLY";
+
 // ── Response Types ──
 
 /**
@@ -30,6 +33,15 @@ export interface SettingsResponse {
   hourlyRate?: number | null;
   /** ISO 4217 (TRY, USD, EUR, GBP) */
   currency?: string | null;
+  digestFrequency?: DigestFrequency | string;
+  /** 0–23, `digestTimezone` içinde */
+  digestHour?: number;
+  /** IANA saat dilimi */
+  digestTimezone?: string;
+  /** Açık borç eşiği (depo başına); null = uyarı kapalı */
+  alertMaxOpen?: number | null;
+  /** Yeni sızan sır bulununca uyarı */
+  alertOnSecret?: boolean;
 }
 
 // ── Request Types ──
@@ -48,4 +60,10 @@ export interface UpdateSettingsRequest {
   /** 0 = ücreti kaldır */
   hourlyRate?: number;
   currency?: string;
+  digestFrequency?: DigestFrequency;
+  digestHour?: number;
+  digestTimezone?: string;
+  /** 0 = eşik uyarısı kapalı */
+  alertMaxOpen?: number;
+  alertOnSecret?: boolean;
 }
