@@ -21,6 +21,8 @@ export enum ApiEndpoint {
   // Report
   SUMMARY = "summary",
   SEND_TEST = "send-test",
+  HOTSPOTS = "hotspots",
+  REPO_COMPARISON = "repos",
 
   // User
   ME = "me",

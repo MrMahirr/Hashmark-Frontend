@@ -26,6 +26,10 @@ export interface SettingsResponse {
   digestLabels?: string[];
   /** Özetin gönderileceği alternatif adres; boş/null = GitHub e-postası */
   digestEmail?: string | null;
+  /** Teknik borç maliyeti için saatlik ücret; null = ayarlanmadı */
+  hourlyRate?: number | null;
+  /** ISO 4217 (TRY, USD, EUR, GBP) */
+  currency?: string | null;
 }
 
 // ── Request Types ──
@@ -41,4 +45,7 @@ export interface UpdateSettingsRequest {
   digestLabels?: string[];
   /** Boş string = GitHub e-postasını kullan */
   digestEmail?: string;
+  /** 0 = ücreti kaldır */
+  hourlyRate?: number;
+  currency?: string;
 }

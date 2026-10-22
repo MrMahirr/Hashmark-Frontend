@@ -2,13 +2,14 @@
 
 import { Fragment, useEffect, useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { ArrowDown, ArrowUp, ArrowUpDown, ExternalLink, Eye, GitPullRequestArrow } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, ExternalLink, Eye, GitPullRequestArrow, ShieldAlert } from "lucide-react";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import type { MessageKey } from "@/shared/i18n";
 import { DebtStatus, type Debt } from "@/shared/types/debt.types";
 import { TagBadge } from "@/shared/ui/TagBadge";
 import { cn } from "@/shared/ui/cn";
 import { buildIssueUrl } from "../utils/issue-url";
+import { STALE_DAYS, debtAgeDays } from "../utils/debt-age";
 
 /** Bu sayıdan fazla satır varsa yalnızca görünür satırlar DOM'a basılır. */
 export const VIRTUALIZE_THRESHOLD = 40;
@@ -66,6 +67,55 @@ function StatusChip({ debt }: { debt: Debt }) {
   return null;
 }
 
+const URGENT_PRIORITIES = new Set(["CRITICAL", "HIGH"]);
+
+/** Açık borçta sızan sır ve kritik/yüksek öncelik işaretleri. */
+function InsightChips({ debt }: { debt: Debt }) {
+  const { t } = useI18n();
+  if (debt.status === DebtStatus.RESOLVED) return null;
+  return (
+    <>
+      {debt.secretDetected && (
+        <span
+          title={t("debts.secret.hint")}
+          className="ml-1.5 inline-flex items-center gap-1 rounded-[6px] border border-hm-danger bg-hm-danger-bg px-1.5 py-px align-middle font-mono text-[11px] font-bold text-hm-danger"
+        >
+          <ShieldAlert size={12} aria-hidden="true" />
+          {t("debts.secret.label")}
+        </span>
+      )}
+      {debt.priority && URGENT_PRIORITIES.has(debt.priority) && (
+        <span
+          title={debt.priorityAuto ? t("debts.priority.autoHint") : undefined}
+          className="ml-1.5 inline-block rounded-[6px] border border-hm-warning bg-hm-warning-bg px-1.5 py-px font-mono text-[11px] font-bold text-hm-warning"
+        >
+          {t(`debts.priority.${debt.priority}` as const)}
+          {debt.priorityAuto && <span className="sr-only"> ({t("debts.priority.auto")})</span>}
+        </span>
+      )}
+    </>
+  );
+}
+
+/** Tarih; 90+ gündür açık borçta "çürüyen" işareti. */
+function DebtDate({ debt }: { debt: Debt }) {
+  const { t, formatDate } = useI18n();
+  const age = debt.status === DebtStatus.ACTIVE ? debtAgeDays(debt) : null;
+  return (
+    <>
+      <span className="font-mono text-[13px] text-hm-text-secondary">{formatDate(debt.createdAt)}</span>
+      {age !== null && age >= STALE_DAYS && (
+        <span
+          title={t("debts.stale.hint", { days: age })}
+          className="ml-2 inline-block rounded-[6px] border border-hm-danger px-1.5 py-px font-mono text-[11px] font-bold text-hm-danger"
+        >
+          {t("debts.stale.label", { days: age })}
+        </span>
+      )}
+    </>
+  );
+}
+
 function FileLink({ debt }: { debt: Debt }) {
   const text = `${debt.filePath}:${debt.lineNumber}`;
   if (!debt.permalink) {
@@ -112,7 +162,7 @@ export function DebtTable({
   onOpenDetails,
   emptyMessage,
 }: DebtTableProps) {
-  const { t, formatDate } = useI18n();
+  const { t } = useI18n();
   const scrollRef = useRef<HTMLDivElement>(null);
   const selectAllRef = useRef<HTMLInputElement>(null);
 
@@ -202,6 +252,7 @@ export function DebtTable({
         <td className="whitespace-nowrap px-4 align-middle">
           <TagBadge tag={debt.type} />
           <StatusChip debt={debt} />
+          <InsightChips debt={debt} />
         </td>
         {showRepoColumn && (
           <td className="px-4 align-middle">
@@ -224,7 +275,7 @@ export function DebtTable({
           </span>
         </td>
         <td className="whitespace-nowrap px-4 align-middle">
-          <span className="font-mono text-[13px] text-hm-text-secondary">{formatDate(debt.createdAt)}</span>
+          <DebtDate debt={debt} />
         </td>
         <td className="px-2 align-middle">
           <div className="flex items-center justify-end">
@@ -348,6 +399,7 @@ export function DebtTable({
                   </label>
                   <TagBadge tag={debt.type} />
                   <StatusChip debt={debt} />
+                  <InsightChips debt={debt} />
                 </div>
                 <button
                   type="button"
@@ -361,7 +413,7 @@ export function DebtTable({
               <p className="m-0 break-words text-[15px]">{debt.message}</p>
               <FileLink debt={debt} />
               <p className="m-0 font-mono text-xs text-hm-text-secondary">
-                {owner ?? t("common.dash")} · {formatDate(debt.createdAt)}
+                {owner ?? t("common.dash")} · <DebtDate debt={debt} />
               </p>
             </li>
           );

@@ -17,6 +17,8 @@ export const queryKeys = {
   },
   dashboard: {
     summary: (repoId?: string) => ["dashboard", "summary", repoId] as const,
+    hotspots: (repoId: string, path: string) => ["dashboard", "hotspots", repoId, path] as const,
+    repoComparison: ["dashboard", "repo-comparison"] as const,
   },
   scanner: {
     status: (repoId: string) => ["scanner", "status", repoId] as const,

@@ -18,11 +18,11 @@ import type {
  */
 
 /** Boş/undefined değerleri atar; backend yalnızca anlamlı parametreleri görür. */
-export function buildDebtParams(filters: DebtFilters = {}): Record<string, string | number> {
-  const params: Record<string, string | number> = {};
+export function buildDebtParams(filters: DebtFilters = {}): Record<string, string | number | boolean> {
+  const params: Record<string, string | number | boolean> = {};
   for (const [key, value] of Object.entries(filters)) {
-    if (value === undefined || value === null || value === "") continue;
-    params[key] = value as string | number;
+    if (value === undefined || value === null || value === "" || value === false) continue;
+    params[key] = value as string | number | boolean;
   }
   return params;
 }

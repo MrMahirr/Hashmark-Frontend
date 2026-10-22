@@ -6,6 +6,8 @@ import { LazyTrendChart } from "./LazyCharts";
 import { LabelDistribution } from "./LabelDistribution";
 import { RecentDebts } from "./RecentDebts";
 import { OnboardingChecklist } from "./OnboardingChecklist";
+import { DebtInsights } from "./DebtInsights";
+import { RepoComparison } from "./RepoComparison";
 import { useDashboardOverview } from "../hooks/useDashboard";
 import { useMappedDebts } from "@/features/debts/hooks/useDebts";
 import { useI18n } from "@/shared/i18n/I18nProvider";
@@ -24,6 +26,9 @@ export function DashboardOverviewContent() {
     stats,
     trendData,
     labelDistribution,
+    insights,
+    grade,
+    healthScore,
     refetch: refetchOverview,
   } = useDashboardOverview();
 
@@ -77,6 +82,8 @@ export function DashboardOverviewContent() {
         <StatCard title={t("dashboard.stat.repos")} value={stats.activeRepos} />
       </div>
 
+      {insights && <DebtInsights insights={insights} grade={grade} healthScore={healthScore} />}
+
       {/* Grafik + etikete göre */}
       <div className="flex flex-wrap items-start gap-4">
         <div className="min-w-0 flex-[2_1_460px]">
@@ -86,6 +93,8 @@ export function DashboardOverviewContent() {
           <LabelDistribution data={labelDistribution} />
         </div>
       </div>
+
+      <RepoComparison />
 
       {/* Table: Recent Debts */}
       <RecentDebts debts={debtsData?.content || []} />

@@ -10,15 +10,21 @@ import { useStartScan } from "@/features/scanner/hooks/useScanner";
 import { ScanProgress } from "@/features/scanner/components/ScanProgress";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { Button } from "@/shared/ui/Button";
+import type { DebtLinkFilters } from "../utils/debt-links";
+
+interface DebtsPageContentProps {
+  /** URL'den gelen başlangıç süzgeçleri */
+  initialFilters?: DebtLinkFilters;
+}
 
 /**
  * SRP & Client Boundary:
  * Tüm teknik borçların listelendiği sayfa: depo seçimi, tarama tetikleme ve canlı tarama durumu.
  * Filtreleme/arama/sıralama/sayfalama `DebtExplorer` içindedir.
  */
-export function DebtsPageContent() {
+export function DebtsPageContent({ initialFilters = {} }: DebtsPageContentProps) {
   const { t } = useI18n();
-  const [selectedRepo, setSelectedRepo] = useState("");
+  const [selectedRepo, setSelectedRepo] = useState(initialFilters.repoId ?? "");
 
   const { data: repos } = useMappedRepos();
   const { data: stats } = useDebtStats(selectedRepo || undefined);
@@ -66,6 +72,7 @@ export function DebtsPageContent() {
             repos={repos?.map((repo) => ({ id: repo.id, name: repo.fullName, debtCount: repo.debtCount })) ?? []}
             selectedRepo={selectedRepo}
             onRepoChange={setSelectedRepo}
+            initialFilters={initialFilters}
           />
         </div>
       </div>

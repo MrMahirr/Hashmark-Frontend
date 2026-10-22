@@ -1,7 +1,7 @@
 import { apiClient } from "@/shared/api/client";
 import { ApiMethod } from "@/shared/api/methods";
 import { ApiEndpoint } from "@/shared/api/endpoints";
-import type { ReportSummaryResponse } from "./dashboard.types";
+import type { HotspotResponse, ReportSummaryResponse, RepoInsightsRowDto } from "./dashboard.types";
 
 /**
  * SRP (Single Responsibility Principle) ve DIP (Dependency Inversion Principle):
@@ -23,6 +23,20 @@ export async function getReportSummary(repoId?: string): Promise<ReportSummaryRe
       params: { repoId } 
     }
   );
+  return response.data;
+}
+
+/** Bir deponun klasör/dosya ısı haritası; `path` boşsa depo kökü. */
+export async function getHotspots(repoId: string, path = ""): Promise<HotspotResponse> {
+  const response = await apiClient.get<HotspotResponse>(`${ApiMethod.REPORT}/${ApiEndpoint.HOTSPOTS}`, {
+    params: { repoId, path: path || undefined },
+  });
+  return response.data;
+}
+
+/** İzlenen her depo için içgörüler (depo karşılaştırma tablosu). */
+export async function getRepoComparison(): Promise<RepoInsightsRowDto[]> {
+  const response = await apiClient.get<RepoInsightsRowDto[]>(`${ApiMethod.REPORT}/${ApiEndpoint.REPO_COMPARISON}`);
   return response.data;
 }
 

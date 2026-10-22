@@ -43,6 +43,10 @@ export interface Debt {
   /** Etkin atanan: elle atama veya koddaki TODO(kisi). */
   assignee: string | null;
   priority: DebtPriority | null;
+  /** Öncelik anahtar kelimeden (security, crash...) çıkarıldı */
+  priorityAuto?: boolean;
+  /** Yorumda sır bulundu ve maskelendi */
+  secretDetected?: boolean;
   dueDate: string | null;
   issueRef: string | null;
   /** git blame (en iyi çaba) */

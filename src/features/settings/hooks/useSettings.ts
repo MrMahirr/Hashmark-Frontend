@@ -35,6 +35,8 @@ export function useUpdateSettings() {
       queryClient.invalidateQueries({
         queryKey: queryKeys.settings.current,
       });
+      // Saatlik ücret gösterge panelindeki tahmini maliyeti değiştirir
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     },
   });
 }

@@ -179,4 +179,31 @@ describe("DebtTable", () => {
 
     expect(await axeViolations(container)).toEqual([]);
   });
+
+  it("açık borçta sır, acil öncelik ve çürüme işaretlerini gösterir; çözülmüşte göstermez", async () => {
+    const old = new Date(Date.now() - 120 * 24 * 60 * 60 * 1000).toISOString();
+    const recent = new Date().toISOString();
+    const { within, container } = setup([
+      makeDebt(0, { secretDetected: true, priority: "CRITICAL", priorityAuto: true, introducedAt: old }),
+      makeDebt(1, { priority: "LOW", createdAt: recent }),
+      makeDebt(2, {
+        secretDetected: true,
+        priority: "HIGH",
+        introducedAt: old,
+        status: DebtStatus.RESOLVED,
+        resolvedAt: recent,
+      }),
+    ]);
+
+    const rows = within.getAllByRole("row").slice(1);
+    expect(rows[0]).toHaveTextContent("Sır");
+    expect(rows[0]).toHaveTextContent("Kritik (otomatik)");
+    expect(rows[0]).toHaveTextContent("120 gün");
+    expect(rows[1]).not.toHaveTextContent("Düşük");
+    expect(rows[1]).not.toHaveTextContent(" gün");
+    expect(rows[2]).not.toHaveTextContent("Sır");
+    expect(rows[2]).not.toHaveTextContent("Yüksek");
+    expect(rows[2]).not.toHaveTextContent("120 gün");
+    expect(await axeViolations(container)).toEqual([]);
+  });
 });
