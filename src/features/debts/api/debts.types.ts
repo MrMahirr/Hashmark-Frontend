@@ -113,6 +113,8 @@ export interface DebtFilters {
   secret?: boolean;
   /** NOTE/DOC/INFO hariç (içgörü sayılarıyla aynı kapsam) */
   debtOnly?: boolean;
+  /** dosya ya da klasör yolu (klasörse altındakiler) */
+  path?: string;
   sort?: string;
   dir?: "asc" | "desc";
   page?: number;

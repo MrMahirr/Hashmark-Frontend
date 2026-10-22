@@ -58,6 +58,7 @@ export function DebtExplorer({
   const [priority, setPriority] = useState<string>(initialFilters.priority ?? "");
   const [secretOnly, setSecretOnly] = useState(initialFilters.secret ?? false);
   const [debtOnly, setDebtOnly] = useState(initialFilters.debtOnly ?? false);
+  const [path, setPath] = useState(initialFilters.path ?? "");
   const [selectedIds, setSelectedIds] = useState<ReadonlySet<string>>(new Set());
   const [detail, setDetail] = useState<Debt | null>(null);
 
@@ -75,12 +76,13 @@ export function DebtExplorer({
       priority: priority || undefined,
       secret: secretOnly || undefined,
       debtOnly: debtOnly || undefined,
+      path: path || undefined,
       sort,
       dir,
       page,
       size,
     }),
-    [repoId, label, status, debouncedSearch, author, olderThanDays, priority, secretOnly, debtOnly, sort, dir, page, size]
+    [repoId, label, status, debouncedSearch, author, olderThanDays, priority, secretOnly, debtOnly, path, sort, dir, page, size]
   );
 
   const { data, isLoading, isFetching, isError, refetch } = useMappedDebts(filters, fixedRepoName);
@@ -199,6 +201,11 @@ export function DebtExplorer({
         debtOnly={debtOnly}
         onDebtOnlyChange={(value) => {
           setDebtOnly(value);
+          resetView();
+        }}
+        path={path}
+        onClearPath={() => {
+          setPath("");
           resetView();
         }}
       />

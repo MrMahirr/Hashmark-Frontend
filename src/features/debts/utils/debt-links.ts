@@ -7,10 +7,13 @@ export interface DebtLinkFilters {
   priority?: DebtPriority;
   secret?: boolean;
   debtOnly?: boolean;
+  /** Dosya ya da klasör yolu (hotspot haritasından) */
+  path?: string;
 }
 
 const PRIORITIES: readonly string[] = ["CRITICAL", "HIGH", "MEDIUM", "LOW"];
 const MAX_AGE_DAYS = 36_500;
+const MAX_PATH_LENGTH = 500;
 
 export const DEBTS_PATH = "/dashboard/debts";
 
@@ -22,6 +25,7 @@ export function buildDebtsHref(filters: DebtLinkFilters = {}): string {
   if (filters.priority) params.set("priority", filters.priority);
   if (filters.secret) params.set("secret", "1");
   if (filters.debtOnly) params.set("debtOnly", "1");
+  if (filters.path) params.set("path", filters.path);
   const query = params.toString();
   return query ? `${DEBTS_PATH}?${query}` : DEBTS_PATH;
 }
@@ -51,5 +55,8 @@ export function parseDebtLinkFilters(params: Record<string, SearchParamValue>): 
 
   if (flag(params.secret)) result.secret = true;
   if (flag(params.debtOnly)) result.debtOnly = true;
+
+  const path = first(params.path)?.trim().replace(/^\/+|\/+$/g, "");
+  if (path && path.length <= MAX_PATH_LENGTH) result.path = path;
   return result;
 }

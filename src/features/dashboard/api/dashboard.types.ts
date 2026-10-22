@@ -75,6 +75,49 @@ export interface ReportSummaryResponse {
   insights?: DebtInsightsDto;
 }
 
+/** Isı haritası öğesi. Backend: dev.hashmark.report.dto.HotspotResponse.Node */
+export interface HotspotNodeDto {
+  name: string;
+  /** Depo köküne göre tam yol */
+  path: string;
+  directory: boolean;
+  debts: number;
+  weightedDebt: number;
+  staleCount: number;
+  /** Klasörse altındaki borçlu dosya sayısı */
+  files: number;
+}
+
+/**
+ * GET /report/hotspots?repoId=&path=
+ * Backend DTO karşılığı: dev.hashmark.report.dto.HotspotResponse
+ */
+export interface HotspotResponse {
+  /** "" = depo kökü */
+  path: string;
+  debts: number;
+  weightedDebt: number;
+  staleCount: number;
+  children: HotspotNodeDto[];
+  /** 50'den fazla alt öğe varsa gösterilmeyenlerin sayısı */
+  hiddenChildren: number;
+  topFiles: HotspotNodeDto[];
+  /** Çok büyük depoda sayılar eksik olabilir */
+  truncated: boolean;
+}
+
+/**
+ * GET /report/repos
+ * Backend DTO karşılığı: dev.hashmark.report.dto.RepoInsightsRow
+ */
+export interface RepoInsightsRowDto {
+  repoId: number;
+  fullName: string;
+  /** Hiç taranmadıysa null */
+  lastScannedAt: string | null;
+  insights: DebtInsightsDto;
+}
+
 // ── Request Types ──
 // Sadece GET isteği yapıldığından (Query Params üzerinden filtreleme olabildiğinden)
 // ekstra bir JSON body tipine şu an için ihtiyaç yoktur.

@@ -4,7 +4,7 @@ import React from "react";
 import { useParams } from "next/navigation";
 import { RepoHeader } from "./RepoHeader";
 import { RepoStatsRow } from "./RepoStatsRow";
-import { RepoModuleDistribution } from "./RepoModuleDistribution";
+import { HotspotMap } from "./HotspotMap";
 import { BranchSetting } from "./BranchSetting";
 import { AutoScanSetting } from "./AutoScanSetting";
 import { LazyTrendChart } from "@/features/dashboard/components/LazyCharts";
@@ -41,7 +41,6 @@ export function RepoDetailContent({ repoId: propRepoId }: RepoDetailContentProps
     stats,
     trendData,
     labelDistribution,
-    moduleDistribution,
     insights,
     grade,
     healthScore,
@@ -75,13 +74,6 @@ export function RepoDetailContent({ repoId: propRepoId }: RepoDetailContentProps
   repo.debtCount = stats.totalDebts;
   repo.resolvedCount = stats.resolvedDebts;
 
-  const totalModuleDebts = moduleDistribution.reduce((acc, curr) => acc + curr.count, 0);
-  const formattedModules = moduleDistribution.map((m) => ({
-    name: m.module || t("repos.modules.root"),
-    count: m.count,
-    percentage: totalModuleDebts > 0 ? Math.round((m.count / totalModuleDebts) * 100) : 0,
-  }));
-
   const addedThisWeek = trendData.length > 0 ? trendData[trendData.length - 1].added : 0;
 
   return (
@@ -111,11 +103,7 @@ export function RepoDetailContent({ repoId: propRepoId }: RepoDetailContentProps
         </div>
       </div>
 
-      <div className="flex flex-wrap items-start gap-4">
-        <div className="min-w-0 flex-[1_1_320px]">
-          <RepoModuleDistribution data={formattedModules} />
-        </div>
-      </div>
+      <HotspotMap repoId={repoId} repoName={repoDto.fullName} />
 
       <DebtExplorer fixedRepoId={repoId} fixedRepoName={repoDto.fullName} />
     </div>

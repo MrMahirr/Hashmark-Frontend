@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, Loader2, Search, ShieldAlert } from "lucide-react";
+import { Download, FolderOpen, Loader2, Search, ShieldAlert, X } from "lucide-react";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { DebtType } from "@/shared/types/debt.types";
 import { Chip, ChipGroup } from "@/shared/ui/Chip";
@@ -61,6 +61,9 @@ interface DebtFilterBarProps {
   /** NOTE/DOC/INFO hariç */
   debtOnly?: boolean;
   onDebtOnlyChange?: (value: boolean) => void;
+  /** Hotspot haritasından gelen dosya/klasör süzgeci; yalnızca kaldırılabilir */
+  path?: string;
+  onClearPath?: () => void;
 }
 
 /** Yaş süzgeci seçenekleri (gün); 0 = her yaş. 90+ gün "çürüyen" borçlardır. */
@@ -114,6 +117,8 @@ export function DebtFilterBar(props: DebtFilterBarProps) {
     onSecretOnlyChange,
     debtOnly = false,
     onDebtOnlyChange,
+    path = "",
+    onClearPath,
   } = props;
 
   // URL'den gelen, listede olmayan yaş da seçili görünsün
@@ -277,6 +282,14 @@ export function DebtFilterBar(props: DebtFilterBarProps) {
           <Chip pressed={secretOnly} onClick={() => onSecretOnlyChange(!secretOnly)}>
             <ShieldAlert size={14} aria-hidden="true" />
             {t("debts.filter.secret")}
+          </Chip>
+        )}
+
+        {path && onClearPath && (
+          <Chip pressed onClick={onClearPath} aria-label={t("debts.filter.clearPath", { path })} title={path}>
+            <FolderOpen size={14} aria-hidden="true" />
+            <span className="max-w-[260px] truncate font-mono">{path}</span>
+            <X size={14} aria-hidden="true" />
           </Chip>
         )}
 

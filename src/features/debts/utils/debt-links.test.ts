@@ -17,6 +17,13 @@ describe("debt-links", () => {
     });
   });
 
+  it("dosya/klasör yolu taşınır, baştaki/sondaki eğik çizgi atılır", () => {
+    expect(buildDebtsHref({ path: "src/a b" })).toBe("/dashboard/debts?path=src%2Fa+b");
+    expect(parseDebtLinkFilters({ path: "/src/api/" })).toEqual({ path: "src/api" });
+    expect(parseDebtLinkFilters({ path: "/" })).toEqual({});
+    expect(parseDebtLinkFilters({ path: "x".repeat(501) })).toEqual({});
+  });
+
   it("süzgeç yoksa düz bağlantı", () => {
     expect(buildDebtsHref()).toBe("/dashboard/debts");
   });

@@ -1,8 +1,8 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { keepPreviousData, useQuery, useMutation } from "@tanstack/react-query";
 import { queryKeys } from "@/shared/api/query-keys";
 import { queryConfig } from "@/shared/config/query.config";
 import { distributePercentages } from "@/shared/utils/percentages";
-import { getReportSummary, sendTestReport } from "../api/dashboard.api";
+import { getHotspots, getRepoComparison, getReportSummary, sendTestReport } from "../api/dashboard.api";
 import { calculateHealth } from "../utils/health";
 import { useDebtStats } from "@/features/debts/hooks/useDebts";
 import { useMappedRepos } from "@/features/repos/hooks/useRepos";
@@ -127,6 +127,26 @@ export function useDashboardOverview(repoId?: string) {
       statsQuery.refetch();
     },
   };
+}
+
+/** Klasör ısı haritası; klasör değişirken önceki görünüm ekranda kalır. */
+export function useHotspots(repoId: string, path: string) {
+  return useQuery({
+    queryKey: queryKeys.dashboard.hotspots(repoId, path),
+    queryFn: () => getHotspots(repoId, path),
+    enabled: !!repoId,
+    staleTime: queryConfig.reportStaleTime,
+    placeholderData: keepPreviousData,
+  });
+}
+
+/** Depo karşılaştırma / liderlik tablosu verisi. */
+export function useRepoComparison() {
+  return useQuery({
+    queryKey: queryKeys.dashboard.repoComparison,
+    queryFn: getRepoComparison,
+    staleTime: queryConfig.reportStaleTime,
+  });
 }
 
 /**
