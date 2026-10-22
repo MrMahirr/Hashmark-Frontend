@@ -6,9 +6,10 @@ vi.mock("../api/repos.api", () => ({
   getBadge: vi.fn(),
   rotateBadge: vi.fn(),
   disableBadge: vi.fn(),
+  setPublicPage: vi.fn(),
 }));
 
-import { disableBadge, getBadge, rotateBadge } from "../api/repos.api";
+import { disableBadge, getBadge, rotateBadge, setPublicPage } from "../api/repos.api";
 import { axeViolations, renderWithQuery } from "@/test/helpers";
 import { BadgeSetting, badgeUrls } from "./BadgeSetting";
 
@@ -34,8 +35,8 @@ describe("BadgeSetting", () => {
   });
 
   it("kapalıyken etkinleştirir, açıkken Markdown gösterir ve kapatır", async () => {
-    vi.mocked(getBadge).mockResolvedValue({ enabled: false, token: null });
-    vi.mocked(rotateBadge).mockResolvedValue({ enabled: true, token: TOKEN });
+    vi.mocked(getBadge).mockResolvedValue({ enabled: false, token: null, publicPage: false });
+    vi.mocked(rotateBadge).mockResolvedValue({ enabled: true, token: TOKEN, publicPage: false });
     vi.mocked(disableBadge).mockResolvedValue();
     const user = userEvent.setup();
     const { container } = renderWithQuery(<BadgeSetting repoId="7" />);
@@ -54,9 +55,28 @@ describe("BadgeSetting", () => {
     expect(await screen.findByRole("button", { name: "Rozeti etkinleştir" })).toBeInTheDocument();
   });
 
+  it("herkese açık sayfa açılınca rozet ona bağlanır; özel depoda uyarı", async () => {
+    vi.mocked(getBadge).mockResolvedValue({ enabled: true, token: TOKEN, publicPage: false });
+    vi.mocked(setPublicPage).mockResolvedValue({ enabled: true, token: TOKEN, publicPage: true });
+    const user = userEvent.setup();
+    renderWithQuery(<BadgeSetting repoId="7" isPrivate />);
+
+    expect(await screen.findByText(/Bu özel bir depo/)).toBeInTheDocument();
+    const toggle = screen.getByRole("switch", { name: "Herkese açık skor sayfası" });
+    expect(toggle).toHaveAttribute("aria-checked", "false");
+    await user.click(toggle);
+
+    await waitFor(() => expect(setPublicPage).toHaveBeenCalledWith("7", true));
+    expect(await screen.findByRole("link", { name: "Sayfayı aç ↗" })).toHaveAttribute(
+      "href",
+      expect.stringMatching(new RegExp(`/p/${TOKEN}$`)),
+    );
+    expect((screen.getByLabelText("Markdown") as HTMLTextAreaElement).value).toMatch(new RegExp(`\\(.*/p/${TOKEN}\\)$`));
+  });
+
   it("bağlantıyı yenilemek onay ister", async () => {
-    vi.mocked(getBadge).mockResolvedValue({ enabled: true, token: TOKEN });
-    vi.mocked(rotateBadge).mockResolvedValue({ enabled: true, token: "n".repeat(43) });
+    vi.mocked(getBadge).mockResolvedValue({ enabled: true, token: TOKEN, publicPage: false });
+    vi.mocked(rotateBadge).mockResolvedValue({ enabled: true, token: "n".repeat(43), publicPage: false });
     const user = userEvent.setup();
     renderWithQuery(<BadgeSetting repoId="7" />);
 

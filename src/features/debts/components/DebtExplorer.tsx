@@ -10,6 +10,7 @@ import { ErrorState } from "@/shared/ui/StateViews";
 import { useBulkTriage, useCreateDebtIssues, useDebtAuthors, useExportDebts, useMappedDebts } from "../hooks/useDebts";
 import type { DebtFilters } from "../api/debts.types";
 import type { DebtLinkFilters } from "../utils/debt-links";
+import { buildReportHref } from "../utils/report-filters";
 import { DebtBulkBar } from "./DebtBulkBar";
 import { DebtDetailDialog } from "./DebtDetailDialog";
 import { DebtFilterBar, type DebtStatusFilter, type RepoOption } from "./DebtFilterBar";
@@ -176,7 +177,13 @@ export function DebtExplorer({
           resetView();
         }}
         exportPending={exporter.isPending}
-        onExport={(format) => exporter.mutate({ filters, format })}
+        onExport={(format) => {
+          if (format === "pdf") {
+            window.open(buildReportHref(filters, { print: true }), "_blank", "noopener");
+          } else {
+            exporter.mutate({ filters, format });
+          }
+        }}
         authors={authors.data ?? []}
         author={author}
         onAuthorChange={(value) => {

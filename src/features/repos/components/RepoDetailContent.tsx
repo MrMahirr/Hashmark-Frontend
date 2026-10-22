@@ -95,7 +95,7 @@ export function RepoDetailContent({ repoId: propRepoId }: RepoDetailContentProps
 
       <AutoScanSetting repoId={repoId} enabled={repo.autoScan ?? false} />
 
-      <BadgeSetting repoId={repoId} />
+      <BadgeSetting repoId={repoId} isPrivate={repoDto.isPrivate} />
 
       <div className="flex flex-wrap items-start gap-4">
         <div className="min-w-0 flex-[2_1_460px]">

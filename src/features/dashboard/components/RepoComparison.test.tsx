@@ -58,7 +58,8 @@ describe("RepoComparison", () => {
     vi.mocked(getRepoComparison).mockReset();
   });
 
-  it("en sağlıklı depo önde, taranmamış depo sonda; başlıkla sıralanır", async () => {
+  // Tablo + axe denetimi; tüm paket paralel koşarken 5 sn sınırına yaklaşıyor
+  it("en sağlıklı depo önde, taranmamış depo sonda; başlıkla sıralanır", { timeout: 20_000 }, async () => {
     vi.mocked(getRepoComparison).mockResolvedValue(ROWS);
     const user = userEvent.setup();
     const { container } = renderWithQuery(<RepoComparison />);

@@ -8,30 +8,36 @@ import { useI18n } from "@/shared/i18n/I18nProvider";
 import { useToastStore } from "@/shared/store/toast.store";
 import { Button } from "@/shared/ui/Button";
 import { Panel } from "@/shared/ui/Panel";
-import { disableBadge, getBadge, rotateBadge } from "../api/repos.api";
+import { Switch } from "@/shared/ui/Switch";
+import { disableBadge, getBadge, rotateBadge, setPublicPage } from "../api/repos.api";
 
 interface BadgeSettingProps {
   repoId: string;
+  /** Özel depoda herkese açık sayfa depo adını gösterir: uyarı */
+  isPrivate?: boolean;
 }
 
 /**
  * Rozet adresleri. API kökü göreli olabilir ("/api/v1"); README'ye mutlak adres gerekir, sayfanın kökeniyle
  * tamamlanır.
  */
-export function badgeUrls(token: string, apiBase: string, origin: string) {
+export function badgeUrls(token: string, apiBase: string, origin: string, publicPage = false) {
   const base = new URL(apiBase.endsWith("/") ? apiBase : `${apiBase}/`, origin);
   const svg = new URL(`public/badge/${token}.svg`, base).toString();
   const json = new URL(`public/badge/${token}.json`, base).toString();
+  const page = `${origin}/p/${token}`;
   return {
     svg,
     json,
-    markdown: `[![Hashmark](${svg})](${origin})`,
+    page,
+    // Herkese açık sayfa açıksa rozet ona bağlanır
+    markdown: `[![Hashmark](${svg})](${publicPage ? page : origin})`,
     shields: `https://img.shields.io/endpoint?url=${encodeURIComponent(json)}`,
   };
 }
 
 /** README rozeti: aç, Markdown'ı kopyala, anahtarı yenile ya da kapat. */
-export function BadgeSetting({ repoId }: BadgeSettingProps) {
+export function BadgeSetting({ repoId, isPrivate = false }: BadgeSettingProps) {
   const { t } = useI18n();
   const addToast = useToastStore((state) => state.addToast);
   const queryClient = useQueryClient();
@@ -47,16 +53,22 @@ export function BadgeSetting({ repoId }: BadgeSettingProps) {
     },
     onError: () => addToast({ title: t("badge.failed"), type: "error" }),
   });
+  const togglePage = useMutation({
+    mutationFn: (enabled: boolean) => setPublicPage(repoId, enabled),
+    onSuccess: (info) => queryClient.setQueryData(key, info),
+    onError: () => addToast({ title: t("badge.failed"), type: "error" }),
+  });
   const disable = useMutation({
     mutationFn: () => disableBadge(repoId),
-    onSuccess: () => queryClient.setQueryData(key, { enabled: false, token: null }),
+    onSuccess: () => queryClient.setQueryData(key, { enabled: false, token: null, publicPage: false }),
     onError: () => addToast({ title: t("badge.failed"), type: "error" }),
   });
 
   const token = badge.data?.enabled ? badge.data.token : null;
+  const publicPage = badge.data?.publicPage ?? false;
   const urls =
     token && typeof window !== "undefined"
-      ? badgeUrls(token, apiClient.defaults.baseURL ?? "", window.location.origin)
+      ? badgeUrls(token, apiClient.defaults.baseURL ?? "", window.location.origin, publicPage)
       : null;
 
   const copy = async (text: string) => {
@@ -113,6 +125,34 @@ export function BadgeSetting({ repoId }: BadgeSettingProps) {
               <button type="button" onClick={() => copy(urls.shields)} className="cursor-pointer font-semibold underline">
                 {t("badge.copyShields")}
               </button>
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 border-t border-hm-border pt-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <Switch
+                checked={publicPage}
+                disabled={togglePage.isPending}
+                onCheckedChange={(value) => togglePage.mutate(value)}
+                aria-label={t("badge.publicPage")}
+                aria-describedby={`badge-page-desc-${repoId}`}
+              />
+              <span className="text-sm font-semibold text-hm-text-primary" aria-hidden="true">
+                {t("badge.publicPage")}
+              </span>
+              {publicPage && (
+                <a
+                  href={urls.page}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono text-xs text-hm-text-secondary underline hover:text-hm-acc"
+                >
+                  {t("badge.openPage")}
+                </a>
+              )}
+            </div>
+            <p id={`badge-page-desc-${repoId}`} className="m-0 text-xs text-hm-text-secondary">
+              {t("badge.publicPageHint")}
+              {isPrivate && <span className="text-hm-warning"> {t("badge.publicPagePrivate")}</span>}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3 border-t border-hm-border pt-4">

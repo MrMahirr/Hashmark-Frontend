@@ -9,6 +9,8 @@ import { tagColor } from "@/shared/ui/TagBadge";
 import { cn } from "@/shared/ui/cn";
 import type { ExportFormat } from "../api/debts.types";
 
+export type ExportChoice = ExportFormat | "pdf";
+
 export const DEBT_STATUSES = ["open", "resolved", "ignored", ""] as const;
 export type DebtStatusFilter = (typeof DEBT_STATUSES)[number];
 
@@ -43,7 +45,8 @@ interface DebtFilterBarProps {
   onStatusChange: (status: DebtStatusFilter) => void;
 
   exportPending: boolean;
-  onExport: (format: ExportFormat) => void;
+  /** "pdf" yazdırmaya uygun rapor sayfasını açar; diğerleri dosya indirir */
+  onExport: (format: ExportChoice) => void;
 
   /** git blame yazarları; boşsa yazar süzgeci gizlenir. */
   authors?: ReadonlyArray<string>;
@@ -153,7 +156,7 @@ export function DebtFilterBar(props: DebtFilterBarProps) {
             {t("debts.export")}
           </summary>
           <div className="absolute right-0 z-20 mt-1.5 flex w-36 flex-col rounded-[14px] border border-hm-border bg-hm-surface p-2 shadow-[6px_6px_0_var(--hm-border)]">
-            {(["csv", "json", "sarif"] as ExportFormat[]).map((format) => (
+            {(["csv", "json", "sarif", "pdf"] as ExportChoice[]).map((format) => (
               <button
                 key={format}
                 type="button"
