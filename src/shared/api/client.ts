@@ -58,6 +58,8 @@ export const zustandAuthProvider: AuthProvider = {
   },
   onConsentRequired: () => {
     if (typeof window !== "undefined" && window.location.pathname !== "/consent") {
+      // axios önleyicisi React dışında çalışır (router yok); tam sayfa geçişi önbelleği de temizler
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
       window.location.assign("/consent");
     }
   },
