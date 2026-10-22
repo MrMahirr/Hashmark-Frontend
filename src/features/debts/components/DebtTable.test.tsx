@@ -155,8 +155,9 @@ describe("DebtTable", () => {
     expect(few.table.querySelectorAll("tbody tr")).toHaveLength(VIRTUALIZE_THRESHOLD);
     few.unmount();
 
-    // jsdom'da yerleşim yok: kaydırma alanına 600px yükseklik ver
-    const sizes = { offsetWidth: 1000, offsetHeight: 600 };
+    // jsdom'da yerleşim yok: kaydırma alanına 600px yükseklik ver. virtual-core 3.19.6'dan beri alan
+    // `clientWidth/clientHeight` ile ölçülüyor (önce `offset*`); ikisi de taklit edilir.
+    const sizes = { offsetWidth: 1000, offsetHeight: 600, clientWidth: 1000, clientHeight: 600 };
     const originals = Object.entries(sizes).map(([prop, value]) => {
       const descriptor = Object.getOwnPropertyDescriptor(HTMLElement.prototype, prop);
       Object.defineProperty(HTMLElement.prototype, prop, { configurable: true, get: () => value });
